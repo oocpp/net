@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6"/>
+	<Project>
+		<Option title="net"/>
+		<Option makefile_is_custom="1"/>
+		<Option compiler="gcc"/>
+		<Option virtualFolders="CMake Files\;"/>
+		<Build>
+			<Target title="all">
+				<Option working_dir="/home/lg/Code/net/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 all"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="rebuild_cache">
+				<Option working_dir="/home/lg/Code/net/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 rebuild_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="edit_cache">
+				<Option working_dir="/home/lg/Code/net/cmake-build-debug"/>
+				<Option type="4"/>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 edit_cache"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="net">
+				<Option output="/home/lg/Code/net/cmake-build-debug/net" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/lg/Code/net/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/6"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
+					<Add directory="/usr/include/c++/6/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 net"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+			<Target title="net/fast">
+				<Option output="/home/lg/Code/net/cmake-build-debug/net" prefix_auto="0" extension_auto="0"/>
+				<Option working_dir="/home/lg/Code/net/cmake-build-debug"/>
+				<Option object_output="./"/>
+				<Option type="1"/>
+				<Option compiler="gcc"/>
+				<Compiler>
+					<Add directory="/usr/include/c++/6"/>
+					<Add directory="/usr/include/x86_64-linux-gnu/c++/6"/>
+					<Add directory="/usr/include/c++/6/backward"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include"/>
+					<Add directory="/usr/local/include"/>
+					<Add directory="/usr/lib/gcc/x86_64-linux-gnu/6/include-fixed"/>
+					<Add directory="/usr/include/x86_64-linux-gnu"/>
+					<Add directory="/usr/include"/>
+				</Compiler>
+				<MakeCommands>
+					<Build command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 net/fast"/>
+					<CompileFile command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 &quot;$file&quot;"/>
+					<Clean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+					<DistClean command="/usr/bin/make -j2 -f &quot;/home/lg/Code/net/cmake-build-debug/Makefile&quot;  VERBOSE=1 clean"/>
+				</MakeCommands>
+			</Target>
+		</Build>
+		<Unit filename="/home/lg/Code/net/Acceptor.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Acceptor.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Buffer.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Buffer.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/CallBack.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Client.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Client.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Connector.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Connector.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Epoll.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Epoll.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/EventLoop.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/EventLoop.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/EventLoopThread.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/EventLoopThread.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/EventLoopThreadPool.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/EventLoopThreadPool.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/InetAddress.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/InetAddress.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Log.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Server.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Server.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Socket.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/Socket.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/TcpConnection.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/TcpConnection.h">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/main.cpp">
+			<Option target="net"/>
+		</Unit>
+		<Unit filename="/home/lg/Code/net/CMakeLists.txt">
+			<Option virtualFolder="CMake Files\"/>
+		</Unit>
+	</Project>
+</CodeBlocks_project_file>
