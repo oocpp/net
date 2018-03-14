@@ -7,9 +7,7 @@
 
 namespace net{
 
-    EventBase &TcpSession::getEventBase() {
-        //return static_cast<EventBase&>(*this);
-    }
+
 
 
     TcpSession::TcpSession(int sockfd, const InetAddress &localAddr, const InetAddress &peerAddr)

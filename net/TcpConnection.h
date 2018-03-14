@@ -20,7 +20,7 @@ namespace net{
 
         TcpSession(int sockfd,const InetAddress&localAddr,const InetAddress&peerAddr);
 
-        EventBase&getEventBase();
+        //EventBase&getEventBase();
 
         void setIter(std::list<std::unique_ptr<TcpSession>>::iterator iter){
             _iter=iter;

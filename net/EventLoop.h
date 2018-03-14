@@ -19,12 +19,11 @@ namespace net {
 
     class EventLoop final {
     public:
-        EventLoop();
-        ~EventLoop();
+        EventLoop()noexcept;
+        ~EventLoop()noexcept;
 
         EventLoop(const EventLoop &) = delete;
         EventLoop &operator==(const EventLoop &)= delete;
-
 
         void add(std::shared_ptr<TcpConnection> &acc);
 
@@ -38,9 +37,10 @@ namespace net {
 
         void stop();
 
+        void init();
+
     private:
-        std::mutex _mu;
-        std::condition_variable _cv;
+        int _fd_pair[2];
         std::atomic<bool> _is_looping;
         Epoll _loop;
     };

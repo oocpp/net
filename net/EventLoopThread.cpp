@@ -1,19 +1,19 @@
 //
 // Created by lg on 17-4-21.
 //
-
+#include<functional>
 #include"EventLoopThread.h"
 
 namespace  net
 {
-    EventLoopThread::~EventLoopThread() {
+    EventLoopThread::~EventLoopThread()noexcept {
         if(_th.joinable()){
             _loop.stop();
             _th.join();
         }
     }
 
-    EventLoopThread::EventLoopThread() {
+    EventLoopThread::EventLoopThread()noexcept{
 
     }
 
@@ -22,7 +22,7 @@ namespace  net
     }
 
     void EventLoopThread::run() {
-        _loop.run();
+        _th=std::thread(&EventLoop::run,&_loop);
     }
 
     void EventLoopThread::stop() {

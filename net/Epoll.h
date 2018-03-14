@@ -5,11 +5,8 @@
 #pragma once
 
 #include <vector>
-#include<map>
 #include <sys/epoll.h>
 #include <cstdint>
-#include "Socket.h"
-#include "Epoll.h"
 
 struct epoll_event;
 
@@ -22,15 +19,13 @@ struct epoll_event;
 //EPOLLONESHOT：只监听一次事件，当监听完这次事件之后，如果还需要继续监听这个socket的话，需要再次把这个socket加入到EPOLL队列里
 
 namespace net{
-    class EventBase;
-
     class Epoll {
     public:
-        Epoll();
-        ~Epoll();
+        Epoll()noexcept ;
+        ~Epoll()noexcept;
 
         void eventAdd(int fd,epoll_event event);
-        void eventDel(int fd,epoll_event event);
+        void eventDel(int fd);
         void eventUpdate(int fd,epoll_event event);
         const std::vector<epoll_event> & wait(int timeout);
 
@@ -38,6 +33,8 @@ namespace net{
         static constexpr EventType NONE=0;
         static constexpr EventType READ=EPOLLIN|EPOLLPRI;
         static constexpr EventType WRITE=EPOLLOUT;
+
+        void init();
 
     private:
         int _epollfd;

@@ -2,19 +2,20 @@
 // Created by lg on 17-4-21.
 //
 
+#include <sys/socket.h>
+#include <unistd.h>
 #include "EventLoop.h"
 
 #include "Log.h"
 #include "EventLoopThread.h"
 #include "Acceptor.h"
-#include "Connector.h"
+#include "Socket.h"
 
 namespace net {
-    EventLoop::EventLoop(){}
-
-
-    EventLoop::~EventLoop() {
-
+    EventLoop::~EventLoop()noexcept {
+        _loop.eventDel(_fd_pair[1]);
+        Socket::close(_fd_pair[0]);
+        Socket::close(_fd_pair[1]);
     }
 
     void EventLoop::add(std::unique_ptr<Accepter> &acc) {
@@ -35,12 +36,32 @@ namespace net {
 
     void EventLoop::run() {
         while(_is_looping){
-
+            _loop.wait(-1);
         }
     }
 
     void EventLoop::stop() {
         _is_looping=false;
+        ::write(_fd_pair[0],"A",1);
+    }
+
+    void EventLoop::init() {
+        _loop.init();
+
+        if(socketpair(AF_LOCAL, SOCK_STREAM, 0, _fd_pair)== -1)
+        {
+            LOG_ERROR<<"socket pair 失败";
+        }
+
+        epoll_event e;
+        e.events=Epoll::READ;
+        _loop.eventAdd(_fd_pair[1],e);
+
+        _is_looping=true;
+    }
+
+    EventLoop::EventLoop()noexcept:_is_looping(false),_fd_pair{-1,-1} {
+
     }
 
 

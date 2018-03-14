@@ -3,22 +3,18 @@
 //
 
 #include <sys/epoll.h>
-#include "Epoll.h"
 #include <unistd.h>
+#include "Epoll.h"
 #include "Log.h"
 
 namespace net
 {
-    Epoll::Epoll()
-        :_epollfd(::epoll_create1(EPOLL_CLOEXEC))
+    Epoll::Epoll()noexcept
+        :_epollfd(-1)
         ,_old_size(init_event_vector_size){
-
-        if(_epollfd<0){
-            LOG_ERROR<<"epoll 失败";
-        }
     }
 
-    Epoll::~Epoll() {
+    Epoll::~Epoll()noexcept {
         ::close(_epollfd);
     }
 
@@ -31,8 +27,8 @@ namespace net
         }
     }
 
-    void Epoll::eventDel(int fd,epoll_event event) {
-
+    void Epoll::eventDel(int fd) {
+        epoll_event event;
         if (::epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &event) < 0)
         {
             LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_DEL"<< " fd =" << fd;
@@ -77,5 +73,12 @@ namespace net
         }
 
         return _events;
+    }
+
+    void Epoll::init() {
+        _epollfd=::epoll_create1(EPOLL_CLOEXEC);
+        if(_epollfd<0){
+            LOG_ERROR<<"epoll 失败";
+        }
     }
 }

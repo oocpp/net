@@ -9,8 +9,8 @@ namespace net {
 
     class EventLoopThread {
     public:
-        EventLoopThread();
-        ~EventLoopThread();
+        EventLoopThread()noexcept;
+        ~EventLoopThread()noexcept;
         EventLoopThread(const EventLoopThread&)=delete;
 
         void run();
