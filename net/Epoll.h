@@ -6,9 +6,6 @@
 
 #include <vector>
 #include <sys/epoll.h>
-#include <cstdint>
-
-struct epoll_event;
 
 //EPOLLIN ：表示对应的文件描述符可以读（包括对端SOCKET正常关闭）；
 //EPOLLOUT：表示对应的文件描述符可以写；

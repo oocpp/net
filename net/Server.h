@@ -3,16 +3,21 @@
 //
 
 #pragma once
-#include<memory>
-#include<set>
-#include<map>
-#include"TcpConnection.h"
+
+#include"EventLoopThreadPool.h"
+
 
 namespace net{
+    class EventLoop;
+
     class Server {
+    public:
+        Server();
 
+        void run();
     private:
-
+        EventLoop*_loop_ptr;
+        EventLoopThreadPool _pool;
     };
 
 }

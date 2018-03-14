@@ -7,14 +7,9 @@
 #include <atomic>
 #include "Epoll.h"
 #include<memory>
-#include<condition_variable>
-#include<mutex>
 
 namespace net {
-
-
     class Accepter;
-
     class TcpConnection;
 
     class EventLoop final {

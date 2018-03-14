@@ -3,27 +3,26 @@
 //
 
 #pragma once
-
 #include "EventLoopThread.h"
-#include"Connector.h"
-#include"Acceptor.h"
 #include<vector>
+#include <cstddef>
 
 namespace net{
 
+    class EventLoop;
+
     class EventLoopThreadPool {
     public:
-        EventLoopThreadPool(size_t threadNum=1):_threads(threadNum),_loop_index(0){
+        EventLoopThreadPool(size_t threadNum=0);
 
-        }
-
-        void start();
+        void run();
         void stop();
         void join();
 
-        void add(Accepter&acc);
-        void add(Connector&conn);
+        EventLoop&getNextLoop();
     private:
+        size_t nextLoopIndex();
+
         std::vector<EventLoopThread>_threads;
         size_t _loop_index;
     };

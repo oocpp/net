@@ -2,7 +2,6 @@
 // Created by lg on 17-4-19.
 //
 
-#include <sys/epoll.h>
 #include <unistd.h>
 #include "Epoll.h"
 #include "Log.h"

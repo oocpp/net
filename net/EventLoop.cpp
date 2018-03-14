@@ -36,7 +36,9 @@ namespace net {
 
     void EventLoop::run() {
         while(_is_looping){
+            LOG_TRACE<<"looping"<<std::endl;
             _loop.wait(-1);
+            LOG_TRACE<<"loop stop"<<std::endl;
         }
     }
 
