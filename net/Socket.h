@@ -10,60 +10,32 @@
 namespace net {
     class InetAddress;
 
-    class Socket final
+    namespace Socket
     {
-    private:
-
-    public:
-        explicit Socket(int _sockfd)
-                : _sockfd(_sockfd)
-        {}
-
-        explicit Socket(sa_family_t family=AF_INET);
-
-        ~Socket();
-        int getSockFd() const { return _sockfd; }
+        int createNonblockingSocket(sa_family_t family=AF_INET);
+        void setNonBlockAndCloseOnExec(int sockfd);
 
 
-        static int createNonblocking(sa_family_t family);
-        static void setNonBlockAndCloseOnExec(int sockfd);
+        void bind(int sockfd,const InetAddress& localaddr);
 
+        void listen(int sockfd,int backlog=SOMAXCONN);
 
-        static void bind(int sockfd,const InetAddress& localaddr);
+        int connect(int sockfd,const InetAddress& localaddr);
 
-        static  void listen(int sockfd);
+        int accept(int sockfd,InetAddress &peeraddr);
 
-        static int connect(int sockfd,const InetAddress& localaddr);
+        void close(int sockfd);
 
-        static int accept(int sockfd,InetAddress &peeraddr);
+        int getSocketError(int sockfd);
 
-        static void close(int sockfd);
-
-        static int getSocketError(int sockfd)
-        {
-            int optval;
-            socklen_t optlen = static_cast<socklen_t>(sizeof optval);
-
-            if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
-            {
-                return errno;
-            }
-            else
-            {
-                return optval;
-            }
-        }
-
-        bool getTcpInfo(struct tcp_info*) const;
-        bool getTcpInfoString(char* buf, int len) const;
+        bool getTcpInfo(struct tcp_info*) ;
+        bool getTcpInfoString(char* buf, int len) ;
 
         //getPeerAddr
         //getLocalAddr
 
         void shutdownWrite();
 
-    private:
-        int _sockfd;
     };
 }
 

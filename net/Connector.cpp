@@ -10,19 +10,19 @@
 namespace net {
 
     Connector::Connector(const InetAddress &peerAddr)
-    :_tcp_ptr(std::make_unique<TcpSession>(peerAddr)){
+    :_tcp_ptr(std::make_unique<TcpConnection>(peerAddr)){
         connect(peerAddr);
     }
 
-    std::unique_ptr<TcpSession> net::Connector::getTcpSession() {
+    std::unique_ptr<TcpConnection> net::Connector::getTcpSession() {
        return std::move(_tcp_ptr);
     }
 
-    void Connector::setConnectedCallBack(const std::function<void(std::unique_ptr<TcpSession> &)> &cb) {
+    void Connector::setConnectedCallBack(const std::function<void(std::unique_ptr<TcpConnection> &)> &cb) {
 
     }
 
-    void Connector::setConnectedCallBack(std::function<void(std::unique_ptr<TcpSession> &)> &&cb) {
+    void Connector::setConnectedCallBack(std::function<void(std::unique_ptr<TcpConnection> &)> &&cb) {
         _tcp_ptr->setWriteCallback(std::move(cb));
     }
 

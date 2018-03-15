@@ -10,21 +10,21 @@ namespace net{
 
 
 
-    TcpSession::TcpSession(int sockfd, const InetAddress &localAddr, const InetAddress &peerAddr)
+    TcpConnection::TcpConnection(int sockfd, const InetAddress &localAddr, const InetAddress &peerAddr)
     :_sockfd(sockfd)
     ,_local_addr(localAddr)
     ,_peer_addr(peerAddr){
 
     }
 
-    TcpSession::TcpSession(const InetAddress &peerAddr)
+    TcpConnection::TcpConnection(const InetAddress &peerAddr)
     :_sockfd(peerAddr.getfamily())
     ,_peer_addr(peerAddr)
     {
 
     }
 
-    void TcpSession::close() {
+    void TcpConnection::close() {
         if(_tcp_state==TcpState::GOOD)
             _tcp_state=TcpState::CLOSING;
     }

@@ -5,26 +5,30 @@
 #pragma once
 #include <functional>
 #include <memory>
+#include "Socket.h"
+#include"InetAddress.h"
 
 
 namespace net{
 
-    class TcpSession;
+    class TcpConnection;
     class InetAddress;
 
     class Accepter {
     public:
         Accepter(const InetAddress&addr);
+        ~Accepter();
 
-        void setNewConnectedCallBack(std::function<void(TcpSession&)>&cb){
-
-        }
-        void setNewConnectedCallBack(std::function<void(TcpSession&)>&&cb){
-            std::move(cb);
+        void setNewConnectedCallBack(std::function<void(TcpConnection&)>&cb){
+            _new_connection_cb=cb;
         }
 
-        std::unique_ptr<TcpSession>  getTcpSession();
+        void listen(int backlog=SOMAXCONN);
+        void accept();
+        void stop();
     private:
-        std::unique_ptr<TcpSession>  _tcp_ptr;
+        int _fd;
+        InetAddress _addr;
+        std::function<void(TcpConnection&)>_new_connection_cb;
     };
 }

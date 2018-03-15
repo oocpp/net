@@ -13,38 +13,38 @@
 
 namespace net{
 
-    class TcpSession {
+    class TcpConnection {
     public:
 
-        explicit TcpSession(const InetAddress&peerAddr);
+        explicit TcpConnection(const InetAddress&peerAddr);
 
-        TcpSession(int sockfd,const InetAddress&localAddr,const InetAddress&peerAddr);
+        TcpConnection(int sockfd,const InetAddress&localAddr,const InetAddress&peerAddr);
 
         //EventBase&getEventBase();
 
-        void setIter(std::list<std::unique_ptr<TcpSession>>::iterator iter){
+        void setIter(std::list<std::unique_ptr<TcpConnection>>::iterator iter){
             _iter=iter;
         }
-        std::list<std::unique_ptr<TcpSession>>::iterator getIter() const{
+        std::list<std::unique_ptr<TcpConnection>>::iterator getIter() const{
             return _iter;
         }
 
         void close();
 
-        void setReadCallback(const std::function<void (std::unique_ptr<TcpSession>&)>&cb){
+        void setReadCallback(const std::function<void (std::unique_ptr<TcpConnection>&)>&cb){
             _read_cb=cb;
            // setReadable();
         }
-        void setReadCallback(std::function<void (std::unique_ptr<TcpSession>&)>&&cb){
+        void setReadCallback(std::function<void (std::unique_ptr<TcpConnection>&)>&&cb){
             _read_cb=std::move(cb);
             //setReadable();
         }
 
-        void setWriteCallback(const std::function<void (std::unique_ptr<TcpSession>&)>&cb){
+        void setWriteCallback(const std::function<void (std::unique_ptr<TcpConnection>&)>&cb){
             _write_cb=cb;
             //setWriteable();
         }
-        void setWriteCallback(std::function<void (std::unique_ptr<TcpSession>&)>&&cb){
+        void setWriteCallback(std::function<void (std::unique_ptr<TcpConnection>&)>&&cb){
             _write_cb=std::move(cb);
             //setWriteable();
         }
@@ -87,14 +87,14 @@ namespace net{
 
         TcpState _tcp_state;
 
-       std::list<std::unique_ptr<TcpSession>>::iterator _iter;
-        std::function<void (std::unique_ptr<TcpSession>&)> _read_cb;
+       std::list<std::unique_ptr<TcpConnection>>::iterator _iter;
+        std::function<void (std::unique_ptr<TcpConnection>&)> _read_cb;
 
-        std::function<void (std::unique_ptr<TcpSession>&)> _write_cb;
+        std::function<void (std::unique_ptr<TcpConnection>&)> _write_cb;
 
-        std::function<void (std::unique_ptr<TcpSession>&)> _close_cb;
-        std::function<void (std::unique_ptr<TcpSession>&)> _error_cb;
-        std::function<void (std::unique_ptr<TcpSession>&)> _write_high_level_cb;
-        std::function<void (std::unique_ptr<TcpSession>&)> _write_complete_cb;
+        std::function<void (std::unique_ptr<TcpConnection>&)> _close_cb;
+        std::function<void (std::unique_ptr<TcpConnection>&)> _error_cb;
+        std::function<void (std::unique_ptr<TcpConnection>&)> _write_high_level_cb;
+        std::function<void (std::unique_ptr<TcpConnection>&)> _write_complete_cb;
     };
 }

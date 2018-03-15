@@ -3,12 +3,25 @@
 //
 
 #include "Server.h"
-#include<thread>
+#include"Acceptor.h"
 
-net::Server::Server(EventLoop*loop,size_t threadSize):_pool(threadSize),_loop_ptr(loop) {
+namespace net {
+    Server::Server(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize) : _pool(
+            threadSize), _loop_ptr(loop) {
 
-}
+    }
 
-void net::Server::run() {
-    _pool.run();
+    void Server::run() {
+        _accepter->accept();
+        _pool.run();
+    }
+
+    void Server::init() {
+        _accepter->listen();
+    }
+
+    void Server::stop() {
+        _accepter->stop();
+        _pool.stop();
+    }
 }
