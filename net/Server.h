@@ -12,7 +12,7 @@ namespace net{
 
     class Server {
     public:
-        Server();
+        Server(EventLoop*loop,size_t threadSize=0);
 
         void run();
     private:

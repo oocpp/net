@@ -7,8 +7,11 @@ using namespace net;
 #include<thread>
 
 int main() {
-    Server s;
+    EventLoop loop;
+
+    Server s(&loop,5);
     s.run();
 
-    this_thread::sleep_for(5s);
+    //loop.run();
+    this_thread::sleep_for(3s);
 }

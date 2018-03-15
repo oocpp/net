@@ -5,7 +5,7 @@
 #include "Server.h"
 #include<thread>
 
-net::Server::Server():_pool(5),_loop_ptr(nullptr) {
+net::Server::Server(EventLoop*loop,size_t threadSize):_pool(threadSize),_loop_ptr(loop) {
 
 }
 

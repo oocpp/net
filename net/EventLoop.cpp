@@ -4,6 +4,7 @@
 
 #include <sys/socket.h>
 #include <unistd.h>
+#include <sys/eventfd.h>
 #include "EventLoop.h"
 
 #include "Log.h"
@@ -13,9 +14,19 @@
 
 namespace net {
     EventLoop::~EventLoop()noexcept {
-        _loop.eventDel(_fd_pair[1]);
-        Socket::close(_fd_pair[0]);
-        Socket::close(_fd_pair[1]);
+        _loop.eventDel(_event_fd);
+        Socket::close(_event_fd);
+    }
+
+    EventLoop::EventLoop()noexcept:_is_looping(true),_event_fd(::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC)) {
+
+        if (_event_fd < 0) {
+            LOG_ERROR << "Failed in eventfd";
+        }
+
+        epoll_event e;
+        e.events=Epoll::READ;
+        _loop.eventAdd(_event_fd,e);
     }
 
     void EventLoop::add(std::unique_ptr<Accepter> &acc) {
@@ -44,27 +55,27 @@ namespace net {
 
     void EventLoop::stop() {
         _is_looping=false;
-        ::write(_fd_pair[0],"A",1);
+        wakeup();
     }
 
-    void EventLoop::init() {
-        _loop.init();
-
-        if(socketpair(AF_LOCAL, SOCK_STREAM, 0, _fd_pair)== -1)
+    void EventLoop::wakeup()
+    {
+        uint64_t one = 1;
+        ssize_t n = ::write(_event_fd, &one, sizeof one);
+        if (n != sizeof one)
         {
-            LOG_ERROR<<"socket pair 失败";
+            LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
         }
-
-        epoll_event e;
-        e.events=Epoll::READ;
-        _loop.eventAdd(_fd_pair[1],e);
-
-        _is_looping=true;
     }
 
-    EventLoop::EventLoop()noexcept:_is_looping(false),_fd_pair{-1,-1} {
-
+    void EventLoop::handleRead()
+    {
+        uint64_t one = 1;
+        ssize_t n = ::read(_event_fd, &one, sizeof one);
+        if (n != sizeof one)
+        {
+            LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+        }
     }
-
 
 }

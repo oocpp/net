@@ -32,10 +32,10 @@ namespace net {
 
         void stop();
 
-        void init();
-
+        void handleRead();
+        void wakeup();
     private:
-        int _fd_pair[2];
+        int _event_fd;
         std::atomic<bool> _is_looping;
         Epoll _loop;
     };

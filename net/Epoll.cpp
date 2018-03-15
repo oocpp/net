@@ -9,8 +9,11 @@
 namespace net
 {
     Epoll::Epoll()noexcept
-        :_epollfd(-1)
+        :_epollfd(::epoll_create1(EPOLL_CLOEXEC))
         ,_old_size(init_event_vector_size){
+        if(_epollfd<0){
+            LOG_ERROR<<"epoll 失败";
+        }
     }
 
     Epoll::~Epoll()noexcept {
@@ -72,12 +75,5 @@ namespace net
         }
 
         return _events;
-    }
-
-    void Epoll::init() {
-        _epollfd=::epoll_create1(EPOLL_CLOEXEC);
-        if(_epollfd<0){
-            LOG_ERROR<<"epoll 失败";
-        }
     }
 }

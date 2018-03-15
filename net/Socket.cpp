@@ -15,6 +15,37 @@
 
 namespace net {
 
+    void SetKeepAlive(int fd, bool on) {
+        int optval = on ? 1 : 0;
+        int rc = ::setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE,
+                              reinterpret_cast<const char*>(&optval), static_cast<socklen_t>(sizeof optval));
+        if (rc != 0) {
+            int serrno = errno;
+            LOG_ERROR << "setsockopt(SO_KEEPALIVE) failed, errno=" << serrno << " " << strerror(serrno);
+        }
+    }
+
+    void SetReuseAddr(int fd) {
+        int optval = 1;
+        int rc = ::setsockopt(fd, SOL_SOCKET, SO_REUSEADDR,
+                              reinterpret_cast<const char*>(&optval), static_cast<socklen_t>(sizeof optval));
+        if (rc != 0) {
+            int serrno = errno;
+            LOG_ERROR << "setsockopt(SO_REUSEADDR) failed, errno=" << serrno << " " << strerror(serrno);
+        }
+    }
+
+    void SetReusePort(int fd) {
+        int optval = 1;
+        int rc = ::setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
+                              reinterpret_cast<const char*>(&optval), static_cast<socklen_t>(sizeof optval));
+        LOG_INFO << "setsockopt SO_REUSEPORT fd=" << fd << " rc=" << rc;
+        if (rc != 0) {
+            int serrno = errno;
+            LOG_ERROR << "setsockopt(SO_REUSEPORT) failed, errno=" << serrno << " " << strerror(serrno);
+        }
+    }
+
     Socket::~Socket() {
         if (::close(_sockfd) < 0) {
             LOG_TRACE << "sockets::close";
@@ -99,6 +130,10 @@ namespace net {
             LOG_ERROR << "sockets::createNonblockingOrDie";
         }
 
+
+        SetKeepAlive(sockfd,true);
+        SetReuseAddr(sockfd);
+        SetReusePort(sockfd);
         return sockfd;
     }
 
@@ -108,7 +143,6 @@ namespace net {
         int ret = ::fcntl(sockfd, F_SETFL, flags);
         // FIXME
     }
-
 
 }
 

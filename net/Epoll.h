@@ -31,8 +31,6 @@ namespace net{
         static constexpr EventType READ=EPOLLIN|EPOLLPRI;
         static constexpr EventType WRITE=EPOLLOUT;
 
-        void init();
-
     private:
         int _epollfd;
         std::vector<epoll_event> _events;

@@ -22,7 +22,6 @@ namespace  net
     }
 
     void EventLoopThread::run() {
-        _loop.init();
         _th=std::thread(&EventLoop::run,&_loop);
     }
 
