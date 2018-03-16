@@ -10,15 +10,18 @@
 #include "InetAddress.h"
 #include "Buffer.h"
 #include "Epoll.h"
+#include"EventLoop.h"
 
 namespace net{
+
+    class EventLoop;
 
     class TcpConnection {
     public:
 
         explicit TcpConnection(const InetAddress&peerAddr);
 
-        TcpConnection(int sockfd,const InetAddress&localAddr,const InetAddress&peerAddr);
+        TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&addr);
 
         //EventBase&getEventBase();
 
@@ -75,8 +78,14 @@ namespace net{
             return _tcp_state;
         }
 
+        uint64_t id()const{
+            return _id;
+        }
+
     private:
 
+        uint64_t _id;
+        EventLoop*_loop;
         int _sockfd;
         //uint32_t _eventType;
         //uint32_t _activeEventType;

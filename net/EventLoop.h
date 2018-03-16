@@ -9,8 +9,7 @@
 #include<memory>
 
 namespace net {
-    class Accepter;
-    class TcpConnection;
+    class Event;
 
     class EventLoop final {
     public:
@@ -20,13 +19,9 @@ namespace net {
         EventLoop(const EventLoop &) = delete;
         EventLoop &operator==(const EventLoop &)= delete;
 
-        void add(std::shared_ptr<TcpConnection> &acc);
-
-        void add(std::unique_ptr<Accepter> &);
-
-        void erase(std::shared_ptr<TcpConnection> &acc);
-
-        void erase(std::unique_ptr<Accepter> &);
+        void add(Event *e);
+        void update(Event* e);
+        void remove(Event* e);
 
         void run();
 

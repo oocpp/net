@@ -14,7 +14,7 @@
 
 namespace net {
     EventLoop::~EventLoop()noexcept {
-        _loop.eventDel(_event_fd);
+        _loop.remove(_event_fd);
         Socket::close(_event_fd);
     }
 
@@ -26,23 +26,7 @@ namespace net {
 
         epoll_event e;
         e.events=Epoll::READ;
-        _loop.eventAdd(_event_fd,e);
-    }
-
-    void EventLoop::add(std::unique_ptr<Accepter> &acc) {
-
-    }
-
-    void EventLoop::add(std::shared_ptr<TcpConnection> &conn) {
-
-    }
-
-    void EventLoop::erase(std::shared_ptr<TcpConnection> &acc) {
-
-    }
-
-    void EventLoop::erase(std::unique_ptr<Accepter> &) {
-
+        _loop.add(_event_fd,e);
     }
 
     void EventLoop::run() {

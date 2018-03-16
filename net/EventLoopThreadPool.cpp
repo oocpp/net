@@ -30,6 +30,6 @@ size_t net::EventLoopThreadPool::nextLoopIndex() {
     return t;
 }
 
-net::EventLoop &net::EventLoopThreadPool::getNextLoop() {
+net::EventLoop *net::EventLoopThreadPool::getNextLoop() {
     return _threads[nextLoopIndex()].getLoop();
 }

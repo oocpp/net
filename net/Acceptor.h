@@ -19,7 +19,7 @@ namespace net{
         Accepter(const InetAddress&addr);
         ~Accepter();
 
-        void setNewConnectedCallBack(std::function<void(TcpConnection&)>&cb){
+        void setNewConnectedCallBack(const std::function<void(int,InetAddress)>&cb){
             _new_connection_cb=cb;
         }
 
@@ -29,6 +29,6 @@ namespace net{
     private:
         int _fd;
         InetAddress _addr;
-        std::function<void(TcpConnection&)>_new_connection_cb;
+        std::function<void(int,InetAddress)>_new_connection_cb;
     };
 }

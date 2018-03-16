@@ -20,7 +20,7 @@ namespace net
         ::close(_epollfd);
     }
 
-    void Epoll::eventAdd(int fd,epoll_event event) {
+    void Epoll::add(int fd,epoll_event event) {
 
         if (::epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &event) < 0)
         {
@@ -29,7 +29,7 @@ namespace net
         }
     }
 
-    void Epoll::eventDel(int fd) {
+    void Epoll::remove(int fd) {
         epoll_event event;
         if (::epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &event) < 0)
         {
@@ -37,7 +37,7 @@ namespace net
         }
     }
 
-    void Epoll::eventUpdate(int fd,epoll_event event) {
+    void Epoll::update(int fd,epoll_event event) {
 
         if (::epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &event) < 0)
         {

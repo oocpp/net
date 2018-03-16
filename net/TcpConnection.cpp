@@ -10,10 +10,11 @@ namespace net{
 
 
 
-    TcpConnection::TcpConnection(int sockfd, const InetAddress &localAddr, const InetAddress &peerAddr)
+    TcpConnection::TcpConnection(uint64_t id,EventLoop*loop,int sockfd, const InetAddress &addr)
     :_sockfd(sockfd)
-    ,_local_addr(localAddr)
-    ,_peer_addr(peerAddr){
+     ,_id(id)
+     ,_loop(loop)
+    ,_local_addr(addr) {
 
     }
 

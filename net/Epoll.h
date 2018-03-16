@@ -21,9 +21,9 @@ namespace net{
         Epoll()noexcept ;
         ~Epoll()noexcept;
 
-        void eventAdd(int fd,epoll_event event);
-        void eventDel(int fd);
-        void eventUpdate(int fd,epoll_event event);
+        void add(int fd,epoll_event event);
+        void remove(int fd);
+        void update(int fd,epoll_event event);
         const std::vector<epoll_event> & wait(int timeout);
 
         typedef uint32_t EventType;

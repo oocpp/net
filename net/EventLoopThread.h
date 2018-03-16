@@ -19,7 +19,7 @@ namespace net {
 
         void join();
 
-        EventLoop &getLoop();
+        EventLoop *getLoop();
 
     private:
         std::thread _th;

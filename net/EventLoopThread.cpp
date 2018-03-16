@@ -29,7 +29,7 @@ namespace  net
         _loop.stop();
     }
 
-    EventLoop &EventLoopThread::getLoop() {
-        return _loop;
+    EventLoop *EventLoopThread::getLoop() {
+        return &_loop;
     }
 }
