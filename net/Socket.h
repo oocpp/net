@@ -12,9 +12,7 @@ namespace net {
 
     namespace Socket
     {
-        int createNonblockingSocket(sa_family_t family=AF_INET);
-        void setNonBlockAndCloseOnExec(int sockfd);
-
+        int create_nonblocking_socket(sa_family_t family = AF_INET);
 
         void bind(int sockfd,const InetAddress& localaddr);
 
@@ -26,10 +24,10 @@ namespace net {
 
         void close(int sockfd);
 
-        int getSocketError(int sockfd);
+        int get_socket_error(int sockfd);
 
-        bool getTcpInfo(struct tcp_info*) ;
-        bool getTcpInfoString(char* buf, int len) ;
+        bool get_tcp_info(struct tcp_info *) ;
+        //bool getTcpInfoString(char* buf, int len) ;
 
         //getPeerAddr
         //getLocalAddr

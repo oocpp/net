@@ -19,7 +19,7 @@ namespace net{
     }
 
     TcpConnection::TcpConnection(const InetAddress &peerAddr)
-    :_sockfd(peerAddr.getfamily())
+    :_sockfd(peerAddr.get_family())
     ,_peer_addr(peerAddr)
     {
 
@@ -28,5 +28,9 @@ namespace net{
     void TcpConnection::close() {
         if(_tcp_state==TcpState::GOOD)
             _tcp_state=TcpState::CLOSING;
+    }
+
+    void TcpConnection::attach_to_loop() {
+
     }
 }

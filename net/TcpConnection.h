@@ -23,49 +23,33 @@ namespace net{
 
         TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&addr);
 
-        //EventBase&getEventBase();
-
-        void setIter(std::list<std::unique_ptr<TcpConnection>>::iterator iter){
-            _iter=iter;
-        }
-        std::list<std::unique_ptr<TcpConnection>>::iterator getIter() const{
-            return _iter;
-        }
 
         void close();
 
-        void setReadCallback(const std::function<void (std::unique_ptr<TcpConnection>&)>&cb){
+        void set_message_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
             _read_cb=cb;
            // setReadable();
         }
-        void setReadCallback(std::function<void (std::unique_ptr<TcpConnection>&)>&&cb){
-            _read_cb=std::move(cb);
-            //setReadable();
-        }
 
-        void setWriteCallback(const std::function<void (std::unique_ptr<TcpConnection>&)>&cb){
+        void set_write_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
             _write_cb=cb;
             //setWriteable();
         }
-        void setWriteCallback(std::function<void (std::unique_ptr<TcpConnection>&)>&&cb){
-            _write_cb=std::move(cb);
-            //setWriteable();
-        }
 
-        void resetWriteCallback(){
+        void reset_write_cb(){
             _write_cb= nullptr;
             //setDisableWrite();
         }
 
-        void resetReadCallback(){
+        void reset_read_cb(){
             _read_cb= nullptr;
            // setDisableRead();
         }
 
-        void enableWrite(){
+        void enable_write(){
            // setWriteable();
         }
-        void enableRead(){
+        void enable_read(){
             //setReadable();
         }
 
@@ -78,10 +62,12 @@ namespace net{
             return _tcp_state;
         }
 
-        uint64_t id()const{
+        uint64_t get_id()const{
             return _id;
         }
 
+        void attach_to_loop();
+        using TCPConnPtr=std::shared_ptr<TcpConnection>;
     private:
 
         uint64_t _id;
@@ -90,20 +76,20 @@ namespace net{
         //uint32_t _eventType;
         //uint32_t _activeEventType;
 
-        Buffer _buff;
+        Buffer _in_buff;
+        Buffer _out_buff;
         InetAddress _local_addr;
         InetAddress _peer_addr;
 
         TcpState _tcp_state;
 
-       std::list<std::unique_ptr<TcpConnection>>::iterator _iter;
-        std::function<void (std::unique_ptr<TcpConnection>&)> _read_cb;
+        std::function<void (TCPConnPtr&)> _read_cb;
 
-        std::function<void (std::unique_ptr<TcpConnection>&)> _write_cb;
+        std::function<void (TCPConnPtr&)> _write_cb;
 
-        std::function<void (std::unique_ptr<TcpConnection>&)> _close_cb;
-        std::function<void (std::unique_ptr<TcpConnection>&)> _error_cb;
-        std::function<void (std::unique_ptr<TcpConnection>&)> _write_high_level_cb;
-        std::function<void (std::unique_ptr<TcpConnection>&)> _write_complete_cb;
+        std::function<void (TCPConnPtr&)> _close_cb;
+        std::function<void (TCPConnPtr&)> _error_cb;
+        std::function<void (TCPConnPtr&)> _write_high_level_cb;
+        std::function<void (TCPConnPtr&)> _write_complete_cb;
     };
 }

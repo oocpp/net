@@ -39,7 +39,7 @@ namespace net {
             int optval = 1;
             int rc = ::setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
                                   reinterpret_cast<const char *>(&optval), static_cast<socklen_t>(sizeof optval));
-            LOG_INFO << "setsockopt SO_REUSEPORT fd=" << fd << " rc=" << rc;
+            //LOG_INFO << "setsockopt SO_REUSEPORT fd=" << get_fd << " rc=" << rc;
             if (rc != 0) {
                 int serrno = errno;
                 LOG_ERROR << "setsockopt(SO_REUSEPORT) failed, errno=" << serrno << " " << strerror(serrno);
@@ -48,7 +48,7 @@ namespace net {
 
 
         void bind(int sockfd, const InetAddress &addr) {
-            if (::bind(sockfd, addr.getSockAddr(), addr.size()) < 0) {
+            if (::bind(sockfd, addr.get_sockaddr(), addr.get_sockaddr_size()) < 0) {
                 LOG_ERROR << "bind 失败";
             }
         }
@@ -60,7 +60,7 @@ namespace net {
         }
 
         int connect(int sockfd, const InetAddress &peeraddr) {
-            return ::connect(sockfd, peeraddr.getSockAddr(), peeraddr.size());
+            return ::connect(sockfd, peeraddr.get_sockaddr(), peeraddr.get_sockaddr_size());
         }
 
         void close(int sockfd) {
@@ -68,9 +68,9 @@ namespace net {
         }
 
         int accept(int sockfd, InetAddress &peeraddr) {
-            socklen_t addrlen = peeraddr.size();
+            socklen_t addrlen = peeraddr.get_sockaddr_size();
 
-            int connfd = ::accept4(sockfd, peeraddr.getSockAddr(),
+            int connfd = ::accept4(sockfd, peeraddr.get_sockaddr(),
                                    &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
             if (connfd < 0) {
 
@@ -113,7 +113,7 @@ namespace net {
             }
         }
 
-        int createNonblockingSocket(sa_family_t family) {
+        int create_nonblocking_socket(sa_family_t family) {
 
             int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
 
@@ -134,7 +134,7 @@ namespace net {
             // FIXME
         }
 
-        int getSocketError(int sockfd)
+        int get_socket_error(int sockfd)
         {
             int optval;
             socklen_t optlen = static_cast<socklen_t>(sizeof optval);

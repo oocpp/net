@@ -20,16 +20,20 @@ namespace net {
         typedef std::function<void()> EventCallback;
         typedef std::function<void()> ReadEventCallback;
 
-        void SetReadCallback(const ReadEventCallback& cb) {
+        void set_read_cb(const ReadEventCallback &cb) {
             _read_fn = cb;
         }
 
-        void SetWriteCallback(const EventCallback& cb) {
+        void set_write_cb(const EventCallback &cb) {
             _write_fn = cb;
         }
 
-        void attachToLoop();
-        void detachFromLoop();
+        void attach_to_loop();
+        void detach_from_loop();
+
+        int get_fd()const{return _fd;}
+        int get_events()const{return _events;}
+        void set_active_events(int event){_active_event=event;}
 
     private:
         int _fd;

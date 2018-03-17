@@ -15,7 +15,7 @@ namespace net{
     class Buffer final
     {
     private:
-        size_t ensureWritableBytes(size_t len) {
+        size_t ensure_writable_bytes(size_t len) {
 
             if (_buff.capacity() - _buff.size() < len) {
                 if (_read_index > _buff.size() / 2) {
@@ -46,7 +46,7 @@ namespace net{
 
         void append(const char*data,size_t len){
             assert(data!= nullptr);
-            size_t index=ensureWritableBytes(len);
+            size_t index= ensure_writable_bytes(len);
             std::copy_n(data,len,_buff.begin()+index);
         }
 
@@ -57,7 +57,7 @@ namespace net{
                 len+=t.second;
             }
 
-            len=ensureWritableBytes(len);
+            len= ensure_writable_bytes(len);
 
             for(auto &t:args) {
                 std::copy_n(t.first, t.second, _buff.begin()+len);
@@ -75,25 +75,25 @@ namespace net{
 
         }
 
-        void setHeadSpace(size_t n){
-            _headspace_index=ensureWritableBytes(n);
+        void set_head_space(size_t n){
+            _headspace_index= ensure_writable_bytes(n);
         }
 
-        void setHeadSpaceData(const char*data,size_t len){
+        void set_head_space_data(const char *data, size_t len){
             assert(data!=nullptr);
 
             std::copy_n(data,len,_buff.begin()+_headspace_index);
         }
 
-        size_t getReadableSize() const{
+        size_t get_readable_size() const{
             return _buff.size()-_read_index;
         }
 
-        char* readPtr(){
+        char* get_read_ptr(){
             return _buff.data()+_read_index;
         }
 
-        void hasRead(size_t n){
+        void has_read(size_t n){
             _read_index+=n;
             assert(_read_index<_buff.size());
         }

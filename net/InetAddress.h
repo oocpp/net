@@ -14,22 +14,15 @@ namespace net {
 
         InetAddress()= default;
         explicit InetAddress(const std::string &ip, in_port_t port = 0,sa_family_t family=AF_INET);
-        explicit InetAddress(bool loopback, in_port_t port = 0,sa_family_t family=AF_INET);
-
-        explicit InetAddress(const struct sockaddr_in& _addr)
-                : _addr(_addr)
-        { }
 
 
-        void setSockAddrInet(const sockaddr_in& addr) { _addr = addr; }
+        const sockaddr* get_sockaddr() const { return reinterpret_cast<const sockaddr*>(&_addr); }
+        sockaddr* get_sockaddr() { return reinterpret_cast<sockaddr*>(&_addr); }
 
-        const sockaddr* getSockAddr() const { return reinterpret_cast<const sockaddr*>(&_addr); }
-        sockaddr* getSockAddr() { return reinterpret_cast<sockaddr*>(&_addr); }
+        sa_family_t get_family() const { return _addr.sin_family; }
+        in_port_t get_port() const { return _addr.sin_port; }
 
-        sa_family_t getfamily() const { return _addr.sin_family; }
-        in_port_t portNetEndian() const { return _addr.sin_port; }
-
-        static constexpr socklen_t size() {return static_cast<socklen_t>(sizeof(sockaddr_in));}
+        static constexpr socklen_t get_sockaddr_size() {return static_cast<socklen_t>(sizeof(sockaddr_in));}
 
         std::string toIp() const;
         std::string toIpPort() const;

@@ -24,12 +24,12 @@ net::EventLoopThreadPool::EventLoopThreadPool(size_t threadNum):_threads(threadN
 
 }
 
-size_t net::EventLoopThreadPool::nextLoopIndex() {
+size_t net::EventLoopThreadPool::next_loop_index() {
    size_t t=_loop_index++;
     _loop_index%=_threads.size();
     return t;
 }
 
-net::EventLoop *net::EventLoopThreadPool::getNextLoop() {
-    return _threads[nextLoopIndex()].getLoop();
+net::EventLoop *net::EventLoopThreadPool::next_loop() {
+    return _threads[next_loop_index()].loop();
 }

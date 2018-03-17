@@ -14,7 +14,7 @@ namespace net {
 
     InetAddress::InetAddress(const std::string & ip, in_port_t port,sa_family_t family)
     {
-        std::memset(&_addr,0,size());
+        std::memset(&_addr,0, get_sockaddr_size());
 
         _addr.sin_family = family;
         _addr.sin_port = ::htons(port);
@@ -23,16 +23,6 @@ namespace net {
         {
             LOG_ERROR << "inet_pton 失败";
         }
-    }
-
-    InetAddress::InetAddress(bool loopback, in_port_t port,sa_family_t family)
-    {
-        std::memset(&_addr,0,size());
-
-        _addr.sin_family = family;
-        _addr.sin_port = ::htons(port);
-
-        _addr.sin_addr.s_addr = loopback ? ::htonl(INADDR_LOOPBACK) : ::htonl(INADDR_ANY);
     }
 
     std::string InetAddress::toIp() const

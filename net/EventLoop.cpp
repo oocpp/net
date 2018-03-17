@@ -27,17 +27,18 @@ namespace{
 
 namespace net {
     EventLoop::~EventLoop()noexcept {
-        _wake_event.detachFromLoop();
+        _wake_event.detach_from_loop();
         Socket::close(_wake_fd);
     }
 
     EventLoop::EventLoop()noexcept
             :_is_looping(true)
             ,_wake_fd(createWakeEventfd())
-            ,_wake_event(this,_wake_fd){
+            ,_wake_event(this,_wake_fd)
+            ,_th_id(std::this_thread::get_id()){
 
-        _wake_event.SetReadCallback(std::bind(&EventLoop::handleWakeRead,this));
-      _wake_event.attachToLoop();
+        _wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
+        _wake_event.attach_to_loop();
     }
 
     void EventLoop::run() {
@@ -45,6 +46,8 @@ namespace net {
             LOG_TRACE<<"looping"<<std::endl;
             _loop.wait(-1);
             LOG_TRACE<<"loop stop"<<std::endl;
+
+
         }
     }
 
@@ -63,7 +66,7 @@ namespace net {
         }
     }
 
-    void EventLoop::handleWakeRead()
+    void EventLoop::handle_wakeup_read()
     {
         uint64_t one = 1;
         ssize_t n = ::read(_wake_fd, &one, sizeof one);
@@ -74,7 +77,7 @@ namespace net {
     }
 
     void EventLoop::add(Event *e) {
-
+        //_loop.add(e->get_fd(),e->)
     }
 
     void EventLoop::update(Event *e) {
@@ -85,17 +88,20 @@ namespace net {
 
     }
 
-    void EventLoop::runInLoop(const std::function<void()> &cb) {
-        if(isInLoopThread()){
+    void EventLoop::run_in_loop(const std::function<void()> &cb) {
+        if(in_loop_thread()){
             cb();
         }
         else {
-            std::lock_guard<std::mutex> l(_mu);
-            _pendingFunctors.push_back(cb);
+            {
+                std::lock_guard<std::mutex> l(_mu);
+                _pendingFunctors.push_back(cb);
+            }
+           wakeup();
         }
     }
 
-    bool EventLoop::isInLoopThread() {
-        return false;
+    bool EventLoop::in_loop_thread()const {
+        return std::this_thread::get_id()==_th_id;
     }
 }

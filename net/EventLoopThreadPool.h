@@ -19,9 +19,9 @@ namespace net{
         void stop();
         void join();
 
-        EventLoop*getNextLoop();
+        EventLoop*next_loop();
     private:
-        size_t nextLoopIndex();
+        size_t next_loop_index();
 
         std::vector<EventLoopThread>_threads;
         size_t _loop_index;

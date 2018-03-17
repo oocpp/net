@@ -9,8 +9,10 @@ using namespace net;
 int main() {
     EventLoop loop;
 
+    Server s(&loop,InetAddress("127.0.0.1",8888),"AAAA",3);
+    s.run();
 
+    loop.run();
 
-    //loop.run();
-    this_thread::sleep_for(3s);
+    cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"<<endl;
 }

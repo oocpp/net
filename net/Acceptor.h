@@ -13,23 +13,27 @@ namespace net{
 
     class TcpConnection;
     class InetAddress;
+    class EventLoop;
 
     class Accepter {
     public:
-        Accepter(const InetAddress&addr);
+        Accepter(EventLoop*loop,const InetAddress&addr);
         ~Accepter();
 
-        void setNewConnectedCallBack(const std::function<void(int,InetAddress)>&cb){
+        void set_new_connection_cb(const std::function<void(int, const InetAddress &)> &cb){
             _new_connection_cb=cb;
         }
 
         void listen(int backlog=SOMAXCONN);
-        void accept();
         void stop();
+
+        void handle_accept();
     private:
-        Event _event;
+        EventLoop*_loop;
         int _fd;
         InetAddress _addr;
-        std::function<void(int,InetAddress)>_new_connection_cb;
+
+        Event _event;
+        std::function<void(int,const InetAddress&)>_new_connection_cb;
     };
 }

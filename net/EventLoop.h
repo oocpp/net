@@ -10,6 +10,7 @@
 #include<vector>
 #include"Event.h"
 #include<mutex>
+#include <thread>
 
 namespace net {
 
@@ -24,21 +25,21 @@ namespace net {
         void add(Event *e);
         void update(Event* e);
         void remove(Event* e);
-        void runInLoop(const std::function<void()>&cb);
+        void run_in_loop(const std::function<void()> &cb);
 
-        bool isInLoopThread();
+        bool in_loop_thread()const;
 
         void run();
 
         void stop();
 
         void wakeup();
-        void handleWakeRead();
+        void handle_wakeup_read();
     private:
-
         Epoll _loop;
         int _wake_fd;
         Event _wake_event;
+        std::thread::id _th_id;
 
         std::atomic<bool> _is_looping;
 

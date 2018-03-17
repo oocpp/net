@@ -23,7 +23,7 @@ namespace net {
     }
 
     void Connector::setConnectedCallBack(std::function<void(std::unique_ptr<TcpConnection> &)> &&cb) {
-        _tcp_ptr->setWriteCallback(std::move(cb));
+       // _tcp_ptr->set_write_cb(std::move(cb));
     }
 
     void Connector::connect(const InetAddress &peerAddr) {

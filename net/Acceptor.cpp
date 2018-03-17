@@ -8,26 +8,35 @@
 #include "Log.h"
 
 namespace net {
+    Accepter::Accepter(EventLoop *loop, const InetAddress &addr)
+            :_loop(loop)
+            ,_fd(Socket::create_nonblocking_socket())
+            ,_addr(addr)
+            ,_event(loop,_fd){
+
+    }
+
     Accepter::~Accepter() {
         Socket::close(_fd);
     }
 
     void Accepter::listen(int backlog) {
-        _fd = Socket::createNonblockingSocket();
-
-        if (_fd < 0)
-            return;
-
         Socket::bind(_fd, _addr);
         Socket::listen(_fd, backlog);
-    }
 
-    void Accepter::accept() {
-
+        _event.set_read_cb(std::bind(&Accepter::handle_accept, this));
+        _event.attach_to_loop();
     }
 
     void Accepter::stop() {
-
+        _event.detach_from_loop();
     }
+
+    void Accepter::handle_accept() {
+        InetAddress addr;
+        int connfd = Socket::accept(_fd,addr);
+        _new_connection_cb(connfd,addr);
+    }
+
 
 }
