@@ -7,9 +7,11 @@
 #include <atomic>
 #include "Epoll.h"
 #include<memory>
+#include<vector>
+#include"Event.h"
+#include<mutex>
 
 namespace net {
-    class Event;
 
     class EventLoop final {
     public:
@@ -22,17 +24,26 @@ namespace net {
         void add(Event *e);
         void update(Event* e);
         void remove(Event* e);
+        void runInLoop(const std::function<void()>&cb);
+
+        bool isInLoopThread();
 
         void run();
 
         void stop();
 
-        void handleRead();
         void wakeup();
+        void handleWakeRead();
     private:
-        int _event_fd;
-        std::atomic<bool> _is_looping;
+
         Epoll _loop;
+        int _wake_fd;
+        Event _wake_event;
+
+        std::atomic<bool> _is_looping;
+
+        std::mutex _mu;
+        std::vector<std::function<void()>> _pendingFunctors;
     };
 
 

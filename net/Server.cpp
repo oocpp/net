@@ -39,11 +39,11 @@ namespace net {
 
 
         TCPConnPtr conn(new TcpConnection(_next_conn_id++,io_loop, fd,addr));
-
         //conn->setMessageCallback(msg_fn_);
         //conn->setConnectionCallback(conn_fn_);
         //conn->setCloseCallback(std::bind(&TCPServer::RemoveConnection, this, std::placeholders::_1));
-        //io_loop->RunInLoop(std::bind(&TCPConn::OnAttachedToLoop, conn));
+        //io_loop->runInLoop(std::bind(&TCPConn::OnAttachedToLoop, conn));
+        //conn->add
         _connections[conn->id()] = conn;
     }
 }

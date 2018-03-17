@@ -19,7 +19,6 @@ namespace net {
             return;
 
         Socket::bind(_fd, _addr);
-
         Socket::listen(_fd, backlog);
     }
 

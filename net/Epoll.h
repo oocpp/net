@@ -25,12 +25,6 @@ namespace net{
         void remove(int fd);
         void update(int fd,epoll_event event);
         const std::vector<epoll_event> & wait(int timeout);
-
-        typedef uint32_t EventType;
-        static constexpr EventType NONE=0;
-        static constexpr EventType READ=EPOLLIN|EPOLLPRI;
-        static constexpr EventType WRITE=EPOLLOUT;
-
     private:
         int _epollfd;
         std::vector<epoll_event> _events;

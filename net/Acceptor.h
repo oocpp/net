@@ -7,7 +7,7 @@
 #include <memory>
 #include "Socket.h"
 #include"InetAddress.h"
-
+#include"Event.h"
 
 namespace net{
 
@@ -27,6 +27,7 @@ namespace net{
         void accept();
         void stop();
     private:
+        Event _event;
         int _fd;
         InetAddress _addr;
         std::function<void(int,InetAddress)>_new_connection_cb;
