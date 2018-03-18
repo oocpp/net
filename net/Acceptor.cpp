@@ -12,8 +12,8 @@ namespace net {
             :_loop(loop)
             ,_fd(Socket::create_nonblocking_socket())
             ,_addr(addr)
-            ,_event(loop,_fd){
-
+            ,_event(loop,_fd,true,false){
+        LOG_INFO<<"true="<< true;
     }
 
     Accepter::~Accepter() {
@@ -25,7 +25,8 @@ namespace net {
         Socket::listen(_fd, backlog);
 
         _event.set_read_cb(std::bind(&Accepter::handle_accept, this));
-        _event.attach_to_loop();
+
+        _loop->run_in_loop(std::bind(&Event::attach_to_loop,&_event));
     }
 
     void Accepter::stop() {

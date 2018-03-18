@@ -24,10 +24,9 @@ namespace net{
         void add(int fd,epoll_event event);
         void remove(int fd);
         void update(int fd,epoll_event event);
-        const std::vector<epoll_event> & wait(int timeout);
+        void wait(int timeout,std::vector<epoll_event> &events);
     private:
         int _epollfd;
-        std::vector<epoll_event> _events;
         size_t _old_size;
         static constexpr size_t init_event_vector_size=16;
     };

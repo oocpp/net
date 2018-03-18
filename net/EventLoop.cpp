@@ -33,8 +33,9 @@ namespace net {
 
     EventLoop::EventLoop()noexcept
             :_is_looping(true)
+             ,_is_pending_fns(false)
             ,_wake_fd(createWakeEventfd())
-            ,_wake_event(this,_wake_fd)
+            ,_wake_event(this,_wake_fd,true)
             ,_th_id(std::this_thread::get_id()){
 
         _wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
@@ -44,10 +45,14 @@ namespace net {
     void EventLoop::run() {
         while(_is_looping){
             LOG_TRACE<<"looping"<<std::endl;
-            _loop.wait(-1);
+
+            _poll.wait(-1,_events);
+
+            for(auto &e:_events)
+                reinterpret_cast<Event*>(e.data.ptr)->handle_event(e.events);
+
+            do_pending_fn();
             LOG_TRACE<<"loop stop"<<std::endl;
-
-
         }
     }
 
@@ -77,15 +82,21 @@ namespace net {
     }
 
     void EventLoop::add(Event *e) {
-        //_loop.add(e->get_fd(),e->)
+        epoll_event event;
+        event.events=e->get_events();
+        event.data.ptr=e;
+       _poll.add(e->get_fd(),event);
     }
 
     void EventLoop::update(Event *e) {
-
+        epoll_event event;
+        event.events=e->get_events();
+        event.data.ptr=e;
+        _poll.update(e->get_fd(),event);
     }
 
     void EventLoop::remove(Event *e) {
-
+        _poll.remove(e->get_fd());
     }
 
     void EventLoop::run_in_loop(const std::function<void()> &cb) {
@@ -93,15 +104,34 @@ namespace net {
             cb();
         }
         else {
-            {
-                std::lock_guard<std::mutex> l(_mu);
-                _pendingFunctors.push_back(cb);
-            }
-           wakeup();
+            queue_in_loop(cb);
         }
     }
 
     bool EventLoop::in_loop_thread()const {
         return std::this_thread::get_id()==_th_id;
+    }
+
+    void EventLoop::queue_in_loop(const std::function<void()> &cb) {
+        {
+            std::lock_guard<std::mutex> l(_mu);
+            _pending_fns.push_back(cb);
+        }
+
+        if(!in_loop_thread()||_is_pending_fns) {
+            wakeup();
+        }
+    }
+
+    void EventLoop::do_pending_fn() {
+        std::vector<std::function<void()>>fns;
+        _is_pending_fns=true;
+        {
+            std::lock_guard<std::mutex> l(_mu);
+            fns.swap(_pending_fns);
+        }
+        for(auto&f:fns)
+            f();
+        _is_pending_fns=false;
     }
 }

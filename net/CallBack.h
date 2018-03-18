@@ -3,20 +3,18 @@
 //
 
 #pragma once
-#include <memory>
 
 namespace net
 {
 
     class TcpConnection;
+    class InetAddress;
 
-    typedef std::shared_ptr<TcpConnection> TcpConnectionPtr;
+    using TCPConnPtr=std::shared_ptr<TcpConnection> ;
+    using NewConnCallback=std::function<void(int,const InetAddress&)>;
 
-    typedef std::function<void()> TimerCallback;
+    //using Nstd::function<void()>_new_connection_cb;
+    using MessageCallback= std::function<void (TCPConnPtr&)>;
 
-    typedef std::function<void (const TcpConnectionPtr&)> ConnectionCallback;
-    typedef std::function<void (const TcpConnectionPtr&)> CloseCallback;
-    typedef std::function<void (const TcpConnectionPtr&)> WriteCompleteCallback;
-    typedef std::function<void (const TcpConnectionPtr&, size_t)> HighWaterMarkCallback;
 
 }

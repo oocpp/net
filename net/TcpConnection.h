@@ -19,9 +19,7 @@ namespace net{
     class TcpConnection {
     public:
 
-        explicit TcpConnection(const InetAddress&peerAddr);
-
-        TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&addr);
+        TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&local_addr,const InetAddress&peer_addr);
 
 
         void close();

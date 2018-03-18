@@ -26,6 +26,8 @@ namespace net {
         void update(Event* e);
         void remove(Event* e);
         void run_in_loop(const std::function<void()> &cb);
+        void queue_in_loop(const std::function<void()> &cb);
+        void do_pending_fn();
 
         bool in_loop_thread()const;
 
@@ -36,7 +38,7 @@ namespace net {
         void wakeup();
         void handle_wakeup_read();
     private:
-        Epoll _loop;
+        Epoll _poll;
         int _wake_fd;
         Event _wake_event;
         std::thread::id _th_id;
@@ -44,7 +46,10 @@ namespace net {
         std::atomic<bool> _is_looping;
 
         std::mutex _mu;
-        std::vector<std::function<void()>> _pendingFunctors;
+        std::vector<std::function<void()>> _pending_fns;
+        std::atomic<bool> _is_pending_fns;
+
+        std::vector<epoll_event>_events;
     };
 
 

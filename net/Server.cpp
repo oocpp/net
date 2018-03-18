@@ -15,7 +15,7 @@ namespace net {
             : _pool(threadSize)
             , _loop_ptr(loop)
             ,_accepter(loop,addr){
-
+        LOG_TRACE<<"server";
     }
 
     void Server::run() {
@@ -37,7 +37,7 @@ namespace net {
         EventLoop* io_loop = _pool.next_loop();
 
 
-        TCPConnPtr conn(new TcpConnection(_next_conn_id++,io_loop, fd,addr));
+        TCPConnPtr conn(new TcpConnection(_next_conn_id++,io_loop, fd,_addr,addr));
         conn->set_message_cb(_message_cb);
         //conn->setConnectionCallback(conn_fn_);
         //conn->setCloseCallback(std::bind(&TCPServer::RemoveConnection, this, std::placeholders::_1));

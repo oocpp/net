@@ -8,6 +8,7 @@
 #include "Socket.h"
 #include"InetAddress.h"
 #include"Event.h"
+#include"CallBack.h"
 
 namespace net{
 
@@ -20,7 +21,7 @@ namespace net{
         Accepter(EventLoop*loop,const InetAddress&addr);
         ~Accepter();
 
-        void set_new_connection_cb(const std::function<void(int, const InetAddress &)> &cb){
+        void set_new_connection_cb(const NewConnCallback &cb){
             _new_connection_cb=cb;
         }
 
@@ -34,6 +35,6 @@ namespace net{
         InetAddress _addr;
 
         Event _event;
-        std::function<void(int,const InetAddress&)>_new_connection_cb;
+        NewConnCallback _new_connection_cb;
     };
 }

@@ -46,14 +46,14 @@ namespace net
         }
     }
 
-    const std::vector<epoll_event> & Epoll::wait(int timeoutMs) {
-        _events.reserve(_old_size);
+    void Epoll::wait(int timeoutMs,std::vector<epoll_event> &events) {
+        events.reserve(_old_size);
 
-        int numEvents = ::epoll_wait(_epollfd,_events.data(), _old_size, timeoutMs);
+        int numEvents = ::epoll_wait(_epollfd,events.data(), _old_size, timeoutMs);
 
         if (numEvents > 0)
         {
-            _events.resize(numEvents);
+            events.resize(numEvents);
 
             if (static_cast<size_t>(numEvents) == _old_size)
             {
@@ -62,18 +62,16 @@ namespace net
         }
         else if (numEvents == 0)
         {
-            _events.resize(0);
+            events.resize(0);
             LOG_ERROR << "nothing happended";
         }
         else
         {
-            _events.resize(0);
+            events.resize(0);
             if (errno != EINTR)
             {
-                LOG_ERROR << "EPollPoller::poll()";
+                LOG_ERROR << "EPollPoller::_poll()";
             }
         }
-
-        return _events;
     }
 }

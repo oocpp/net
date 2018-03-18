@@ -10,7 +10,7 @@
 namespace net {
 
     Connector::Connector(const InetAddress &peerAddr)
-    :_tcp_ptr(std::make_unique<TcpConnection>(peerAddr)){
+    {
         connect(peerAddr);
     }
 

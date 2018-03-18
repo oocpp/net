@@ -4,24 +4,19 @@
 
 #include "TcpConnection.h"
 #include "Buffer.h"
+#include"Log.h"
 
 namespace net{
 
 
 
 
-    TcpConnection::TcpConnection(uint64_t id,EventLoop*loop,int sockfd, const InetAddress &addr)
+    TcpConnection::TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&local_addr,const InetAddress&peer_add)
     :_sockfd(sockfd)
      ,_id(id)
      ,_loop(loop)
-    ,_local_addr(addr) {
-
-    }
-
-    TcpConnection::TcpConnection(const InetAddress &peerAddr)
-    :_sockfd(peerAddr.get_family())
-    ,_peer_addr(peerAddr)
-    {
+    ,_local_addr(local_addr)
+    ,_peer_addr(peer_add){
 
     }
 
@@ -31,6 +26,6 @@ namespace net{
     }
 
     void TcpConnection::attach_to_loop() {
-
+        LOG_INFO<<"新链接:id="<<_id<<"  port"<<_peer_addr.get_port();
     }
 }

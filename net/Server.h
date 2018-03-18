@@ -11,6 +11,7 @@
 #include<functional>
 #include<map>
 #include"Acceptor.h"
+#include"CallBack.h"
 
 namespace net{
     class EventLoop;
@@ -25,7 +26,7 @@ namespace net{
 
         void handle_new_connection(int fd, const InetAddress &addr);
 
-        using TCPConnPtr=std::shared_ptr<TcpConnection> ;
+
     private:
         EventLoop*_loop_ptr;
         EventLoopThreadPool _pool;
@@ -38,7 +39,7 @@ namespace net{
 
 
         std::function<void()>_new_connection_cb;
-        std::function<void (TCPConnPtr&)>_message_cb;
+        MessageCallback _message_cb;
     };
 
 }
