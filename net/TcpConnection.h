@@ -11,12 +11,15 @@
 #include "Buffer.h"
 #include "Epoll.h"
 #include"EventLoop.h"
+#include"CallBack.h"
+#include "Any.h"
+
 
 namespace net{
 
     class EventLoop;
 
-    class TcpConnection {
+    class TcpConnection:public std::enable_shared_from_this<TcpConnection> {
     public:
 
         TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&local_addr,const InetAddress&peer_addr);
@@ -24,14 +27,14 @@ namespace net{
 
         void close();
 
-        void set_message_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
-            _read_cb=cb;
-           // setReadable();
-        }
+        void set_message_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){ _read_cb=cb; }
 
         void set_write_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
             _write_cb=cb;
-            //setWriteable();
+        }
+
+        void set_connection_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
+
         }
 
         void reset_write_cb(){
@@ -51,38 +54,38 @@ namespace net{
             //setReadable();
         }
 
-        enum  TcpState{CONNECTING,GOOD,FAILURE,BAD,CLOSING};
 
-        void setTcpState(TcpState ts){
-            _tcp_state=ts;
-        }
-        TcpState getTcpState()const{
-            return _tcp_state;
-        }
 
         uint64_t get_id()const{
             return _id;
         }
 
         void attach_to_loop();
-        using TCPConnPtr=std::shared_ptr<TcpConnection>;
+    private:
+        enum Status {
+            Disconnected = 0,
+            Connecting = 1,
+            Connected = 2,
+            Disconnecting = 3,
+        };
     private:
 
         uint64_t _id;
         EventLoop*_loop;
         int _sockfd;
-        //uint32_t _eventType;
-        //uint32_t _activeEventType;
+        Event _event;
+        std::atomic<Status> _conn_status;
 
         Buffer _in_buff;
         Buffer _out_buff;
         InetAddress _local_addr;
         InetAddress _peer_addr;
+        Any _context;
 
-        TcpState _tcp_state;
 
+
+        std::function<void(TCPConnPtr &)> _connecting_cb;
         std::function<void (TCPConnPtr&)> _read_cb;
-
         std::function<void (TCPConnPtr&)> _write_cb;
 
         std::function<void (TCPConnPtr&)> _close_cb;

@@ -38,7 +38,7 @@ namespace net{
         std::map<uint64_t,TCPConnPtr>_connections;
 
 
-        std::function<void()>_new_connection_cb;
+        std::function<void()>_connecting_cb;
         MessageCallback _message_cb;
     };
 

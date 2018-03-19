@@ -13,6 +13,8 @@ void net::EventLoopThreadPool::run() {
 void net::EventLoopThreadPool::stop() {
     for(auto &t:_threads)
         t.stop();
+
+    join();
 }
 
 void net::EventLoopThreadPool::join() {
@@ -30,6 +32,6 @@ size_t net::EventLoopThreadPool::next_loop_index() {
     return t;
 }
 
-net::EventLoop *net::EventLoopThreadPool::next_loop() {
-    return _threads[next_loop_index()].loop();
+net::EventLoop *net::EventLoopThreadPool::get_next_loop() {
+    return _threads[next_loop_index()].get_loop();
 }

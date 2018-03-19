@@ -15,17 +15,22 @@ namespace net{
     :_sockfd(sockfd)
      ,_id(id)
      ,_loop(loop)
+     ,_event(loop,sockfd)
     ,_local_addr(local_addr)
     ,_peer_addr(peer_add){
 
     }
 
     void TcpConnection::close() {
-        if(_tcp_state==TcpState::GOOD)
-            _tcp_state=TcpState::CLOSING;
+
     }
 
     void TcpConnection::attach_to_loop() {
-        LOG_INFO<<"新链接:id="<<_id<<"  port"<<_peer_addr.get_port();
+        _conn_status = Connected;
+        _event.enable_read();
+
+        if (_connecting_cb) {
+           // _connecting_cb(shared_from_this());
+        }
     }
 }

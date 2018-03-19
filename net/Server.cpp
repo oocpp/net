@@ -16,12 +16,11 @@ namespace net {
             , _loop_ptr(loop)
             ,_accepter(loop,addr){
         LOG_TRACE<<"server";
+        _accepter.set_new_connection_cb(std::bind(&Server::handle_new_connection, this, _1, _2));
     }
 
     void Server::run() {
         _pool.run();
-
-        _accepter.set_new_connection_cb(std::bind(&Server::handle_new_connection, this, _1, _2));
         _accepter.listen();
     }
 
@@ -34,15 +33,14 @@ namespace net {
         LOG_TRACE << "get_fd=" << fd;
 
 
-        EventLoop* io_loop = _pool.next_loop();
+        EventLoop* loop = _pool.get_next_loop();
 
 
-        TCPConnPtr conn(new TcpConnection(_next_conn_id++,io_loop, fd,_addr,addr));
+        TCPConnPtr conn(new TcpConnection(_next_conn_id++,loop, fd,_addr,addr));
         conn->set_message_cb(_message_cb);
-        //conn->setConnectionCallback(conn_fn_);
-        //conn->setCloseCallback(std::bind(&TCPServer::RemoveConnection, this, std::placeholders::_1));
-        //io_loop->run_in_loop(std::bind(&TCPConn::OnAttachedToLoop, conn));
-        conn->attach_to_loop();
+        //conn->set_connection_cb(_connecting_cb);
+        //conn->set_closeCallback(std::bind(&TCPServer::RemoveConnection, this, std::placeholders::_1));
+        loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, conn));
         _connections[conn->get_id()] = conn;
     }
 }

@@ -19,7 +19,7 @@ namespace net{
         void stop();
         void join();
 
-        EventLoop*next_loop();
+        EventLoop*get_next_loop();
     private:
         size_t next_loop_index();
 

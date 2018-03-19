@@ -52,7 +52,7 @@ namespace net {
                 reinterpret_cast<Event*>(e.data.ptr)->handle_event(e.events);
 
             do_pending_fn();
-            LOG_TRACE<<"loop stop"<<std::endl;
+            LOG_TRACE<<"get_loop stop"<<std::endl;
         }
     }
 

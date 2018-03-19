@@ -14,6 +14,7 @@ namespace net {
             ,_addr(addr)
             ,_event(loop,_fd,true,false){
         LOG_INFO<<"true="<< true;
+        Socket::bind(_fd, _addr);
     }
 
     Accepter::~Accepter() {
@@ -21,7 +22,6 @@ namespace net {
     }
 
     void Accepter::listen(int backlog) {
-        Socket::bind(_fd, _addr);
         Socket::listen(_fd, backlog);
 
         _event.set_read_cb(std::bind(&Accepter::handle_accept, this));
