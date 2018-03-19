@@ -5,6 +5,7 @@
 #pragma once
 #include<functional>
 #include <sys/epoll.h>
+#include"CallBack.h"
 
 namespace net {
     class EventLoop;
@@ -18,8 +19,7 @@ namespace net {
         static constexpr uint32_t ReadEvent=EPOLLIN|EPOLLPRI;
         static constexpr uint32_t WriteEvent=EPOLLOUT;
 
-        typedef std::function<void()> EventCallback;
-        typedef std::function<void()> ReadEventCallback;
+
 
         void set_read_cb(const ReadEventCallback &cb) { _read_cb = cb; }
         void set_write_cb(const EventCallback &cb) { _write_cb = cb; }

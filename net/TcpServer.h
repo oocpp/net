@@ -17,18 +17,19 @@ namespace net{
     class EventLoop;
     class TcpConnection;
 
-    class Server {
+    class TcpServer {
     public:
-        Server(EventLoop*loop,const InetAddress& addr,const std::string &name,size_t threadSize=0);
+        TcpServer(EventLoop*loop,const InetAddress& addr,const std::string &name,size_t threadSize=0);
 
         void run();
         void stop();
 
         void handle_new_connection(int fd, const InetAddress &addr);
 
-
+        void remove_connection(const TCPConnPtr& conn);
+        void remove_connection_in_loop(const TCPConnPtr& conn);
     private:
-        EventLoop*_loop_ptr;
+        EventLoop*_loop;
         EventLoopThreadPool _pool;
         InetAddress _addr;
         std::string _name;
@@ -38,7 +39,7 @@ namespace net{
         std::map<uint64_t,TCPConnPtr>_connections;
 
 
-        std::function<void()>_connecting_cb;
+        ConnectingCallback _connecting_cb;
         MessageCallback _message_cb;
     };
 

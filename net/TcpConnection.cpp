@@ -30,7 +30,7 @@ namespace net{
         _event.enable_read();
 
         if (_connecting_cb) {
-           // _connecting_cb(shared_from_this());
+            _connecting_cb(shared_from_this());
         }
     }
 }

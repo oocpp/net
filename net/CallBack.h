@@ -3,18 +3,29 @@
 //
 
 #pragma once
+#include<memory>
 
-namespace net
-{
+namespace net {
 
     class TcpConnection;
+
+    class Buffer;
+
     class InetAddress;
 
-    using TCPConnPtr=std::shared_ptr<TcpConnection> ;
-    using NewConnCallback=std::function<void(int,const InetAddress&)>;
+    using TCPConnPtr=std::shared_ptr<TcpConnection>;
 
-    //using Nstd::function<void()>_new_connection_cb;
-    using MessageCallback= std::function<void (TCPConnPtr&)>;
+    using NewConnCallback = std::function<void(int, const InetAddress &)>;
+
+    using MessageCallback = std::function<void(const TCPConnPtr &, Buffer *)>;
+
+
+    using ConnectingCallback =std::function<void(const TCPConnPtr &)>;
+    using CloseCallback =std::function<void(const TCPConnPtr &)>;
+
+    using EventCallback=std::function<void()>;
+
+    using ReadEventCallback =std::function<void()>;
 
 
 }

@@ -2,7 +2,7 @@
 
 using namespace std;
 
-#include"Server.h"
+#include"TcpServer.h"
 using namespace net;
 #include<thread>
 #include"Socket.h"
@@ -14,7 +14,7 @@ int main() {
 Any a(12);
     EventLoop loop;
 
-    Server s(&loop,InetAddress("127.0.0.1",8888),"AAAA",3);
+    TcpServer s(&loop,InetAddress("127.0.0.1",8888),"AAAA",3);
     s.run();
 
     thread A([]{

@@ -27,33 +27,35 @@ namespace net{
 
         void close();
 
-        void set_message_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){ _read_cb=cb; }
+        void set_message_cb(const MessageCallback & cb){
+            _read_cb=cb;
+        }
 
         void set_write_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
             _write_cb=cb;
         }
 
-        void set_connection_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
+        void set_connection_cb(const ConnectingCallback &cb){
+            _connecting_cb=cb;
+        }
 
+        void set_close_cb(const CloseCallback&cb){
+            _close_cb=cb;
         }
 
         void reset_write_cb(){
             _write_cb= nullptr;
-            //setDisableWrite();
         }
 
         void reset_read_cb(){
             _read_cb= nullptr;
-           // setDisableRead();
         }
 
         void enable_write(){
-           // setWriteable();
-        }
-        void enable_read(){
-            //setReadable();
         }
 
+        void enable_read(){
+        }
 
 
         uint64_t get_id()const{
@@ -83,12 +85,12 @@ namespace net{
         Any _context;
 
 
+        CloseCallback  _close_cb;
+        ConnectingCallback _connecting_cb;
+        MessageCallback _read_cb;
 
-        std::function<void(TCPConnPtr &)> _connecting_cb;
-        std::function<void (TCPConnPtr&)> _read_cb;
         std::function<void (TCPConnPtr&)> _write_cb;
 
-        std::function<void (TCPConnPtr&)> _close_cb;
         std::function<void (TCPConnPtr&)> _error_cb;
         std::function<void (TCPConnPtr&)> _write_high_level_cb;
         std::function<void (TCPConnPtr&)> _write_complete_cb;
