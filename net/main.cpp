@@ -9,25 +9,27 @@ using namespace net;
 using namespace net::Socket;
 #include<numeric>
 #include "Any.h"
+#include"Log.h"
 int main() {
 
 Any a(12);
-    EventLoop loop;
-
-    TcpServer s(&loop,InetAddress("127.0.0.1",8888),"AAAA",3);
-    s.run();
-
-    thread A([]{
-        this_thread::sleep_for(3s);
-        int fd=create_nonblocking_socket();
-        InetAddress addr("127.0.0.1",8888);
-        connect(fd,addr);
-
-        this_thread::sleep_for(10s);
-        Socket::close(fd);
-    });
-
+    EventLoopThread loop;
     loop.run();
 
-    cout<<"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"<<endl;
+    TcpServer s(loop.get_loop(),InetAddress("127.0.0.1",8888),"AAAA",1);
+    s.run();
+    //this_thread::sleep_for(2s);
+
+
+
+    LOG_INFO<<"------------------------"<<endl;
+    //this_thread::sleep_for(5s);
+    s.stop();
+
+    //this_thread::sleep_for(20s);
+    loop.stop();
+
+    loop.join();
+
+    LOG_INFO<<"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"<<endl;
 }

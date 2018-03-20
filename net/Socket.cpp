@@ -65,7 +65,7 @@ namespace net {
 
         void close(int sockfd) {
             ::close(sockfd);
-            LOG_INFO<<"fd="<<sockfd<<"close";
+            LOG_INFO<<"fd= "<<sockfd<<"close";
         }
 
         int accept(int sockfd, InetAddress &peeraddr) {

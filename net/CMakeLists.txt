@@ -5,8 +5,24 @@ set(CMAKE_CXX_STANDARD 14)
 
 link_libraries(pthread)
 
-set(SOURCE_FILES main.cpp Log.h Socket.h Socket.cpp InetAddress.h InetAddress.cpp Buffer.h Buffer.cpp
-        TcpConnection.cpp TcpConnection.h Acceptor.cpp Acceptor.h Connector.cpp Connector.h Epoll.cpp EventLoopThread.h
-        EventLoopThread.cpp Epoll.h CallBack.h EventLoop.h EventLoop.cpp TcpServer.cpp TcpServer.h Client.cpp Client.h EventLoopThreadPool.cpp EventLoopThreadPool.h Event.cpp Event.h Any.h)
+include(CheckFunctionExists)
+check_function_exists(accept4 HAVE_ACCEPT4)
+
+set(SOURCE_FILES
+        main.cpp
+        Socket.cpp
+        InetAddress.cpp
+        Buffer.cpp
+        TcpConnection.cpp
+        Acceptor.cpp
+        Connector.cpp
+        Epoll.cpp
+        EventLoopThread.cpp
+        EventLoop.cpp
+        TcpServer.cpp
+        Client.cpp
+        EventLoopThreadPool.cpp
+        Event.cpp
+        )
 
 add_executable(net ${SOURCE_FILES})

@@ -20,6 +20,7 @@ namespace net{
     class TcpServer {
     public:
         TcpServer(EventLoop*loop,const InetAddress& addr,const std::string &name,size_t threadSize=0);
+        ~TcpServer();
 
         void run();
         void stop();
@@ -28,6 +29,7 @@ namespace net{
 
         void remove_connection(const TCPConnPtr& conn);
         void remove_connection_in_loop(const TCPConnPtr& conn);
+        void stop_in_loop();
     private:
         EventLoop*_loop;
         EventLoopThreadPool _pool;

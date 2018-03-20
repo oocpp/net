@@ -47,10 +47,11 @@ namespace net
     }
 
     void Epoll::wait(int timeoutMs,std::vector<epoll_event> &events) {
-        events.reserve(_old_size);
+        events.resize(_old_size);
 
         int numEvents = ::epoll_wait(_epollfd,events.data(), _old_size, timeoutMs);
 
+        int savedErrno = errno;
         if (numEvents > 0)
         {
             events.resize(numEvents);
@@ -68,8 +69,9 @@ namespace net
         else
         {
             events.resize(0);
-            if (errno != EINTR)
+            if (savedErrno != EINTR)
             {
+                errno=savedErrno;
                 LOG_ERROR << "EPollPoller::_poll()";
             }
         }

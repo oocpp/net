@@ -7,6 +7,7 @@
 #include<cstdio>
 #include<cstdarg>
 #include<iostream>
+#include<thread>
 
 #ifdef _DEBUG
 #include<string>
@@ -47,7 +48,7 @@ namespace net{
             return *this;
         }
 
-        ~Log() { std::cout << "--->>" << out.rdbuf() << std::endl; }
+        ~Log() { std::cout <<std::this_thread::get_id()<< "--->>" << out.rdbuf() << std::endl; }
 
     private:
         std::stringstream out;

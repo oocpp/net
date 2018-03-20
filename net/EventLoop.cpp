@@ -5,6 +5,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/eventfd.h>
+#include <csignal>
 #include "EventLoop.h"
 
 #include "Log.h"
@@ -23,6 +24,17 @@ namespace{
         }
         return evtfd;
     }
+
+#pragma GCC diagnostic ignored "-Wold-style-cast"
+    struct IgnoreSigPipe {
+        IgnoreSigPipe() {
+            ::signal(SIGPIPE, SIG_IGN);
+            LOG_TRACE << "Ignore SIGPIPE";
+        }
+    };
+#pragma GCC diagnostic error "-Wold-style-cast"
+
+    IgnoreSigPipe initObj;
 }
 
 namespace net {
@@ -35,34 +47,39 @@ namespace net {
             :_is_looping(true)
              ,_is_pending_fns(false)
             ,_wake_fd(createWakeEventfd())
-            ,_wake_event(this,_wake_fd,true)
-            ,_th_id(std::this_thread::get_id()){
+            ,_th_id(std::this_thread::get_id())
+            ,_wake_event(this,_wake_fd,true) {
 
         _wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
         _wake_event.attach_to_loop();
     }
 
     void EventLoop::run() {
+        _th_id=std::this_thread::get_id();
         while(_is_looping){
-            LOG_TRACE<<"looping"<<std::endl;
+            LOG_TRACE<<" looping"<<std::endl;
 
             _poll.wait(-1,_events);
 
+            LOG_TRACE<<"poll "<<_events.size();
             for(auto &e:_events)
                 reinterpret_cast<Event*>(e.data.ptr)->handle_event(e.events);
 
             do_pending_fn();
-            LOG_TRACE<<"get_loop stop"<<std::endl;
+            LOG_TRACE<<" loop stop"<<std::endl;
         }
     }
 
     void EventLoop::stop() {
-        _is_looping=false;
-        wakeup();
+        if(_is_looping) {
+            _is_looping = false;
+            wakeup();
+        }
     }
 
     void EventLoop::wakeup()
     {
+        LOG_TRACE;
         uint64_t one = 1;
         ssize_t n = ::write(_wake_fd, &one, sizeof one);
         if (n != sizeof one)
@@ -73,6 +90,7 @@ namespace net {
 
     void EventLoop::handle_wakeup_read()
     {
+        LOG_TRACE;
         uint64_t one = 1;
         ssize_t n = ::read(_wake_fd, &one, sizeof one);
         if (n != sizeof one)
@@ -100,6 +118,7 @@ namespace net {
     }
 
     void EventLoop::run_in_loop(const std::function<void()> &cb) {
+        LOG_TRACE;
         if(in_loop_thread()){
             cb();
         }
@@ -124,12 +143,16 @@ namespace net {
     }
 
     void EventLoop::do_pending_fn() {
+
         std::vector<std::function<void()>>fns;
         _is_pending_fns=true;
         {
             std::lock_guard<std::mutex> l(_mu);
             fns.swap(_pending_fns);
         }
+
+        LOG_TRACE<<fns.size();
+
         for(auto&f:fns)
             f();
         _is_pending_fns=false;

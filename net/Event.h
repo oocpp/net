@@ -19,8 +19,6 @@ namespace net {
         static constexpr uint32_t ReadEvent=EPOLLIN|EPOLLPRI;
         static constexpr uint32_t WriteEvent=EPOLLOUT;
 
-
-
         void set_read_cb(const ReadEventCallback &cb) { _read_cb = cb; }
         void set_write_cb(const EventCallback &cb) { _write_cb = cb; }
 

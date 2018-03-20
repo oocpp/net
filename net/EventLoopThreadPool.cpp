@@ -13,8 +13,6 @@ void net::EventLoopThreadPool::run() {
 void net::EventLoopThreadPool::stop() {
     for(auto &t:_threads)
         t.stop();
-
-    join();
 }
 
 void net::EventLoopThreadPool::join() {

@@ -2,13 +2,13 @@
 // Created by lg on 17-4-21.
 //
 #include<functional>
+#include <cassert>
 #include"EventLoopThread.h"
 
 namespace  net
 {
     EventLoopThread::~EventLoopThread()noexcept {
         if(_th.joinable()){
-            _loop.stop();
             _th.join();
         }
     }

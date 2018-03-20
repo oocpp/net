@@ -23,12 +23,12 @@ namespace net{
     public:
 
         TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&local_addr,const InetAddress&peer_addr);
-
+        ~TcpConnection();
 
         void close();
 
         void set_message_cb(const MessageCallback & cb){
-            _read_cb=cb;
+            _message_cb=cb;
         }
 
         void set_write_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
@@ -43,26 +43,25 @@ namespace net{
             _close_cb=cb;
         }
 
-        void reset_write_cb(){
-            _write_cb= nullptr;
-        }
-
-        void reset_read_cb(){
-            _read_cb= nullptr;
-        }
-
         void enable_write(){
+
         }
 
         void enable_read(){
         }
 
+        EventLoop*get_loop(){return _loop;}
 
         uint64_t get_id()const{
             return _id;
         }
 
         void attach_to_loop();
+        void handle_read();
+        void handle_write();
+
+        void handle_close();
+        void handle_error();
     private:
         enum Status {
             Disconnected = 0,
@@ -87,7 +86,7 @@ namespace net{
 
         CloseCallback  _close_cb;
         ConnectingCallback _connecting_cb;
-        MessageCallback _read_cb;
+        MessageCallback _message_cb;
 
         std::function<void (TCPConnPtr&)> _write_cb;
 
