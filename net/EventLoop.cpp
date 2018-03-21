@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <sys/eventfd.h>
 #include <csignal>
+#include <cassert>
 #include "EventLoop.h"
 
 #include "Log.h"
@@ -20,7 +21,7 @@ namespace{
         if (evtfd < 0)
         {
             LOG_ERROR << "Failed in eventfd";
-            //abort();
+            abort();
         }
         return evtfd;
     }
@@ -39,6 +40,8 @@ namespace{
 
 namespace net {
     EventLoop::~EventLoop()noexcept {
+        assert(!_is_looping);
+
         _wake_event.detach_from_loop();
         Socket::close(_wake_fd);
     }
@@ -56,6 +59,7 @@ namespace net {
 
     void EventLoop::run() {
         _th_id=std::this_thread::get_id();
+
         while(_is_looping){
             LOG_TRACE<<" looping"<<std::endl;
 

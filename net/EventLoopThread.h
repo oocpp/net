@@ -11,6 +11,7 @@ namespace net {
     public:
         EventLoopThread()noexcept;
         ~EventLoopThread()noexcept;
+
         EventLoopThread(const EventLoopThread&)=delete;
 
         void run();

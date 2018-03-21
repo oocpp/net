@@ -28,6 +28,8 @@ namespace net{
         void listen(int backlog=SOMAXCONN);
         void stop();
 
+    private:
+
         void handle_accept();
     private:
         EventLoop*_loop;

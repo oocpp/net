@@ -29,13 +29,6 @@ namespace net {
         in_port_t toPort() const;
         uint32_t ipNetEndian() const;
 
-
-        // resolve hostname to IP address, not changing port or sin_family
-        // return true on success.
-        // thread safe
-        static bool resolve(const std::string& hostname, InetAddress& result);
-        // static std::vector<InetAddress> resolveAll(const char* hostname, uint16_t port = 0);
-
     private:
             sockaddr_in _addr;
     };

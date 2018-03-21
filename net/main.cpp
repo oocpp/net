@@ -13,32 +13,32 @@ using namespace net::Socket;
 int main() {
 
 Any a(12);
-    EventLoopThread loop;
+    EventLoop loop;
 
 
-    TcpServer s(loop.get_loop(),InetAddress("127.0.0.1",8888),"AAAA",1);
+    TcpServer s(&loop,InetAddress("127.0.0.1",8888),"AAAA",3);
     s.run();
     //this_thread::sleep_for(2s);
+    thread A([]{
+        this_thread::sleep_for(3s);
+        int fd=create_nonblocking_socket();
+        Socket::connect(fd,InetAddress{"127.0.0.1",8888});
+
+        this_thread::sleep_for(5s);
+        Socket::close(fd);
+    });
     loop.run();
 
     LOG_INFO<<"------------------------"<<endl;
 
-    thread A([]{
-        this_thread::sleep_for(2s);
-        int fd=create_nonblocking_socket();
-        Socket::connect(fd,InetAddress{"127.0.0.1",8888});
 
-        this_thread::sleep_for(10s);
-        Socket::close(fd);
-    });
-
-    this_thread::sleep_for(6s);
+    this_thread::sleep_for(7s);
     s.stop();
 
     //this_thread::sleep_for(20s);
     loop.stop();
 
-    loop.join();
+    //loop.join();
     A.join();
 
     LOG_INFO<<"AAAAAAAAAAAAAAAAAAAAAAAAAAAAA"<<endl;

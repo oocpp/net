@@ -36,6 +36,9 @@ namespace net{
                 ,_read_index(0){
         }
 
+        std::pair<ssize_t,int> read_from_fd(int fd);
+
+    private:
         void append(const char*data,size_t len){
             assert(data!= nullptr);
 
@@ -86,7 +89,6 @@ namespace net{
             assert(_write_index<=_buff.size());
         }
 
-        std::pair<ssize_t,int> read_from_fd(int fd);
     private:
         std::vector<char>_buff;
         size_t _read_index;

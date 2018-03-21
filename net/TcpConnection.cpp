@@ -44,10 +44,11 @@ namespace net{
     }
 
     void TcpConnection::handle_write() {
-
+        assert(_loop->in_loop_thread());
     }
 
     void TcpConnection::handle_read() {
+        assert(_loop->in_loop_thread());
 
         auto r = _in_buff.read_from_fd(_sockfd);
 
@@ -66,6 +67,8 @@ namespace net{
     }
 
     void TcpConnection::handle_close() {
+        assert(_loop->in_loop_thread());
+
         if(_conn_status==Disconnected)
             return;
 
@@ -87,6 +90,8 @@ namespace net{
     }
 
     void TcpConnection::handle_error() {
+        assert(_loop->in_loop_thread());
+
         int err = Socket::get_socket_error(_event.get_fd());
         LOG_ERROR << "TcpConnection::handleError - SO_ERROR = " << err;
 

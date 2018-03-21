@@ -25,15 +25,17 @@ namespace net {
         void add(Event *e);
         void update(Event* e);
         void remove(Event* e);
+
         void run_in_loop(const std::function<void()> &cb);
         void queue_in_loop(const std::function<void()> &cb);
-        void do_pending_fn();
-
-        bool in_loop_thread()const;
 
         void run();
 
         void stop();
+        bool in_loop_thread()const;
+    private:
+
+        void do_pending_fn();
 
         void wakeup();
         void handle_wakeup_read();

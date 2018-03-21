@@ -20,7 +20,7 @@ namespace net {
     }
 
     void Event::detach_from_loop() {
-        if (_add_to_loop) {
+        if (is_add_to_loop()) {
             _loop->remove(this);
             _add_to_loop=false;
         }
@@ -29,7 +29,7 @@ namespace net {
     void Event::attach_to_loop() {
         assert(!is_none());
 
-        if (_add_to_loop) {
+        if (is_add_to_loop()) {
             _loop->update(this);
         }
         else {
@@ -99,7 +99,7 @@ namespace net {
     }
 
     Event::~Event() noexcept {
-        detach_from_loop();
+        assert(!is_add_to_loop());
     }
 
 

@@ -13,6 +13,7 @@ namespace net {
 
     TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize)
             : _pool(threadSize)
+            ,_th_size(threadSize)
             , _loop(loop)
             ,_accepter(loop,addr){
         LOG_TRACE<<"server";
@@ -34,6 +35,8 @@ namespace net {
     }
 
     void TcpServer::stop_in_loop(){
+        assert(_loop->in_loop_thread());
+
         _accepter.stop();
 
         for(auto&conn:_connections){
@@ -43,10 +46,11 @@ namespace net {
     }
 
     void TcpServer::handle_new_connection(int fd, const InetAddress &addr) {
+        assert(_loop->in_loop_thread());
+
         LOG_TRACE << "get_fd=" << fd;
 
-
-        EventLoop* loop = _pool.get_next_loop();
+        EventLoop* loop = get_next_loop();
 
 
         TCPConnPtr conn(new TcpConnection(_next_conn_id++,loop, fd,_addr,addr));
@@ -65,11 +69,20 @@ namespace net {
     }
 
     void TcpServer::remove_connection_in_loop(const TCPConnPtr& conn) {
+        assert(_loop->in_loop_thread());
+
         _connections.erase(conn->get_id());
         //EventLoop* loop = conn->get_loop();
         //loop->queue_in_loop(std::bind(&TcpConnection::connectDestroyed, conn));
 
         LOG_TRACE<<"remove id="<<conn->get_id();
+    }
+
+    EventLoop *TcpServer::get_next_loop() {
+        if(_th_size>0)
+            return _pool.get_next_loop();
+        return _loop;
+
     }
 
 }

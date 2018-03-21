@@ -18,6 +18,8 @@ namespace net {
     }
 
     Accepter::~Accepter() {
+        assert(!_event.is_add_to_loop());
+
         Socket::close(_fd);
     }
 
@@ -30,10 +32,14 @@ namespace net {
     }
 
     void Accepter::stop() {
+        assert(_loop->in_loop_thread());
+
         _event.detach_from_loop();
     }
 
     void Accepter::handle_accept() {
+        assert(_loop->in_loop_thread());
+
         InetAddress addr;
         int connfd = Socket::accept(_fd,addr);
         _new_connection_cb(connfd,addr);

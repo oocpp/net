@@ -57,12 +57,14 @@ namespace net{
         }
 
         void attach_to_loop();
+
+    private:
         void handle_read();
         void handle_write();
 
         void handle_close();
         void handle_error();
-    private:
+
         enum Status {
             Disconnected = 0,
             Connecting = 1,

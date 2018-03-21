@@ -30,19 +30,22 @@ namespace net {
         void disable_write();
         void disable_all();
 
+        int get_fd()const{return _fd;}
+        uint32_t get_events()const{return _events;}
+
+        void attach_to_loop();
+        void detach_from_loop();
+        void handle_event(uint32_t event);
+
+        bool is_add_to_loop()const noexcept {return _add_to_loop;}
+    private:
+        void update();
+
         bool is_write() const { return (_events & WriteEvent)!=0; }
         bool is_read() const { return (_events & ReadEvent)!=0; }
         bool is_none()const{return _events==NoneEvent;}
 
-        int get_fd()const{return _fd;}
-        uint32_t get_events()const{return _events;}
-       // void set_active_events(int event){_active_event=event;}
 
-        void attach_to_loop();
-        void detach_from_loop();
-        void update();
-
-        void handle_event(uint32_t event);
     private:
         int _fd;
         EventLoop* _loop;
@@ -51,8 +54,6 @@ namespace net {
         bool _add_to_loop;
         ReadEventCallback _read_cb;
         EventCallback _write_cb;
-        //EventCallback _error_cb;
-        //EventCallback _close_cb;
     };
 }
 

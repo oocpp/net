@@ -45,10 +45,6 @@ namespace net {
         return uint32_t();
     }
 
-    bool InetAddress::resolve(const std::string & hostname, InetAddress & result)
-    {
-        return false;
-    }
 
 
 }
