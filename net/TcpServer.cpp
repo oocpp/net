@@ -37,7 +37,7 @@ namespace net {
         _accepter.stop();
 
         for(auto&conn:_connections){
-            conn.second->get_loop()->run_in_loop(std::bind(&TcpConnection::close,conn.second));
+            conn.second->close();
         }
         _pool.stop();
     }

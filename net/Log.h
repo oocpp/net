@@ -8,22 +8,24 @@
 #include<cstdarg>
 #include<iostream>
 #include<thread>
-
-#ifdef _DEBUG
-#include<string>
-#endif // _DEBUG
+#include"cstring"
+#include<iomanip>
 
 namespace net{
     class Log {
     public:
-        Log(const char*file, int line, const char*func) {
+        Log(const char* file, int line, const char*func) {
 
-#ifdef _DEBUG	/*防止debug模式下,,文件名前带有路径*/
-            file += std::string(file).rfind('\\') + 1;
-#endif // _DEBUG
+            const char*p=strrchr(file,'/');
+            if(p==nullptr)
+                p=file;
+            else
+                ++p;
 
-            /*输出前缀内容 file文件名,line 行号,所在函数名*/
-            this->out << file << '(' << line << ") " << func << " >> ";
+            this->out <<std::this_thread::get_id()<<" "
+                      <<std::setw(15)<< p << '('<< line << ") "
+                      <<std::setw(15)<< std::setiosflags(std::ios::left) <<func
+                      <<"     ";
         }
 
         template<typename T>
@@ -48,7 +50,7 @@ namespace net{
             return *this;
         }
 
-        ~Log() { std::cout <<std::this_thread::get_id()<< "--->>" << out.rdbuf() << std::endl; }
+        ~Log() { std::cout << out.rdbuf() << std::endl; }
 
     private:
         std::stringstream out;

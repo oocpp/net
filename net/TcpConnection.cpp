@@ -27,10 +27,11 @@ namespace net{
     }
 
     void TcpConnection::close() {
-        LOG_TRACE << "fd=" <<_sockfd ;
-        _conn_status = Disconnecting;
-
-        _loop->queue_in_loop(std::bind(&TcpConnection::handle_close,shared_from_this()));
+        Status t = Connected;
+        if(_conn_status.compare_exchange_strong(t,Disconnecting)) {
+            LOG_TRACE << "fd=" << _sockfd;
+            _loop->queue_in_loop(std::bind(&TcpConnection::handle_close, shared_from_this()));
+        }
     }
 
     void TcpConnection::attach_to_loop() {
@@ -54,6 +55,7 @@ namespace net{
             _message_cb(shared_from_this(), &_in_buff);
         }
         else if (r.first == 0) {
+            _conn_status = Disconnecting;
             handle_close();
         }
         else {
@@ -64,8 +66,10 @@ namespace net{
     }
 
     void TcpConnection::handle_close() {
-        _conn_status = Disconnecting;
+        if(_conn_status==Disconnected)
+            return;
 
+        _conn_status = Disconnecting;
         _event.disable_all();
 
         TCPConnPtr conn(shared_from_this());
@@ -86,6 +90,7 @@ namespace net{
         int err = Socket::get_socket_error(_event.get_fd());
         LOG_ERROR << "TcpConnection::handleError - SO_ERROR = " << err;
 
+        _conn_status = Disconnecting;
         handle_close();
     }
 }
