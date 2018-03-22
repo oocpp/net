@@ -14,6 +14,7 @@ namespace net {
     TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize)
             : _pool(threadSize)
             ,_th_size(threadSize)
+            ,_status(Init)
             , _loop(loop)
             ,_accepter(loop,addr){
         LOG_TRACE<<"server";
@@ -21,21 +22,30 @@ namespace net {
     }
 
     TcpServer::~TcpServer() {
-
+        assert(_status == Stopped);
     }
 
     void TcpServer::run() {
+        assert(_status==Init);
+        _status=Running;
+
         _pool.run();
         _accepter.listen();
     }
 
     void TcpServer::stop() {
+        assert(_status==Running);
+        _status=Stopping;
+
        _loop->run_in_loop(std::bind(&TcpServer::stop_in_loop,this));
         _pool.join();
+
+        _status=Stopped;
     }
 
     void TcpServer::stop_in_loop(){
         assert(_loop->in_loop_thread());
+        assert(_status=Stopping);
 
         _accepter.stop();
 
@@ -47,6 +57,11 @@ namespace net {
 
     void TcpServer::handle_new_connection(int fd, const InetAddress &addr) {
         assert(_loop->in_loop_thread());
+
+        if(_status!=Running) {
+            LOG_INFO<<"server is stopping";
+            return;
+        }
 
         LOG_TRACE << "get_fd=" << fd;
 

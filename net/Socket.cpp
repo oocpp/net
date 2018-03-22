@@ -3,7 +3,7 @@
 //
 
 
-
+#include <netinet/tcp.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <cstring>
@@ -46,6 +46,16 @@ namespace net {
             }
         }
 
+        void setTcpNoDelay(int fd,bool on)
+        {
+            int optval = on ? 1 : 0;
+            int rc=::setsockopt(fd, IPPROTO_TCP, TCP_NODELAY,
+                         &optval, static_cast<socklen_t>(sizeof optval));
+            if (rc != 0) {
+                int serrno = errno;
+                LOG_ERROR << "setsockopt(TCP_NODELAY) failed, errno=" << serrno << " " << strerror(serrno);
+            }
+        }
 
         void bind(int sockfd, const InetAddress &addr) {
             if (::bind(sockfd, addr.get_sockaddr(), addr.get_sockaddr_size()) < 0) {

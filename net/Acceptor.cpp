@@ -42,6 +42,11 @@ namespace net {
 
         InetAddress addr;
         int connfd = Socket::accept(_fd,addr);
+
+        if(connfd<0){
+            return ;
+        }
+
         _new_connection_cb(connfd,addr);
     }
 

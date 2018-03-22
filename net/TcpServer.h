@@ -34,6 +34,13 @@ namespace net{
         void stop_in_loop();
 
         EventLoop*get_next_loop();
+
+        enum Status {
+            Init = 0,
+            Running = 1,
+            Stopping = 2,
+            Stopped = 3,
+        };
     private:
         EventLoop*_loop;
         EventLoopThreadPool _pool;
@@ -41,6 +48,7 @@ namespace net{
         std::string _name;
         Accepter _accepter;
         size_t _th_size;
+        std::atomic<Status> _status;
 
         uint64_t _next_conn_id = 0;
         std::map<uint64_t,TCPConnPtr>_connections;

@@ -47,7 +47,7 @@ namespace net {
     }
 
     EventLoop::EventLoop()noexcept
-            :_is_looping(true)
+            :_is_looping(false)
              ,_is_pending_fns(false)
             ,_wake_fd(createWakeEventfd())
             ,_th_id(std::this_thread::get_id())
@@ -58,6 +58,10 @@ namespace net {
     }
 
     void EventLoop::run() {
+
+        assert(!_is_looping);
+
+        _is_looping=true;
         _th_id=std::this_thread::get_id();
 
         while(_is_looping){
@@ -72,6 +76,7 @@ namespace net {
             do_pending_fn();
             LOG_TRACE<<" loop stop"<<std::endl;
         }
+        _is_looping=false;
     }
 
     void EventLoop::stop() {
