@@ -6,6 +6,7 @@
 
 #include <sys/socket.h>
 #include <cerrno>
+#include <netinet/in.h>
 
 namespace net {
     class InetAddress;
@@ -29,8 +30,9 @@ namespace net {
         bool get_tcp_info(struct tcp_info *) ;
         //bool getTcpInfoString(char* buf, int len) ;
 
-        //getPeerAddr
-        //getLocalAddr
+        bool is_self_connect(int sockfd);
+        sockaddr_in get_peer_addr(int fd);
+        sockaddr_in get_local_addr(int fd);
 
         void shutdownWrite();
 

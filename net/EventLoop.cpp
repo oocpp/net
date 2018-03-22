@@ -61,7 +61,10 @@ namespace net {
 
         assert(!_is_looping);
 
-        _is_looping=true;
+        bool t=false;
+        if(!_is_looping.compare_exchange_strong(t,true))
+            return ;
+
         _th_id=std::this_thread::get_id();
 
         while(_is_looping){
@@ -80,8 +83,9 @@ namespace net {
     }
 
     void EventLoop::stop() {
-        if(_is_looping) {
-            _is_looping = false;
+        bool t=true;
+
+        if(_is_looping.compare_exchange_strong(t,false)) {
             wakeup();
         }
     }

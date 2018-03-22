@@ -13,15 +13,15 @@ namespace net {
 
     class InetAddress;
 
-    using TCPConnPtr=std::shared_ptr<TcpConnection>;
-
-    using NewConnCallback = std::function<void(int, const InetAddress &)>;
+    using TCPConnPtr = std::shared_ptr<TcpConnection>;
 
     using MessageCallback = std::function<void(const TCPConnPtr &, Buffer *)>;
 
-
     using ConnectingCallback =std::function<void(const TCPConnPtr &)>;
+
     using CloseCallback =std::function<void(const TCPConnPtr &)>;
+
+
 
     using EventCallback=std::function<void()>;
 

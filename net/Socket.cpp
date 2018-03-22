@@ -159,6 +159,43 @@ namespace net {
                 return optval;
             }
         }
+
+        sockaddr_in get_peer_addr(int fd) {
+            struct sockaddr_in peeraddr;
+            bzero(&peeraddr, sizeof peeraddr);
+            socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
+            if (::getpeername(fd, reinterpret_cast< sockaddr*>(&peeraddr), &addrlen) < 0)
+            {
+                LOG_ERROR << "sockets::getPeerAddr";
+            }
+            return peeraddr;
+        }
+
+        sockaddr_in get_local_addr(int fd) {
+            sockaddr_in localaddr;
+            bzero(&localaddr, sizeof localaddr);
+            socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
+            if (::getsockname(fd, reinterpret_cast< sockaddr*>(&localaddr), &addrlen) < 0)
+            {
+                LOG_ERROR << "sockets::getLocalAddr";
+            }
+            return localaddr;
+        }
+
+        bool is_self_connect(int sockfd)
+        {
+            struct sockaddr_in laddr4 = get_local_addr(sockfd);
+            struct sockaddr_in raddr4 = get_peer_addr(sockfd);
+            if (laddr4.sin_family == AF_INET)
+            {
+                return laddr4.sin_port == raddr4.sin_port
+                       && laddr4.sin_addr.s_addr == raddr4.sin_addr.s_addr;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 }
 

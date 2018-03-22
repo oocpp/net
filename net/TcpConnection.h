@@ -58,6 +58,18 @@ namespace net{
 
         void attach_to_loop();
 
+        void set_context(const Any&a){
+            _context=a;
+        }
+
+        void set_context(Any&&a){
+            _context=std::move(a);
+        }
+
+        Any&get_context(){
+            return _context;
+        }
+
     private:
         void handle_read();
         void handle_write();

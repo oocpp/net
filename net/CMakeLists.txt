@@ -20,7 +20,7 @@ set(SOURCE_FILES
         EventLoopThread.cpp
         EventLoop.cpp
         TcpServer.cpp
-        Client.cpp
+        TcpClient.cpp
         EventLoopThreadPool.cpp
         Event.cpp
         )

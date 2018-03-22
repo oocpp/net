@@ -3,9 +3,12 @@
 //
 #pragma once
 
+namespace net{
+    class TcpClient {
 
-class Client {
+    };
 
-};
+}
+
 
 

@@ -10,7 +10,7 @@
 namespace net {
     Accepter::Accepter(EventLoop *loop, const InetAddress &addr)
             :_loop(loop)
-            ,_fd(Socket::create_nonblocking_socket())
+            ,_fd(Socket::create_nonblocking_socket(addr.get_family()))
             ,_addr(addr)
             ,_event(loop,_fd,true,false){
         LOG_INFO<<"true="<< true;

@@ -14,7 +14,9 @@ namespace net {
 
         InetAddress()= default;
         explicit InetAddress(const std::string &ip, in_port_t port = 0,sa_family_t family=AF_INET);
-
+        explicit InetAddress(const struct sockaddr_in& addr)
+                : _addr(addr)
+        { }
 
         const sockaddr* get_sockaddr() const { return reinterpret_cast<const sockaddr*>(&_addr); }
         sockaddr* get_sockaddr() { return reinterpret_cast<sockaddr*>(&_addr); }

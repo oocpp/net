@@ -18,6 +18,8 @@ namespace net{
 
     class Accepter {
     public:
+        using NewConnCallback = std::function<void(int, const InetAddress &)>;
+
         Accepter(EventLoop*loop,const InetAddress&addr);
         ~Accepter();
 

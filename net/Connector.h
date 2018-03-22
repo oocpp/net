@@ -4,29 +4,49 @@
 
 #pragma once
 #include <functional>
-#include <memory>
+#include <atomic>
+#include "InetAddress.h"
+#include "Event.h"
 
 namespace net{
 
-    class TcpConnection;
-    class InetAddress;
+    class EventLoop;
 
     class Connector {
     public:
-        Connector(const InetAddress&addr);
+        using NewConnCallback = std::function<void(int, const InetAddress &)>;
 
-        void setConnectedCallBack(const std::function<void(std::unique_ptr<TcpConnection>&)>&cb);
+        Connector(EventLoop*loop,const InetAddress&addr);
+        ~Connector();
 
-        void setConnectedCallBack(std::function<void(std::unique_ptr<TcpConnection>&)>&&cb);
+        void set_new_connection_cb(const NewConnCallback&cb);
 
-        std::unique_ptr<TcpConnection> getTcpSession();
+        void set_new_connection_cb(NewConnCallback&&cb);
+        void start();
+        void cancel();
+        void restart();
+
 
     private:
-        void connect(const InetAddress &peerAddr);
-        //void connecting(int sockfd);
-        //void retry(int sockfd);
+       void retry(int fd);
+        void connect();
+        void connecting(int fd);
+        void stop_in_loop();
+        void handle_write();
+        void handle_error();
+
+        enum Status {
+            Disconnected = 0,
+            Connecting = 1,
+            Connected = 2,
+           // Disconnecting = 3,
+        };
 
     private:
-        std::unique_ptr<TcpConnection> _tcp_ptr;
+       EventLoop* _loop;
+        InetAddress _addr;
+        NewConnCallback _new_conn_cb;
+        std::atomic<Status> _status;
+        Event _event;
     };
 }

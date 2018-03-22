@@ -21,6 +21,7 @@ namespace net {
 
         void set_read_cb(const ReadEventCallback &cb) { _read_cb = cb; }
         void set_write_cb(const EventCallback &cb) { _write_cb = cb; }
+        void set_error_cb(const EventCallback &cb){_error_cb=cb;}
 
         void enable_read();
         void enable_write();
@@ -38,6 +39,8 @@ namespace net {
         void handle_event(uint32_t event);
 
         bool is_add_to_loop()const noexcept {return _add_to_loop;}
+
+        void set_fd(int fd) {_fd=fd;}
     private:
         void update();
 
@@ -54,6 +57,7 @@ namespace net {
         bool _add_to_loop;
         ReadEventCallback _read_cb;
         EventCallback _write_cb;
+        EventCallback _error_cb;
     };
 }
 

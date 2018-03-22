@@ -27,19 +27,23 @@ namespace net {
 
     void TcpServer::run() {
         assert(_status==Init);
-        _status=Running;
 
-        _pool.run();
-        _accepter.listen();
+        Status t=Init;
+        if(_status.compare_exchange_strong(t,Running)){
+            _pool.run();
+            _accepter.listen();
+        }
     }
 
     void TcpServer::stop() {
         assert(_status==Running);
-        _status=Stopping;
 
-       _loop->run_in_loop(std::bind(&TcpServer::stop_in_loop,this));
-        _pool.join();
+        Status t=Running;
 
+        if(_status.compare_exchange_strong(t,Stopping)){
+            _loop->run_in_loop(std::bind(&TcpServer::stop_in_loop,this));
+            _pool.join();
+        }
         _status=Stopped;
     }
 
