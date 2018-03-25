@@ -11,11 +11,12 @@ using namespace net::Socket;
 #include "Any.h"
 #include"Log.h"
 #include "Connector.h"
+#include "TcpClient.h"
 #include<chrono>
 
 
     void fun(EventLoop&loop,TcpServer&s){
-        this_thread::sleep_for(10s);
+        this_thread::sleep_for(15s);
         s.stop();
         loop.stop();
     }
@@ -30,11 +31,12 @@ using namespace net::Socket;
 
         thread A([&loop]{
             //this_thread::sleep_for(3s);
-            Connector c(&loop,InetAddress("127.0.0.1",8888));
+            TcpClient c(&loop,InetAddress("127.0.0.1",8888),"asdasd");
 
             this_thread::sleep_for(3s);
-            c.start();
-            this_thread::sleep_for(20s);
+            c.connect();
+            this_thread::sleep_for(5s);
+            c.disconnect();
         });
 
 

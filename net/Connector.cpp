@@ -22,7 +22,7 @@ namespace net {
     }
 
     Connector::~Connector() {
-        _event.disable_all();
+        //_event.disable_all();
     }
 
     void Connector::set_new_connection_cb(const Connector::NewConnCallback &cb) {
@@ -105,11 +105,11 @@ namespace net {
     void Connector::handle_write() {
         LOG_TRACE << "Connector::handleWrite " << _status;
 
+        _event.disable_all();
+
         if (_status == Connecting)
         {
             int sockfd = _event.get_fd();
-
-            _event.disable_all();
 
             int err = Socket::get_socket_error(sockfd);
             if (err)
@@ -128,7 +128,7 @@ namespace net {
                 if (_status.compare_exchange_strong(t, Connected)) {
                     LOG_TRACE << "connect success";
                     if (_new_conn_cb) {
-                        _new_conn_cb(sockfd, InetAddress(Socket::get_peer_addr(sockfd)));
+                        _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
                     }
                 }
                 else {
