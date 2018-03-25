@@ -11,12 +11,13 @@
 #include"Event.h"
 #include<mutex>
 #include <thread>
+#include<chrono>
 
 namespace net {
 
     class EventLoop final {
     public:
-        EventLoop()noexcept;
+        explicit EventLoop()noexcept;
         ~EventLoop()noexcept;
 
         EventLoop(const EventLoop &) = delete;
@@ -29,10 +30,13 @@ namespace net {
         void run_in_loop(const std::function<void()> &cb);
         void queue_in_loop(const std::function<void()> &cb);
 
+        void run_after(std::chrono::milliseconds ms,const std::function<void()> &cb);
+
         void run();
 
         void stop();
         bool in_loop_thread()const;
+        void set_thread_id(std::thread::id id){_th_id=id;}
     private:
 
         void do_pending_fn();

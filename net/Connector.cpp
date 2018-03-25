@@ -9,17 +9,20 @@
 
 namespace net {
 
+   // constexpr int Connector::init_retry_delay_ms=1000;
+
     Connector::Connector(EventLoop *loop, const InetAddress &addr)
     :_loop(loop)
     ,_addr(addr)
     ,_status(Disconnected)
     ,_event(loop,-1)
+    ,_retry_delay_ms(init_retry_delay_ms+0)
     {
 
     }
 
     Connector::~Connector() {
-
+        _event.disable_all();
     }
 
     void Connector::set_new_connection_cb(const Connector::NewConnCallback &cb) {
@@ -31,6 +34,8 @@ namespace net {
     }
 
     void Connector::start() {
+        assert(_status==Disconnected);
+
         Status t=Disconnected;
         if(_status.compare_exchange_strong(t,Connecting)){
             _loop->run_in_loop(std::bind(&Connector::connect,this));
@@ -39,17 +44,17 @@ namespace net {
 
 
     void Connector::stop_in_loop() {
-
+        _event.disable_all();
+        Socket::close(_event.get_fd());
     }
 
     void Connector::cancel() {
+        assert(_status==Connecting);
 
-        if(_status==Disconnected)
-            return ;
-
-        _status==Disconnected;
-
-        _loop->run_in_loop(std::bind(&Connector::stop_in_loop,this));
+        Status t=Connecting;
+        if(_status.compare_exchange_strong(t,Disconnected)) {
+            _loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
+        }
     }
 
     void Connector::connect() {
@@ -92,6 +97,8 @@ namespace net {
                 Socket::close(fd);
                 break;
         }
+
+        LOG_TRACE<<"connecting .........";
     }
 
 
@@ -101,6 +108,9 @@ namespace net {
         if (_status == Connecting)
         {
             int sockfd = _event.get_fd();
+
+            _event.disable_all();
+
             int err = Socket::get_socket_error(sockfd);
             if (err)
             {
@@ -116,8 +126,10 @@ namespace net {
             else {
                 Status t = Connecting;
                 if (_status.compare_exchange_strong(t, Connected)) {
-                    if (_new_conn_cb)
+                    LOG_TRACE << "connect success";
+                    if (_new_conn_cb) {
                         _new_conn_cb(sockfd, InetAddress(Socket::get_peer_addr(sockfd)));
+                    }
                 }
                 else {
                     Socket::close(sockfd);
@@ -126,13 +138,22 @@ namespace net {
         }
         else
         {
-            // what happened?
             assert(_status == Disconnected);
         }
     }
 
     void Connector::handle_error() {
+        LOG_ERROR << "Connector::handleError state=" << _status;
+        if (_status == Connecting)
+        {
+            int sockfd = _event.get_fd();
 
+            _event.disable_all();
+
+            int err = Socket::get_socket_error(sockfd);
+            LOG_TRACE << "SO_ERROR = " << err << " " << err;
+            retry(sockfd);
+        }
     }
 
     void Connector::restart() {
@@ -147,8 +168,22 @@ namespace net {
         _event.enable_write();
     }
 
-    void Connector::retry(int fd) {
+    void Connector::retry(int sockfd) {
+        Socket::close(sockfd);
+        Status t = Connecting;
+        if (_status.compare_exchange_strong(t, Disconnected)) {
 
+            LOG_INFO << "Connector::retry - Retry connecting to " << _addr.toIpPort()
+                     << " in " << _retry_delay_ms.count() << " milliseconds. ";
+            _loop->run_after(_retry_delay_ms,std::bind(&Connector::connect, shared_from_this()));
+            _retry_delay_ms *= 2;
+            //if(_retry_delay_ms.count()>max_retry_delay_ms)
+              //  _retry_delay_ms=max_retry_delay_ms;
+        }
+        else
+        {
+            LOG_DEBUG << "do not connect";
+        }
     }
 
 

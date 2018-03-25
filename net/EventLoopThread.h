@@ -23,6 +23,9 @@ namespace net {
         EventLoop *get_loop();
 
     private:
+
+        void thread_fn();
+
         std::thread _th;
         EventLoop _loop;
     };

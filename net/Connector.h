@@ -7,12 +7,13 @@
 #include <atomic>
 #include "InetAddress.h"
 #include "Event.h"
+#include<chrono>
 
 namespace net{
 
     class EventLoop;
 
-    class Connector {
+    class Connector:public std::enable_shared_from_this<Connector> {
     public:
         using NewConnCallback = std::function<void(int, const InetAddress &)>;
 
@@ -42,11 +43,17 @@ namespace net{
            // Disconnecting = 3,
         };
 
+        static constexpr int init_retry_delay_ms=1000;
+        //static constexpr size_t init_event_vector_size=16;
     private:
        EventLoop* _loop;
         InetAddress _addr;
         NewConnCallback _new_conn_cb;
         std::atomic<Status> _status;
         Event _event;
+        std::chrono::milliseconds _retry_delay_ms;
+
+
+        //static constexpr int max_retry_delay_ms=30*1000;
     };
 }

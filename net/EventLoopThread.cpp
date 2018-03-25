@@ -13,7 +13,8 @@ namespace  net
         }
     }
 
-    EventLoopThread::EventLoopThread()noexcept{
+    EventLoopThread::EventLoopThread()noexcept
+    {
 
     }
 
@@ -22,7 +23,7 @@ namespace  net
     }
 
     void EventLoopThread::run() {
-        _th=std::thread(&EventLoop::run,&_loop);
+        _th=std::thread(&EventLoopThread::thread_fn,this);
     }
 
     void EventLoopThread::stop() {
@@ -31,5 +32,11 @@ namespace  net
 
     EventLoop *EventLoopThread::get_loop() {
         return &_loop;
+    }
+
+    void EventLoopThread::thread_fn() {
+
+        _loop.set_thread_id(std::this_thread::get_id());
+        _loop.run();
     }
 }

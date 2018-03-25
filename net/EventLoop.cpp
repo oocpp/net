@@ -46,7 +46,7 @@ namespace net {
         Socket::close(_wake_fd);
     }
 
-    EventLoop::EventLoop()noexcept
+     EventLoop::EventLoop()noexcept
             :_is_looping(false)
              ,_is_pending_fns(false)
             ,_wake_fd(createWakeEventfd())
@@ -60,12 +60,11 @@ namespace net {
     void EventLoop::run() {
 
         assert(!_is_looping);
+        assert(_th_id==std::this_thread::get_id());
 
         bool t=false;
         if(!_is_looping.compare_exchange_strong(t,true))
             return ;
-
-        _th_id=std::this_thread::get_id();
 
         while(_is_looping){
             LOG_TRACE<<" looping"<<std::endl;
@@ -169,5 +168,9 @@ namespace net {
         for(auto&f:fns)
             f();
         _is_pending_fns=false;
+    }
+
+    void EventLoop::run_after(std::chrono::milliseconds ms, const std::function<void()> &cb) {
+
     }
 }
