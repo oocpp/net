@@ -28,4 +28,7 @@ namespace net {
     using ReadEventCallback =std::function<void()>;
 
 
+    using TimerCallback = std::function<void()>;
+
+
 }

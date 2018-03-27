@@ -12,6 +12,7 @@
 #include<mutex>
 #include <thread>
 #include<chrono>
+#include"TimerQueue.h"
 
 namespace net {
 
@@ -30,7 +31,10 @@ namespace net {
         void run_in_loop(const std::function<void()> &cb);
         void queue_in_loop(const std::function<void()> &cb);
 
-        void run_after(std::chrono::milliseconds ms,const std::function<void()> &cb);
+        uint64_t run_after(std::chrono::milliseconds ms,const std::function<void()> &cb);
+        uint64_t run_at(TimerQueue::time_point time,const std::function<void()> &cb);
+        uint64_t run_every(std::chrono::milliseconds ms,const std::function<void()> &cb);
+        void cancel(uint64_t id);
 
         void run();
 
@@ -56,6 +60,8 @@ namespace net {
         std::atomic<bool> _is_pending_fns;
 
         std::vector<epoll_event>_events;
+
+        TimerQueue _timers;
     };
 
 

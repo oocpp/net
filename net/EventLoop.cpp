@@ -51,6 +51,7 @@ namespace net {
              ,_is_pending_fns(false)
             ,_wake_fd(createWakeEventfd())
             ,_th_id(std::this_thread::get_id())
+             ,_timers(this)
             ,_wake_event(this,_wake_fd,true) {
 
         _wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
@@ -170,7 +171,19 @@ namespace net {
         _is_pending_fns=false;
     }
 
-    void EventLoop::run_after(std::chrono::milliseconds ms, const std::function<void()> &cb) {
+    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, const std::function<void()> &cb) {
+        return run_at(TimerQueue::now()+ms, cb);
+    }
 
+    uint64_t EventLoop::run_at(TimerQueue::time_point time, const std::function<void()> &cb) {
+        return _timers.addTimer(cb,time,0ms);
+    }
+
+    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, const std::function<void()> &cb) {
+        return _timers.addTimer(cb,TimerQueue::now()+ms,ms);
+    }
+
+    void EventLoop::cancel(uint64_t id) {
+        _timers.cancel(id);
     }
 }

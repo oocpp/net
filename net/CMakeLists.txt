@@ -23,6 +23,8 @@ set(SOURCE_FILES
         TcpClient.cpp
         EventLoopThreadPool.cpp
         Event.cpp
+        Timer.cpp
+        TimerQueue.cpp
         )
 
 add_executable(net ${SOURCE_FILES})
