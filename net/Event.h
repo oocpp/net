@@ -41,13 +41,12 @@ namespace net {
         bool is_add_to_loop()const noexcept {return _add_to_loop;}
 
         void set_fd(int fd) {_fd=fd;}
-    private:
-        void update();
 
         bool is_write() const { return (_events & WriteEvent)!=0; }
         bool is_read() const { return (_events & ReadEvent)!=0; }
         bool is_none()const{return _events==NoneEvent;}
-
+    private:
+        void update();
 
     private:
         int _fd;

@@ -20,8 +20,20 @@ namespace net{
         void stop();
 
         void enable_retry(){_retry=true;}
-        void retry();
+
+        EventLoop*get_loop(){return _loop;}
         const std::string& get_name(){return _name;}
+
+        void set_connection_cb(const ConnectingCallback& cb)
+        { _connecting_cb = cb; }
+
+
+        void set_message_cb(const MessageCallback& cb)
+        { _message_cb = cb; }
+
+
+        void set_write_complete_cb(const WriteCompleteCallback& cb)
+        { _write_complete_cb = cb; }
 
         void set_context(const Any&a){
             _context=a;
@@ -46,15 +58,17 @@ namespace net{
         };
 
         static std::atomic<uint64_t> id;
+        using ConnectorPtr = std::shared_ptr<Connector>;
     private:
         EventLoop*_loop;
         std::string _name;
         InetAddress _peer_addr;
-        Connector _connector;
+        ConnectorPtr _connector;
         std::atomic<bool>  _retry;
         std::atomic<Status>  _status;
         TCPConnPtr _connection;
 
+        WriteCompleteCallback _write_complete_cb;
         ConnectingCallback _connecting_cb;
         MessageCallback _message_cb;
         Any _context;

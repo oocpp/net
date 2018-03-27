@@ -25,9 +25,8 @@ namespace net{
         void set_new_connection_cb(NewConnCallback&&cb);
         void start();
         void cancel();
+
         void restart();
-
-
     private:
        void retry(int fd);
         void connect();
@@ -44,7 +43,7 @@ namespace net{
         };
 
         static constexpr int init_retry_delay_ms=1000;
-        //static constexpr size_t init_event_vector_size=16;
+        static constexpr int max_retry_delay_ms=30*1000;
     private:
        EventLoop* _loop;
         InetAddress _addr;
@@ -53,7 +52,5 @@ namespace net{
         Event _event;
         std::chrono::milliseconds _retry_delay_ms;
 
-
-        //static constexpr int max_retry_delay_ms=30*1000;
     };
 }

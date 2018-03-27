@@ -38,7 +38,16 @@ namespace net{
 
         std::pair<ssize_t,int> read_from_fd(int fd);
 
-    private:
+        size_t get_writable_size() const{
+            return _buff.size()-_write_index;
+        }
+
+        size_t length() const {
+            assert(_write_index >= _read_index);
+            return _write_index - _read_index;
+        }
+
+
         void append(const char*data,size_t len){
             assert(data!= nullptr);
 
@@ -63,12 +72,9 @@ namespace net{
             }
         }
 
+
         size_t get_readable_size() const{
             return _write_index - _read_index;
-        }
-
-        size_t get_writable_size() const{
-            return _buff.size()-_write_index;
         }
 
         char* get_read_ptr(){

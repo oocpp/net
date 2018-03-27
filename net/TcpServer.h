@@ -25,6 +25,17 @@ namespace net{
         void run();
         void stop();
 
+        void set_connection_cb(const ConnectingCallback& cb)
+        { _connecting_cb = cb; }
+
+
+        void set_message_cb(const MessageCallback& cb)
+        { _message_cb = cb; }
+
+
+        void set_write_complete_cb(const WriteCompleteCallback& cb)
+        { _write_complete_cb = cb; }
+
     private:
 
         void handle_new_connection(int fd, const InetAddress &addr);
@@ -55,6 +66,7 @@ namespace net{
 
         ConnectingCallback _connecting_cb;
         MessageCallback _message_cb;
+        WriteCompleteCallback _write_complete_cb;
     };
 
 }

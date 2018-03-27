@@ -76,6 +76,7 @@ namespace net {
 
         conn->set_message_cb(_message_cb);
         conn->set_connection_cb(_connecting_cb);
+        conn->set_write_complete_cb(_write_complete_cb);
         conn->set_close_cb(std::bind(&TcpServer::remove_connection, this, _1));
 
         loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, conn));

@@ -31,11 +31,16 @@ namespace net{
             _message_cb=cb;
         }
 
-        void set_write_cb(const std::function<void(std::shared_ptr<TcpConnection> &)> &cb){
-            _write_cb=cb;
+        void set_high_water_cb(const HighWaterMarkCallback &cb, size_t mark){
+            _write_high_level_cb=cb;
+            _high_level_mark=mark;
         }
 
         void set_connection_cb(const ConnectingCallback &cb){
+            _connecting_cb=cb;
+        }
+
+        void set_write_complete_cb(const WriteCompleteCallback &cb){
             _connecting_cb=cb;
         }
 
@@ -70,12 +75,15 @@ namespace net{
             return _context;
         }
 
+        void send(const std::string& d);
     private:
         void handle_read();
         void handle_write();
 
         void handle_close();
         void handle_error();
+
+        void send_in_loop(const std::string& message);
 
         enum Status {
             Disconnected = 0,
@@ -89,7 +97,7 @@ namespace net{
         EventLoop*_loop;
         int _sockfd;
         Event _event;
-        std::atomic<Status> _conn_status;
+        std::atomic<Status> _status;
 
         Buffer _in_buff;
         Buffer _out_buff;
@@ -97,15 +105,12 @@ namespace net{
         InetAddress _peer_addr;
         Any _context;
 
+        size_t _high_level_mark=64 * 1024 * 1024; // Default 128MB
 
         CloseCallback  _close_cb;
         ConnectingCallback _connecting_cb;
         MessageCallback _message_cb;
-
-        std::function<void (TCPConnPtr&)> _write_cb;
-
-        std::function<void (TCPConnPtr&)> _error_cb;
-        std::function<void (TCPConnPtr&)> _write_high_level_cb;
-        std::function<void (TCPConnPtr&)> _write_complete_cb;
+        HighWaterMarkCallback _write_high_level_cb;
+        WriteCompleteCallback _write_complete_cb;
     };
 }

@@ -19,8 +19,11 @@ namespace net {
 
     using ConnectingCallback =std::function<void(const TCPConnPtr &)>;
 
-    using CloseCallback =std::function<void(const TCPConnPtr &)>;
+    using CloseCallback = std::function<void(const TCPConnPtr &)>;
 
+    using WriteCompleteCallback = std::function<void(const TCPConnPtr &)>;
+
+    typedef std::function<void (const TCPConnPtr&, size_t)> HighWaterMarkCallback;
 
 
     using EventCallback=std::function<void()>;
