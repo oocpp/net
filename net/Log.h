@@ -4,29 +4,13 @@
 
 #pragma once
 #include<sstream>
-#include<cstdio>
-#include<cstdarg>
 #include<iostream>
-#include<thread>
-#include"cstring"
-#include<iomanip>
 
 namespace net{
+
     class Log {
     public:
-        Log(const char* file, int line, const char*func) {
-
-            const char*p=strrchr(file,'/');
-            if(p==nullptr)
-                p=file;
-            else
-                ++p;
-
-            this->out <<std::this_thread::get_id()<<" "
-                      <<std::setw(15)<< p << '('<< line << ") "
-                      <<std::setw(15)<< std::setiosflags(std::ios::left) <<func
-                      <<"     ";
-        }
+        Log(int n,const char* file, int line, const char*func);
 
         template<typename T>
         Log&operator<<(const T & t) {
@@ -34,32 +18,23 @@ namespace net{
             return *this;
         }
 
-        Log&operator<<(std::ostream&(*op)(std::ostream&)) {
-            op(this->out);
-            return *this;
-        }
+        Log&operator<<(std::ostream&(*op)(std::ostream&));
 
-        Log& operator()(const char*s, ...) {
-            char buf[1024];/*注意 最大输出长度1024..自行设置*/
-            va_list ap;
-            va_start(ap, s);
-            int n = vsnprintf(buf, 1024, s, ap);
-            va_end(ap);
-            buf[n] = '\0';
-            out << buf;
-            return *this;
-        }
+        Log& operator()(const char*s, ...);
 
-        ~Log() { std::cout << out.rdbuf() << std::endl; }
+        ~Log();
 
+        static void set_rank(int i){RANK=i;}
     private:
         std::stringstream out;
+        int rank;
+        static int RANK;
     };
 }
 
-#define LOG_TRACE net::Log(__FILE__,__LINE__,__FUNCTION__)
-#define LOG_DEBUG net::Log(__FILE__,__LINE__,__FUNCTION__)
-#define LOG_INFO  net::Log(__FILE__,__LINE__,__FUNCTION__)
-#define LOG_WARN  net::Log(__FILE__,__LINE__,__FUNCTION__)
-#define LOG_ERROR net::Log(__FILE__,__LINE__,__FUNCTION__)
-#define LOG_FATAL net::Log(__FILE__,__LINE__,__FUNCTION__)
+#define LOG_TRACE net::Log(1,__FILE__,__LINE__,__FUNCTION__)<<" [trace] "
+#define LOG_DEBUG net::Log(2,__FILE__,__LINE__,__FUNCTION__)<<" [debug] "
+#define LOG_INFO  net::Log(3,__FILE__,__LINE__,__FUNCTION__)<<" [info ] "
+#define LOG_WARN  net::Log(4,__FILE__,__LINE__,__FUNCTION__)<<" [warn ] "
+#define LOG_ERROR net::Log(5,__FILE__,__LINE__,__FUNCTION__)<<" [error] "
+#define LOG_FATAL net::Log(6,__FILE__,__LINE__,__FUNCTION__)<<" [fatal] "

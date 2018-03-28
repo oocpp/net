@@ -2,6 +2,7 @@
 // Created by lg on 17-4-19.
 //
 
+#include <cstring>
 #include "TcpConnection.h"
 #include "Buffer.h"
 #include"Log.h"

@@ -3,13 +3,13 @@
 //
 
 #pragma once
-
-#include"EventLoopThreadPool.h"
-#include "InetAddress.h"
 #include<memory>
 #include<string>
 #include<functional>
 #include<map>
+
+#include"EventLoopThreadPool.h"
+#include "InetAddress.h"
 #include"Acceptor.h"
 #include"CallBack.h"
 
@@ -25,21 +25,20 @@ namespace net{
         void run();
         void stop();
 
-        void set_connection_cb(const ConnectingCallback& cb)
-        { _connecting_cb = cb; }
+        void set_connection_cb(const ConnectingCallback& cb) {
+            _connecting_cb = cb;
+        }
 
+        void set_message_cb(const MessageCallback& cb) {
+            _message_cb = cb;
+        }
 
-        void set_message_cb(const MessageCallback& cb)
-        { _message_cb = cb; }
-
-
-        void set_write_complete_cb(const WriteCompleteCallback& cb)
-        { _write_complete_cb = cb; }
+        void set_write_complete_cb(const WriteCompleteCallback& cb) {
+            _write_complete_cb = cb;
+        }
 
     private:
-
         void handle_new_connection(int fd, const InetAddress &addr);
-
         void remove_connection(const TCPConnPtr& conn);
         void remove_connection_in_loop(const TCPConnPtr& conn);
         void stop_in_loop();

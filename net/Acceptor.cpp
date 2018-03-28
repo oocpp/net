@@ -13,7 +13,6 @@ namespace net {
             ,_fd(Socket::create_nonblocking_socket(addr.get_family()))
             ,_addr(addr)
             ,_event(loop,_fd,true,false){
-        LOG_INFO<<"true="<< true;
         Socket::bind(_fd, _addr);
     }
 

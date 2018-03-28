@@ -1,13 +1,12 @@
 #pragma once
 
-
 #include <set>
 #include<map>
 #include <vector>
 #include<chrono>
 #include<memory>
+
 #include "Event.h"
-#include<memory>
 #include"Timer.h"
 
 namespace net {

@@ -9,7 +9,6 @@ include(CheckFunctionExists)
 check_function_exists(accept4 HAVE_ACCEPT4)
 
 set(SOURCE_FILES
-        main.cpp
         Socket.cpp
         InetAddress.cpp
         Buffer.cpp
@@ -25,6 +24,13 @@ set(SOURCE_FILES
         Event.cpp
         Timer.cpp
         TimerQueue.cpp
+        Log.cpp
         )
 
-add_executable(net ${SOURCE_FILES})
+set(NET_LIBRARY 1)
+
+if(NET_LIBRARY)
+    add_library(net ${SOURCE_FILES})
+else()
+    add_executable(net main.cpp ${SOURCE_FILES})
+endif()

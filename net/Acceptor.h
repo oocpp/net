@@ -31,7 +31,6 @@ namespace net{
         void stop();
 
     private:
-
         void handle_accept();
     private:
         EventLoop*_loop;

@@ -19,7 +19,7 @@ namespace net{
         void disconnect();
         void stop();
 
-        void enable_retry(){_retry=true;}
+        void set_retry(bool t=true){_retry=t;}
 
         EventLoop*get_loop(){return _loop;}
         const std::string& get_name(){return _name;}
