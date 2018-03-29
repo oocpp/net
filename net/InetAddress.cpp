@@ -27,17 +27,19 @@ namespace net {
 
     std::string InetAddress::toIp() const
     {
-        return std::string();
+        std::string s(16,'\0');
+        ::inet_ntop(AF_INET, &_addr.sin_addr, &s[0], static_cast<socklen_t>(s.size()));
+        return s;
     }
 
     std::string InetAddress::toIpPort() const
     {
-        return std::string();
+        return std::to_string(ntohs(_addr.sin_port));
     }
 
     in_port_t InetAddress::toPort() const
     {
-        return in_port_t();
+        return ntohs(_addr.sin_port);
     }
 
     uint32_t InetAddress::ipNetEndian() const

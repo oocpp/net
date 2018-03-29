@@ -76,8 +76,12 @@ namespace net{
         }
 
         void send(const std::string& d);
+        void send(Buffer* d);
 
         bool is_connected()const{return _status==Connected;}
+
+        InetAddress get_local_addr()const{return _local_addr;}
+        InetAddress get_peer_addr()const{return _peer_addr;}
     private:
         void handle_read();
         void handle_write();

@@ -42,8 +42,8 @@ namespace net{
            // Disconnecting = 3,
         };
 
-        static constexpr int init_retry_delay_ms=1000;
-        static constexpr int max_retry_delay_ms=30*1000;
+        static constexpr int init_retry_delay_ms=500;
+        static constexpr int max_retry_delay_ms=10*1000;
     private:
        EventLoop* _loop;
         InetAddress _addr;

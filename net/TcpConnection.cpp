@@ -186,4 +186,8 @@ namespace net{
             }
         }
     }
+
+    void TcpConnection::send( Buffer *d) {
+        send(std::string(d->get_read_ptr(),d->get_readable_size()));
+    }
 }

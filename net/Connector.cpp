@@ -55,6 +55,9 @@ namespace net {
 
     void Connector::connect() {
 
+        if(_status!=Connecting)
+            return;
+
         int fd = Socket::create_nonblocking_socket(_addr.get_family());
         int rt = Socket::connect(fd, _addr);
 
@@ -161,17 +164,17 @@ namespace net {
 
     void Connector::retry(int sockfd) {
         Socket::close(sockfd);
-        Status t = Connecting;
-        if (_status.compare_exchange_strong(t, Disconnected)) {
+
+        if (_status==Connecting) {
 
             LOG_INFO << "Connector::retry - Retry connecting to " << _addr.toIpPort()
                      << " in " << _retry_delay_ms.count() << " milliseconds. ";
 
-            _loop->run_after(_retry_delay_ms, std::bind(&Connector::connect, shared_from_this()));
-
             _retry_delay_ms *= 2;
             if (_retry_delay_ms.count() > max_retry_delay_ms)
                 _retry_delay_ms = std::chrono::milliseconds(max_retry_delay_ms+0);
+
+            _loop->run_after(_retry_delay_ms, std::bind(&Connector::connect, shared_from_this()));
 
         } else {
             LOG_DEBUG << "do not connect";

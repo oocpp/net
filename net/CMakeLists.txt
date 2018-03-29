@@ -3,9 +3,6 @@ project(net)
 
 set(CMAKE_CXX_STANDARD 14)
 
-find_package(Threads REQUIRED)
-link_libraries(Threads::Threads)
-
 include(CheckFunctionExists)
 check_function_exists(accept4 HAVE_ACCEPT4)
 
@@ -31,10 +28,15 @@ set(SOURCE_FILES
 SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -Wall")
 SET(CMAKE_CXX_FLAGS_RELEASE   "$ENV{CXXFLAGS} -Wall")
 
-set(NET_LIBRARY 0)
+set(NET_LIBRARY 1)
 
 if(NET_LIBRARY)
     add_library(net ${SOURCE_FILES})
 else()
     add_executable(net main.cpp ${SOURCE_FILES})
 endif()
+
+target_link_libraries(net pthread)
+
+#find_package(Threads REQUIRED)
+#target_link_libraries(net Threads::Threads)

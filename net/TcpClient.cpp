@@ -39,31 +39,35 @@ namespace net{
     void TcpClient::disconnect() {
         //assert(_status==Connecting);
 
-        Status t=Connecting;
+        Status t=Connected;
         if(_status.compare_exchange_strong(t,Disconnected)){
             _connection->close();
+            _connection.reset();
         }
     }
 
     void TcpClient::stop() {
-        Status t=Connected;
-        if(_status.compare_exchange_strong(t,Disconnecting)){
+        Status t=Connecting;
+        if(_status.compare_exchange_strong(t,Disconnected)){
             _connector->cancel();
         }
     }
 
     void TcpClient::on_new_connection(int fd, InetAddress addr) {
+        Status t=Connecting;
+        if(_status.compare_exchange_strong(t,Connected)) {
 
-        _connection.reset(new TcpConnection(++id,_loop, fd,addr,_peer_addr));
+            _connection.reset(new TcpConnection(++id, _loop, fd, addr, _peer_addr));
 
-        _connection->set_message_cb(_message_cb);
-        _connection->set_connection_cb(_connecting_cb);
-        _connection->set_write_complete_cb(_write_complete_cb);
-        _connection->set_close_cb(std::bind(&TcpClient::on_remove_connection, this, _1));
+            _connection->set_message_cb(_message_cb);
+            _connection->set_connection_cb(_connecting_cb);
+            _connection->set_write_complete_cb(_write_complete_cb);
+            _connection->set_close_cb(std::bind(&TcpClient::on_remove_connection, this, _1));
 
-        _loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, _connection));
+            _loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, _connection));
 
-        LOG_TRACE<<"Client new conn";
+            LOG_TRACE << "Client new conn";
+        }
     }
 
     void TcpClient::on_remove_connection(const TCPConnPtr &conn) {
