@@ -47,6 +47,10 @@ namespace net{
             return _write_index - _read_index;
         }
 
+        void clear(){
+            _read_index=0;
+            _write_index=0;
+        }
 
         void append(const char*data,size_t len){
             assert(data!= nullptr);

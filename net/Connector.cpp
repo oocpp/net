@@ -110,8 +110,7 @@ namespace net {
 
             int err = Socket::get_socket_error(sockfd);
             if (err) {
-                LOG_WARN << "Connector::handleWrite - SO_ERROR = "
-                         << err;
+                LOG_WARN << "Connector::handleWrite - SO_ERROR = " << err;
                 retry(sockfd);
             } else if (Socket::is_self_connect(sockfd)) {
                 LOG_WARN << "Connector::handleWrite - Self connect";
@@ -155,6 +154,9 @@ namespace net {
     }
 
     void Connector::connecting(int fd) {
+        if(_status!=Connecting)
+            return;
+
         _event.set_fd(fd);
         _event.set_write_cb(std::bind(&Connector::handle_write, this));
         _event.set_error_cb(std::bind(&Connector::handle_error, this));

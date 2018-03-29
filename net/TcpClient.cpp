@@ -46,7 +46,7 @@ namespace net{
         }
     }
 
-    void TcpClient::stop() {
+    void TcpClient::cancel_connect() {
         Status t=Connecting;
         if(_status.compare_exchange_strong(t,Disconnected)){
             _connector->cancel();

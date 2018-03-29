@@ -17,7 +17,7 @@ namespace net{
 
         void connect();
         void disconnect();
-        void stop();
+        void cancel_connect();
 
         void set_retry(bool t=true){_retry=t;}
 
@@ -46,6 +46,8 @@ namespace net{
         Any&get_context(){
             return _context;
         }
+
+        bool is_connecting()const{return _status==Connecting;}
 
     private:
         void on_new_connection(int fd, InetAddress addr);
