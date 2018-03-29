@@ -141,8 +141,7 @@ namespace net {
         void setNonBlockAndCloseOnExec(int sockfd) {
             int flags = ::fcntl(sockfd, F_GETFL, 0);
             flags |= O_NONBLOCK | FD_CLOEXEC;
-            int ret = ::fcntl(sockfd, F_SETFL, flags);
-            // FIXME
+            ::fcntl(sockfd, F_SETFL, flags);
         }
 
         int get_socket_error(int sockfd)

@@ -61,19 +61,18 @@ namespace net{
         using ConnectorPtr = std::shared_ptr<Connector>;
     private:
         EventLoop*_loop;
-        std::string _name;
-        InetAddress _peer_addr;
         ConnectorPtr _connector;
+        InetAddress _peer_addr;
+        std::string _name;
+        TCPConnPtr _connection;
         std::atomic<bool>  _retry;
         std::atomic<Status>  _status;
-        TCPConnPtr _connection;
 
         WriteCompleteCallback _write_complete_cb;
         ConnectingCallback _connecting_cb;
         MessageCallback _message_cb;
         Any _context;
     };
-
 }
 
 

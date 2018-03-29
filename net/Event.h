@@ -49,11 +49,12 @@ namespace net {
         void update();
 
     private:
-        int _fd;
         EventLoop* _loop;
+        int _fd;
+        bool _add_to_loop;
         uint32_t _events;
 
-        bool _add_to_loop;
+
         ReadEventCallback _read_cb;
         EventCallback _write_cb;
         EventCallback _error_cb;

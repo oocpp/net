@@ -32,8 +32,8 @@ namespace net{
     public:
 
         Buffer()
-                :_write_index(0)
-                ,_read_index(0){
+                :_read_index(0)
+                ,_write_index(0){
         }
 
         std::pair<ssize_t,int> read_from_fd(int fd);

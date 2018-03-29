@@ -10,21 +10,22 @@ namespace net{
 
     class Log {
     public:
-        Log(int n,const char* file, int line, const char*func);
+        Log(int n, const char *file, int line, const char *func);
 
         template<typename T>
-        Log&operator<<(const T & t) {
+        Log &operator<<(const T &t) {
             this->out << t;
             return *this;
         }
 
-        Log&operator<<(std::ostream&(*op)(std::ostream&));
+        Log &operator<<(std::ostream &(*op)(std::ostream &));
 
-        Log& operator()(const char*s, ...);
+        Log &operator()(const char *s, ...);
 
         ~Log();
 
-        static void set_rank(int i){RANK=i;}
+        static void set_rank(int i) { RANK = i; }
+
     private:
         std::stringstream out;
         int rank;

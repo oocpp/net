@@ -17,7 +17,7 @@ namespace net {
         std::memset(&_addr,0, get_sockaddr_size());
 
         _addr.sin_family = family;
-        _addr.sin_port = ::htons(port);
+        _addr.sin_port = htons(port);
 
         if (::inet_pton(AF_INET, ip.c_str(), &_addr.sin_addr) <= 0)
         {

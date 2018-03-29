@@ -41,7 +41,7 @@ namespace net{
         }
 
         void set_write_complete_cb(const WriteCompleteCallback &cb){
-            _connecting_cb=cb;
+            _write_complete_cb=cb;
         }
 
         void set_close_cb(const CloseCallback&cb){
@@ -76,6 +76,8 @@ namespace net{
         }
 
         void send(const std::string& d);
+
+        bool is_connected()const{return _status==Connected;}
     private:
         void handle_read();
         void handle_write();
@@ -92,17 +94,17 @@ namespace net{
             Disconnecting = 3,
         };
     private:
-
+        int _sockfd;
         uint64_t _id;
         EventLoop*_loop;
-        int _sockfd;
         Event _event;
         std::atomic<Status> _status;
 
-        Buffer _in_buff;
-        Buffer _out_buff;
         InetAddress _local_addr;
         InetAddress _peer_addr;
+        Buffer _in_buff;
+        Buffer _out_buff;
+
         Any _context;
 
         size_t _high_level_mark=64 * 1024 * 1024; // Default 128MB

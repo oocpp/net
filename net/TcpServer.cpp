@@ -12,11 +12,12 @@ namespace net {
     using std::placeholders::_2;
 
     TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize)
-            : _pool(threadSize)
+            : _loop(loop)
+            , _pool(threadSize)
+            ,_accepter(loop,addr)
             ,_th_size(threadSize)
             ,_status(Init)
-            , _loop(loop)
-            ,_accepter(loop,addr){
+    {
         LOG_TRACE<<"server";
         _accepter.set_new_connection_cb(std::bind(&TcpServer::handle_new_connection, this, _1, _2));
     }

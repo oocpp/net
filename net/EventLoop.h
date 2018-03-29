@@ -49,19 +49,17 @@ namespace net {
         void handle_wakeup_read();
     private:
         Epoll _poll;
-        int _wake_fd;
-        Event _wake_event;
-        std::thread::id _th_id;
-
         std::atomic<bool> _is_looping;
+        std::atomic<bool> _is_pending_fns;
+        int _wake_fd;
+        std::thread::id _th_id;
+        TimerQueue _timers;
+        Event _wake_event;
 
         std::mutex _mu;
         std::vector<std::function<void()>> _pending_fns;
-        std::atomic<bool> _is_pending_fns;
 
         std::vector<epoll_event>_events;
-
-        TimerQueue _timers;
     };
 
 
