@@ -1,5 +1,5 @@
 //
-// Created by lg on 17-4-19.
+// Created by lg on 18-4-19.
 //
 
 #include "Connector.h"
@@ -8,8 +8,6 @@
 #include "Log.h"
 
 namespace net {
-
-    // constexpr int Connector::init_retry_delay_ms=1000;
 
     Connector::Connector(EventLoop *loop, const InetAddress &addr)
             : _loop(loop), _addr(addr), _status(Disconnected), _event(loop, -1),

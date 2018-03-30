@@ -6,6 +6,8 @@ set(CMAKE_CXX_STANDARD 14)
 include(CheckFunctionExists)
 check_function_exists(accept4 HAVE_ACCEPT4)
 
+link_libraries(pthread)
+
 set(SOURCE_FILES
         Socket.cpp
         InetAddress.cpp
@@ -26,7 +28,7 @@ set(SOURCE_FILES
         )
 
 SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -Wall")
-SET(CMAKE_CXX_FLAGS_RELEASE   "$ENV{CXXFLAGS} -Wall")
+SET(CMAKE_CXX_FLAGS_RELEASE  "$ENV{CXXFLAGS} -O3 -Wall")
 
 set(NET_LIBRARY 1)
 
@@ -36,7 +38,3 @@ else()
     add_executable(net main.cpp ${SOURCE_FILES})
 endif()
 
-target_link_libraries(net pthread)
-
-#find_package(Threads REQUIRED)
-#target_link_libraries(net Threads::Threads)

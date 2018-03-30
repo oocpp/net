@@ -20,12 +20,11 @@ namespace net{
     public:
         using NewConnCallback = std::function<void(int, const InetAddress &)>;
 
-        Accepter(EventLoop*loop,const InetAddress&addr);
-        ~Accepter();
+        Accepter(EventLoop*loop,const InetAddress&addr)noexcept ;
+        ~Accepter()noexcept;
 
-        void set_new_connection_cb(const NewConnCallback &cb){
-            _new_connection_cb=cb;
-        }
+        void set_new_connection_cb(const NewConnCallback &cb);
+        void set_new_connection_cb(NewConnCallback &&cb);
 
         void listen(int backlog=SOMAXCONN);
         void stop();

@@ -12,7 +12,9 @@ namespace net {
     class Any {
     public:
         Any() noexcept: _value_ptr(nullptr) {}
-        ~Any()noexcept { delete _value_ptr; }
+        ~Any()noexcept {
+            delete _value_ptr;
+        }
 
         template<typename ValueType>
         explicit Any(ValueType&& value)
@@ -22,7 +24,8 @@ namespace net {
                 : _value_ptr(other._value_ptr ? other._value_ptr->clone() : nullptr) {}
 
         Any(Any&& other)noexcept
-                : _value_ptr(other._value_ptr) {
+                : _value_ptr(other._value_ptr)
+        {
             other._value_ptr = nullptr;
         }
 
@@ -38,11 +41,14 @@ namespace net {
             return*this;
         }
 
-        Any& operator=(const Any& rhs) {
+        Any& operator=(const Any& rhs)
+        {
             *this = Any{ rhs };
             return *this;
         }
-        Any& operator=(Any&& rhs) noexcept{
+
+        Any& operator=(Any&& rhs) noexcept
+        {
             reset();
             _value_ptr = rhs._value_ptr;
             rhs._value_ptr = nullptr;
@@ -57,13 +63,14 @@ namespace net {
             return has_value() ? _value_ptr->type() : typeid(void);
         }
 
-        void reset() noexcept{
+        void reset() noexcept {
             delete _value_ptr;
             _value_ptr = nullptr;
         }
 
         template<typename ValueType>
-        const ValueType* _Cast()const noexcept {
+        const ValueType* _Cast()const noexcept
+        {
             if (has_value() && type() == typeid(ValueType)) {
                 return &(static_cast<Any::AnyImpl<ValueType> * >(_value_ptr)->_value);
             }
@@ -76,14 +83,16 @@ namespace net {
         }
 
     protected:
-        struct AnyImplBase {
+        struct AnyImplBase
+        {
             virtual ~AnyImplBase()noexcept {}
             virtual const std::type_info& type() const noexcept= 0;
             virtual AnyImplBase* clone()const=0;
         };
 
         template<typename ValueType>
-        struct AnyImpl : public AnyImplBase {
+        struct AnyImpl : public AnyImplBase
+        {
             AnyImpl(const ValueType &value)
                     : _value(value) {}
 
@@ -94,6 +103,7 @@ namespace net {
             virtual AnyImplBase *clone() const {
                 return new AnyImpl(_value);
             }
+
             ValueType _value;
         };
 
@@ -102,17 +112,20 @@ namespace net {
     };
 
     template<typename ValueType>
-    ValueType* any_cast(Any* a) noexcept {
+    ValueType* any_cast(Any* a) noexcept
+    {
         return a->_Cast<ValueType>();
     }
 
     template<typename ValueType>
-    const ValueType* any_cast(const Any* a)noexcept {
+    const ValueType* any_cast(const Any* a)noexcept
+    {
         return a->_Cast<ValueType>();
     }
 
     template<typename ValueType>
-    ValueType any_cast(Any& a) {
+    ValueType any_cast(Any& a)
+    {
         auto const result = any_cast<std::decay_t<ValueType>>(&a);
 
         if (!result) {
