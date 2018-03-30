@@ -17,8 +17,8 @@ namespace net{
     public:
         using NewConnCallback = std::function<void(int, const InetAddress &)>;
 
-        Connector(EventLoop*loop,const InetAddress&addr);
-        ~Connector();
+        Connector(EventLoop*loop,const InetAddress&addr)noexcept;
+        ~Connector()noexcept;
 
         void set_new_connection_cb(const NewConnCallback&cb);
 

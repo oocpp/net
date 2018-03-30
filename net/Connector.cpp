@@ -9,25 +9,33 @@
 
 namespace net {
 
-    Connector::Connector(EventLoop *loop, const InetAddress &addr)
-            : _loop(loop), _addr(addr), _status(Disconnected), _event(loop, -1),
-              _retry_delay_ms(init_retry_delay_ms + 0) {
+    Connector::Connector(EventLoop *loop, const InetAddress &addr)noexcept
+            : _loop(loop)
+            , _addr(addr)
+            , _status(Disconnected)
+            , _event(loop, -1)
+            , _retry_delay_ms(init_retry_delay_ms + 0)
+    {
 
     }
 
-    Connector::~Connector() {
+    Connector::~Connector() noexcept
+    {
         assert(_status != Connecting);
     }
 
-    void Connector::set_new_connection_cb(const Connector::NewConnCallback &cb) {
+    void Connector::set_new_connection_cb(const Connector::NewConnCallback &cb)
+    {
         _new_conn_cb = cb;
     }
 
-    void Connector::set_new_connection_cb(Connector::NewConnCallback &&cb) {
+    void Connector::set_new_connection_cb(Connector::NewConnCallback &&cb)
+    {
         _new_conn_cb = std::move(cb);
     }
 
-    void Connector::start() {
+    void Connector::start()
+    {
         assert(_status == Disconnected);
 
         Status t = Disconnected;
@@ -37,12 +45,14 @@ namespace net {
     }
 
 
-    void Connector::stop_in_loop() {
+    void Connector::stop_in_loop()
+    {
         _event.disable_all();
         Socket::close(_event.get_fd());
     }
 
-    void Connector::cancel() {
+    void Connector::cancel()
+    {
         assert(_status == Connecting);
 
         Status t = Connecting;
@@ -51,7 +61,8 @@ namespace net {
         }
     }
 
-    void Connector::connect() {
+    void Connector::connect()
+    {
 
         if(_status!=Connecting)
             return;
@@ -98,7 +109,8 @@ namespace net {
     }
 
 
-    void Connector::handle_write() {
+    void Connector::handle_write()
+    {
         LOG_TRACE << "Connector::handleWrite " << _status;
 
         _event.disable_all();
@@ -129,7 +141,8 @@ namespace net {
         }
     }
 
-    void Connector::handle_error() {
+    void Connector::handle_error()
+    {
         LOG_ERROR << "Connector::handleError state=" << _status;
         if (_status == Connecting) {
             int sockfd = _event.get_fd();
@@ -142,7 +155,8 @@ namespace net {
         }
     }
 
-    void Connector::restart() {
+    void Connector::restart()
+    {
         assert(_status == Connected);
 
         Status t = Connected;
@@ -151,7 +165,8 @@ namespace net {
         }
     }
 
-    void Connector::connecting(int fd) {
+    void Connector::connecting(int fd)
+    {
         if(_status!=Connecting)
             return;
 
@@ -162,7 +177,8 @@ namespace net {
         _event.enable_write();
     }
 
-    void Connector::retry(int sockfd) {
+    void Connector::retry(int sockfd)
+    {
         Socket::close(sockfd);
 
         if (_status==Connecting) {

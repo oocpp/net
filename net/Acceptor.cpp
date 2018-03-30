@@ -63,6 +63,4 @@ namespace net {
     {
         _new_connection_cb=std::move(cb);
     }
-
-
 }

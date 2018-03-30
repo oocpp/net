@@ -102,5 +102,65 @@ namespace net {
         assert(!is_add_to_loop());
     }
 
+    void Event::set_read_cb(const ReadEventCallback &cb)
+    {
+        _read_cb = cb;
+    }
 
+    void Event::set_write_cb(const EventCallback &cb)
+    {
+        _write_cb = cb;
+    }
+
+    void Event::set_error_cb(const EventCallback &cb)
+    {
+        _error_cb=cb;
+    }
+
+    void Event::set_read_cb(ReadEventCallback &&cb) {
+        _read_cb = std::move(cb);
+    }
+
+    void Event::set_write_cb(EventCallback &&cb) {
+        _write_cb = std::move(cb);
+    }
+
+    void Event::set_error_cb(EventCallback &&cb) {
+        _error_cb=std::move(cb);
+    }
+
+    int Event::get_fd() const noexcept
+    {
+        return _fd;
+    }
+
+    uint32_t Event::get_events() const noexcept
+    {
+        return _events;
+    }
+
+    bool Event::is_add_to_loop() const noexcept
+    {
+        return _add_to_loop;
+    }
+
+    void Event::set_fd(int fd) noexcept
+    {
+        _fd=fd;
+    }
+
+    bool Event::is_write() const noexcept
+    {
+        return (_events & WriteEvent)!=0;
+    }
+
+    bool Event::is_read() const noexcept
+    {
+        return (_events & ReadEvent)!=0;
+    }
+
+    bool Event::is_none() const noexcept
+    {
+        return _events==NoneEvent;
+    }
 }

@@ -13,39 +13,34 @@ namespace net{
         TcpClient(EventLoop* loop,
                   const InetAddress& serverAddr,
                   const std::string& nameArg);
-        ~TcpClient();
+        ~TcpClient()noexcept ;
 
         void connect();
         void disconnect();
         void cancel_connect();
 
-        void set_retry(bool t=true){_retry=t;}
+        void set_retry(bool t=true);
 
-        EventLoop*get_loop(){return _loop;}
-        const std::string& get_name(){return _name;}
+        EventLoop*get_loop();
+        const std::string& get_name();
 
-        void set_connection_cb(const ConnectingCallback& cb)
-        { _connecting_cb = cb; }
+        void set_connection_cb(const ConnectingCallback& cb);
 
+        void set_message_cb(const MessageCallback& cb);
 
-        void set_message_cb(const MessageCallback& cb)
-        { _message_cb = cb; }
+        void set_write_complete_cb(const WriteCompleteCallback& cb);
 
+        void set_connection_cb( ConnectingCallback&& cb);
 
-        void set_write_complete_cb(const WriteCompleteCallback& cb)
-        { _write_complete_cb = cb; }
+        void set_message_cb( MessageCallback&& cb);
 
-        void set_context(const Any&a){
-            _context=a;
-        }
+        void set_write_complete_cb( WriteCompleteCallback&& cb);
 
-        void set_context(Any&&a){
-            _context=std::move(a);
-        }
+        void set_context(const Any&a);
 
-        Any&get_context(){
-            return _context;
-        }
+        void set_context(Any&&a);
+
+        Any&get_context();
 
         bool is_connecting()const{return _status==Connecting;}
 

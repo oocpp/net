@@ -10,17 +10,20 @@ namespace net
 {
     Epoll::Epoll()noexcept
         :_epollfd(::epoll_create1(EPOLL_CLOEXEC))
-        ,_old_size(init_event_vector_size){
+        ,_old_size(init_event_vector_size)
+    {
         if(_epollfd<0){
             LOG_ERROR<<"epoll 失败";
         }
     }
 
-    Epoll::~Epoll()noexcept {
+    Epoll::~Epoll()noexcept
+    {
         ::close(_epollfd);
     }
 
-    void Epoll::add(int fd,epoll_event event) {
+    void Epoll::add(int fd,epoll_event event)
+    {
 
         if (::epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &event) < 0)
         {
@@ -29,7 +32,8 @@ namespace net
         }
     }
 
-    void Epoll::remove(int fd) {
+    void Epoll::remove(int fd)
+    {
         epoll_event event;
         if (::epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &event) < 0)
         {
@@ -37,7 +41,8 @@ namespace net
         }
     }
 
-    void Epoll::update(int fd,epoll_event event) {
+    void Epoll::update(int fd,epoll_event event)
+    {
 
         if (::epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &event) < 0)
         {
@@ -46,7 +51,8 @@ namespace net
         }
     }
 
-    void Epoll::wait(int timeoutMs,std::vector<epoll_event> &events) {
+    void Epoll::wait(int timeoutMs,std::vector<epoll_event> &events)
+    {
         events.resize(_old_size);
 
         int numEvents = ::epoll_wait(_epollfd,events.data(), _old_size, timeoutMs);

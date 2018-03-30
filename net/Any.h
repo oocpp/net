@@ -135,4 +135,3 @@ namespace net {
         return static_cast<ValueType>(*result);
     }
 }
-

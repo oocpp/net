@@ -12,15 +12,15 @@ namespace net{
         void ensure_writable_bytes(size_t len);
 
     public:
-        Buffer();
+        Buffer()noexcept ;
 
         std::pair<ssize_t,int> read_from_fd(int fd);
 
-        size_t get_writable_size() const;
+        size_t get_writable_size() const noexcept;
 
-        size_t length() const;
+        size_t length() const noexcept;
 
-        void clear();
+        void clear() noexcept;
 
         void append(const char*data,size_t len);
 
@@ -30,22 +30,21 @@ namespace net{
 
         void append(std::initializer_list<std::pair<const char*,std::size_t>>args);
 
-        size_t get_readable_size() const;
+        size_t get_readable_size() const noexcept;
 
-        const char* get_read_ptr()const;
+        const char* get_read_ptr()const noexcept;
 
-        char* get_read_ptr();
+        char* get_read_ptr() noexcept;
 
-        char* get_write_ptr();
+        char* get_write_ptr()noexcept;
 
-        void has_read(size_t n);
+        void has_read(size_t n)noexcept;
 
-        void has_write(size_t n);
+        void has_write(size_t n)noexcept;
 
     private:
         std::vector<char>_buff;
         size_t _read_index;
         size_t _write_index;
     };
-
 }

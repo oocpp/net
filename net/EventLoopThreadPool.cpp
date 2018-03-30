@@ -20,7 +20,9 @@ void net::EventLoopThreadPool::join() {
         t.join();
 }
 
-net::EventLoopThreadPool::EventLoopThreadPool(size_t threadNum):_threads(threadNum),_loop_index(0){
+net::EventLoopThreadPool::EventLoopThreadPool(size_t threadNum)
+        :_threads(threadNum)
+        ,_loop_index(0){
 
 }
 

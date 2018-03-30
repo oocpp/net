@@ -4,7 +4,7 @@
 
 namespace net{
 
-    Buffer::Buffer()
+    Buffer::Buffer()noexcept
             :_read_index(0)
             ,_write_index(0){
     }
@@ -54,18 +54,18 @@ namespace net{
         }
     }
 
-    size_t Buffer::get_writable_size() const
+    size_t Buffer::get_writable_size() const noexcept
     {
         return _buff.size()-_write_index;
     }
 
-    size_t Buffer::length() const
+    size_t Buffer::length() const noexcept
     {
         assert(_write_index >= _read_index);
         return _write_index - _read_index;
     }
 
-    void Buffer::clear()
+    void Buffer::clear()noexcept
     {
         _read_index=0;
         _write_index=0;
@@ -107,33 +107,33 @@ namespace net{
         }
     }
 
-    size_t Buffer::get_readable_size() const
+    size_t Buffer::get_readable_size() const noexcept
     {
         return _write_index - _read_index;
     }
 
-    const char *Buffer::get_read_ptr() const
+    const char *Buffer::get_read_ptr() const noexcept
     {
         return _buff.data()+_read_index;
     }
 
-    char *Buffer::get_read_ptr()
+    char *Buffer::get_read_ptr()noexcept
     {
         return _buff.data()+_read_index;
     }
 
-    char *Buffer::get_write_ptr()
+    char *Buffer::get_write_ptr()noexcept
     {
         return _buff.data()+_write_index;
     }
 
-    void Buffer::has_read(size_t n)
+    void Buffer::has_read(size_t n)noexcept
     {
         _read_index+=n;
         assert(_read_index<=_write_index);
     }
 
-    void Buffer::has_write(size_t n)
+    void Buffer::has_write(size_t n)noexcept
     {
         _write_index+=n;
         assert(_write_index<=_buff.size());

@@ -23,7 +23,7 @@ namespace net{
         _connector->set_new_connection_cb(std::bind(&TcpClient::on_new_connection,this,_1,_2));
     }
 
-    TcpClient::~TcpClient() {
+    TcpClient::~TcpClient()noexcept {
         assert(_status==Disconnected);
     }
 
@@ -81,5 +81,56 @@ namespace net{
                 _connector->restart();
         }
 
+    }
+
+    void TcpClient::set_retry(bool t)
+    {
+        _retry=t;
+    }
+
+    EventLoop *TcpClient::get_loop()
+    {
+        return _loop;
+    }
+
+    const std::string &TcpClient::get_name()
+    {
+        return _name;
+    }
+
+    Any &TcpClient::get_context() {
+        return _context;
+    }
+
+    void TcpClient::set_context(Any &&a) {
+        _context=std::move(a);
+    }
+
+    void TcpClient::set_context(const Any &a) {
+        _context=a;
+    }
+
+    void TcpClient::set_connection_cb(const ConnectingCallback &cb) {
+        _connecting_cb = cb;
+    }
+
+    void TcpClient::set_message_cb(const MessageCallback &cb) {
+        _message_cb = cb;
+    }
+
+    void TcpClient::set_write_complete_cb(const WriteCompleteCallback &cb) {
+        _write_complete_cb = cb;
+    }
+
+    void TcpClient::set_connection_cb(ConnectingCallback &&cb) {
+        _connecting_cb = std::move(cb);
+    }
+
+    void TcpClient::set_message_cb(MessageCallback &&cb) {
+        _message_cb = std::move(cb);
+    }
+
+    void TcpClient::set_write_complete_cb(WriteCompleteCallback &&cb) {
+        _write_complete_cb = std::move(cb);
     }
 }

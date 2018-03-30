@@ -10,8 +10,6 @@
 
 namespace net {
 
-
-
     InetAddress::InetAddress(const std::string & ip, in_port_t port,sa_family_t family)
     {
         std::memset(&_addr,0, get_sockaddr_size());
@@ -47,6 +45,29 @@ namespace net {
         return uint32_t();
     }
 
+    InetAddress::InetAddress(const struct sockaddr_in &addr)
+            : _addr(addr)
+    {
+
+    }
+
+    const sockaddr *InetAddress::get_sockaddr() const
+    {
+        return reinterpret_cast<const sockaddr*>(&_addr);
+    }
+
+    sockaddr *InetAddress::get_sockaddr() {
+        return reinterpret_cast<sockaddr*>(&_addr);
+    }
+
+    sa_family_t InetAddress::get_family() const {
+        return _addr.sin_family;
+    }
+
+    in_port_t InetAddress::get_port() const
+    {
+        return _addr.sin_port;
+    }
 
 
 }

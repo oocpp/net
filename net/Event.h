@@ -19,9 +19,13 @@ namespace net {
         static constexpr uint32_t ReadEvent=EPOLLIN|EPOLLPRI;
         static constexpr uint32_t WriteEvent=EPOLLOUT;
 
-        void set_read_cb(const ReadEventCallback &cb) { _read_cb = cb; }
-        void set_write_cb(const EventCallback &cb) { _write_cb = cb; }
-        void set_error_cb(const EventCallback &cb){_error_cb=cb;}
+        void set_read_cb(const ReadEventCallback &cb);
+        void set_write_cb(const EventCallback &cb);
+        void set_error_cb(const EventCallback &cb);
+
+        void set_read_cb( ReadEventCallback &&cb);
+        void set_write_cb( EventCallback &&cb);
+        void set_error_cb( EventCallback &&cb);
 
         void enable_read();
         void enable_write();
@@ -31,20 +35,20 @@ namespace net {
         void disable_write();
         void disable_all();
 
-        int get_fd()const{return _fd;}
-        uint32_t get_events()const{return _events;}
+        int get_fd()const noexcept;
+        uint32_t get_events()const noexcept;
 
         void attach_to_loop();
         void detach_from_loop();
         void handle_event(uint32_t event);
 
-        bool is_add_to_loop()const noexcept {return _add_to_loop;}
+        bool is_add_to_loop()const noexcept;
 
-        void set_fd(int fd) {_fd=fd;}
+        void set_fd(int fd)noexcept;
 
-        bool is_write() const { return (_events & WriteEvent)!=0; }
-        bool is_read() const { return (_events & ReadEvent)!=0; }
-        bool is_none()const{return _events==NoneEvent;}
+        bool is_write() const noexcept;
+        bool is_read() const noexcept;
+        bool is_none()const noexcept;
     private:
         void update();
 
@@ -53,7 +57,6 @@ namespace net {
         int _fd;
         bool _add_to_loop;
         uint32_t _events;
-
 
         ReadEventCallback _read_cb;
         EventCallback _write_cb;

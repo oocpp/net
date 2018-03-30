@@ -33,7 +33,39 @@ SET(CMAKE_CXX_FLAGS_RELEASE  "$ENV{CXXFLAGS} -O3 -Wall")
 set(NET_LIBRARY 1)
 
 if(NET_LIBRARY)
-    add_library(net ${SOURCE_FILES})
+    SET(lib_name "net")
+    add_library(${lib_name} STATIC ${SOURCE_FILES})
+
+    set_target_properties(${lib_name}
+            PROPERTIES
+            OUTPUT_NAME_DEBUG ${lib_name}d
+            OUTPUT_NAME ${lib_name}
+            )
+
+    set(HEAD_FILES
+            Socket.h
+            InetAddress.h
+            Buffer.h
+            TcpConnection.h
+            Acceptor.h
+            Connector.h
+            Epoll.h
+            EventLoopThread.h
+            EventLoop.h
+            TcpServer.h
+            TcpClient.h
+            EventLoopThreadPool.h
+            Event.h
+            Timer.h
+            TimerQueue.h
+            Log.h
+            Any.h
+            CallBack.h
+            )
+
+    INSTALL(TARGETS ${lib_name} ARCHIVE DESTINATION ${PROJECT_SOURCE_DIR}/../net_library/lib_static/)
+    INSTALL(FILES ${HEAD_FILES} DESTINATION ${PROJECT_SOURCE_DIR}/../net_library/include/)
+
 else()
     add_executable(net main.cpp ${SOURCE_FILES})
 endif()

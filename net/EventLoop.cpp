@@ -140,7 +140,28 @@ namespace net {
         }
     }
 
-    bool EventLoop::in_loop_thread()const {
+    void EventLoop::run_in_loop(std::function<void()> &&cb) {
+        LOG_TRACE;
+        if(in_loop_thread()){
+            cb();
+        }
+        else {
+            queue_in_loop(std::move(cb));
+        }
+    }
+
+    void EventLoop::queue_in_loop(std::function<void()> &&cb) {
+        {
+            std::lock_guard<std::mutex> l(_mu);
+            _pending_fns.push_back(std::move(cb));
+        }
+
+        if(!in_loop_thread()||_is_pending_fns) {
+            wakeup();
+        }
+    }
+
+    bool EventLoop::in_loop_thread()const noexcept {
         return std::this_thread::get_id()==_th_id;
     }
 
@@ -186,4 +207,22 @@ namespace net {
     void EventLoop::cancel(uint64_t id) {
         _timers.cancel(id);
     }
+
+    void EventLoop::set_thread_id(std::thread::id id) noexcept {
+        _th_id=id;
+    }
+
+    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, std::function<void()> &&cb) {
+        return run_at(TimerQueue::now()+ms, std::move(cb));
+    }
+
+    uint64_t EventLoop::run_at(TimerQueue::time_point time, std::function<void()> &&cb) {
+        return _timers.addTimer(std::move(cb),time,0ms);
+    }
+
+    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, std::function<void()> &&cb) {
+        return _timers.addTimer(std::move(cb),TimerQueue::now()+ms,ms);
+    }
+
+
 }

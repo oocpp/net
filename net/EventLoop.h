@@ -31,16 +31,24 @@ namespace net {
         void run_in_loop(const std::function<void()> &cb);
         void queue_in_loop(const std::function<void()> &cb);
 
+        void run_in_loop(std::function<void()> &&cb);
+        void queue_in_loop( std::function<void()> &&cb);
+
         uint64_t run_after(std::chrono::milliseconds ms,const std::function<void()> &cb);
         uint64_t run_at(TimerQueue::time_point time,const std::function<void()> &cb);
         uint64_t run_every(std::chrono::milliseconds ms,const std::function<void()> &cb);
+
+        uint64_t run_after(std::chrono::milliseconds ms, std::function<void()> &&cb);
+        uint64_t run_at(TimerQueue::time_point time, std::function<void()> &&cb);
+        uint64_t run_every(std::chrono::milliseconds ms, std::function<void()> &&cb);
+
         void cancel(uint64_t id);
 
         void run();
 
         void stop();
-        bool in_loop_thread()const;
-        void set_thread_id(std::thread::id id){_th_id=id;}
+        bool in_loop_thread()const noexcept ;
+        void set_thread_id(std::thread::id id)noexcept;
     private:
 
         void do_pending_fn();
@@ -61,6 +69,4 @@ namespace net {
 
         std::vector<epoll_event>_events;
     };
-
-
 }
