@@ -29,7 +29,7 @@ namespace net {
         _new_conn_cb = cb;
     }
 
-    void Connector::set_new_connection_cb(Connector::NewConnCallback &&cb)
+    void Connector::set_new_connection_cb(Connector::NewConnCallback &&cb)noexcept
     {
         _new_conn_cb = std::move(cb);
     }

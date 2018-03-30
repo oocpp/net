@@ -12,28 +12,19 @@ namespace net {
     public:
         using time_point =std::chrono::system_clock::time_point;
 
+        Timer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
+        Timer(const TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);
 
-        Timer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval)
-                : callback_(cb),
-                  expiration_(when),
-                  interval_(interval),
-                  repeat_(interval > 0ms),
-                  sequence_(++id) {}
+        void run() const;
 
+        time_point expiration() const noexcept;
 
-        void run() const {
-          callback_();
-        }
-
-        time_point expiration() const { return expiration_; }
-
-        bool repeat() const { return repeat_; }
-
-        uint64_t sequence() const { return sequence_; }
+        bool repeat() const noexcept;
+        uint64_t sequence() const noexcept;
 
         void restart(time_point now);
 
-        bool isValid()const{return expiration_> time_point{};}
+        bool isValid()const noexcept;
 
     private:
         TimerCallback callback_;

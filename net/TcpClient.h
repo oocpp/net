@@ -30,11 +30,11 @@ namespace net{
 
         void set_write_complete_cb(const WriteCompleteCallback& cb);
 
-        void set_connection_cb( ConnectingCallback&& cb);
+        void set_connection_cb( ConnectingCallback&& cb)noexcept;
 
-        void set_message_cb( MessageCallback&& cb);
+        void set_message_cb( MessageCallback&& cb)noexcept;
 
-        void set_write_complete_cb( WriteCompleteCallback&& cb);
+        void set_write_complete_cb( WriteCompleteCallback&& cb)noexcept;
 
         void set_context(const Any&a);
 
@@ -45,7 +45,7 @@ namespace net{
         bool is_connecting()const{return _status==Connecting;}
 
     private:
-        void on_new_connection(int fd, InetAddress addr);
+        void on_new_connection(int fd,const InetAddress& addr);
         void on_remove_connection(const TCPConnPtr&conn);
         enum Status {
             Disconnected = 0,

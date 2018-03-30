@@ -53,7 +53,7 @@ namespace net{
         }
     }
 
-    void TcpClient::on_new_connection(int fd, InetAddress addr) {
+    void TcpClient::on_new_connection(int fd,const InetAddress &addr) {
         Status t=Connecting;
         if(_status.compare_exchange_strong(t,Connected)) {
 
@@ -122,15 +122,15 @@ namespace net{
         _write_complete_cb = cb;
     }
 
-    void TcpClient::set_connection_cb(ConnectingCallback &&cb) {
+    void TcpClient::set_connection_cb(ConnectingCallback &&cb) noexcept{
         _connecting_cb = std::move(cb);
     }
 
-    void TcpClient::set_message_cb(MessageCallback &&cb) {
+    void TcpClient::set_message_cb(MessageCallback &&cb)noexcept {
         _message_cb = std::move(cb);
     }
 
-    void TcpClient::set_write_complete_cb(WriteCompleteCallback &&cb) {
+    void TcpClient::set_write_complete_cb(WriteCompleteCallback &&cb)noexcept {
         _write_complete_cb = std::move(cb);
     }
 }

@@ -22,7 +22,7 @@ namespace net {
         _accepter.set_new_connection_cb(std::bind(&TcpServer::handle_new_connection, this, _1, _2));
     }
 
-    TcpServer::~TcpServer() {
+    TcpServer::~TcpServer() noexcept {
         assert(_status == Stopped);
     }
 
@@ -104,6 +104,30 @@ namespace net {
             return _pool.get_next_loop();
         return _loop;
 
+    }
+
+    void TcpServer::set_connection_cb(const ConnectingCallback &cb) {
+        _connecting_cb = cb;
+    }
+
+    void TcpServer::set_message_cb(const MessageCallback &cb) {
+        _message_cb = cb;
+    }
+
+    void TcpServer::set_write_complete_cb(const WriteCompleteCallback &cb) {
+        _write_complete_cb = cb;
+    }
+
+    void TcpServer::set_connection_cb(ConnectingCallback &&cb) noexcept {
+        _connecting_cb = std::move(cb);
+    }
+
+    void TcpServer::set_message_cb(MessageCallback &&cb) noexcept {
+        _message_cb = std::move(cb);
+    }
+
+    void TcpServer::set_write_complete_cb(WriteCompleteCallback &&cb) noexcept {
+        _write_complete_cb = std::move(cb);
     }
 
 }

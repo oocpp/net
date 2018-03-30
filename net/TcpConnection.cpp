@@ -22,7 +22,7 @@ namespace net{
         _event.set_write_cb(std::bind(&TcpConnection::handle_write, this));
     }
 
-    TcpConnection::~TcpConnection() {
+    TcpConnection::~TcpConnection()noexcept {
         LOG_TRACE;
         Socket::close(_sockfd);
     }
@@ -189,5 +189,79 @@ namespace net{
 
     void TcpConnection::send( Buffer *d) {
         send(std::string(d->get_read_ptr(),d->get_readable_size()));
+    }
+
+    void TcpConnection::set_message_cb(const MessageCallback &cb) {
+        _message_cb=cb;
+    }
+
+    void TcpConnection::set_high_water_cb(const HighWaterMarkCallback &cb, size_t mark) {
+        _write_high_level_cb=cb;
+        _high_level_mark=mark;
+    }
+
+    void TcpConnection::set_connection_cb(const ConnectingCallback &cb) {
+        _connecting_cb=cb;
+    }
+
+    void TcpConnection::set_write_complete_cb(const WriteCompleteCallback &cb) {
+        _write_complete_cb=cb;
+    }
+
+    void TcpConnection::set_close_cb(const CloseCallback &cb) {
+        _close_cb=cb;
+    }
+
+    void TcpConnection::set_message_cb(MessageCallback &&cb) noexcept{
+        _message_cb= std::move(cb);
+    }
+
+    void TcpConnection::set_high_water_cb(HighWaterMarkCallback &&cb, size_t mark) noexcept{
+        _write_high_level_cb=std::move(cb);
+        _high_level_mark=mark;
+    }
+
+    void TcpConnection::set_connection_cb(ConnectingCallback &&cb) noexcept{
+        _connecting_cb=std::move(cb);
+    }
+
+    void TcpConnection::set_write_complete_cb(WriteCompleteCallback &&cb)noexcept {
+        _write_complete_cb=std::move(cb);
+    }
+
+    void TcpConnection::set_close_cb(CloseCallback &&cb)noexcept {
+        _close_cb=std::move(cb);
+    }
+
+    EventLoop *TcpConnection::get_loop() noexcept{
+        return _loop;
+    }
+
+    uint64_t TcpConnection::get_id() const noexcept{
+        return _id;
+    }
+
+    void TcpConnection::set_context(const Any &a) {
+        _context=a;
+    }
+
+    void TcpConnection::set_context(Any &&a) noexcept{
+        _context=std::move(a);
+    }
+
+    Any &TcpConnection::get_context() {
+        return _context;
+    }
+
+    InetAddress TcpConnection::get_local_addr() const noexcept {
+        return _local_addr;
+    }
+
+    InetAddress TcpConnection::get_peer_addr() const noexcept{
+        return _peer_addr;
+    }
+
+    bool TcpConnection::is_connected() const noexcept {
+        return _status==Connected;
     }
 }

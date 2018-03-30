@@ -67,7 +67,7 @@ namespace net {
         timerfdChannel_.enable_read();
     }
 
-    TimerQueue::~TimerQueue() {
+    TimerQueue::~TimerQueue() noexcept{
         timerfdChannel_.disable_all();
         Socket::close(timerfd_);
 
@@ -207,6 +207,10 @@ namespace net {
 
         assert(timers_.size() == activeTimers_.size());
         return earliestChanged;
+    }
+
+    TimerQueue::time_point TimerQueue::now() {
+        return std::chrono::system_clock::now();
     }
 }
 

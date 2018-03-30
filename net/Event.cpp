@@ -117,15 +117,15 @@ namespace net {
         _error_cb=cb;
     }
 
-    void Event::set_read_cb(ReadEventCallback &&cb) {
+    void Event::set_read_cb(ReadEventCallback &&cb) noexcept{
         _read_cb = std::move(cb);
     }
 
-    void Event::set_write_cb(EventCallback &&cb) {
+    void Event::set_write_cb(EventCallback &&cb) noexcept{
         _write_cb = std::move(cb);
     }
 
-    void Event::set_error_cb(EventCallback &&cb) {
+    void Event::set_error_cb(EventCallback &&cb)noexcept {
         _error_cb=std::move(cb);
     }
 

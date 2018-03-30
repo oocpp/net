@@ -21,18 +21,13 @@ namespace net {
 
         explicit TimerQueue(EventLoop *loop);
 
-        ~TimerQueue();
+        ~TimerQueue()noexcept ;
 
-
-        uint64_t addTimer(const TimerCallback &cb,
-                         time_point when,
-                         std::chrono::milliseconds interval);
+        uint64_t addTimer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
 
         void cancel(uint64_t timerId);
 
-        static time_point now(){
-            return std::chrono::system_clock::now();
-        }
+        static time_point now();
 
         using Entry= std::pair<time_point, Timer*>;
     private:
@@ -45,10 +40,8 @@ namespace net {
 
         void cancelInLoop(uint64_t timerId);
 
-        // called when timerfd alarms
         void handleRead();
 
-        // move out all expired timers
         std::vector<Entry> getExpired(time_point now);
 
         void reset(const std::vector<Entry> &expired, time_point now);
@@ -58,12 +51,10 @@ namespace net {
         EventLoop *loop_;
         const int timerfd_;
         Event timerfdChannel_;
-        // Timer list sorted by expiration
         TimerList timers_;
 
-        // for cancel()
         ActiveTimerSet activeTimers_;
-        bool callingExpiredTimers_; /* atomic */
+        bool callingExpiredTimers_;
         std::set<uint64_t > cancelingTimers_;
     };
 

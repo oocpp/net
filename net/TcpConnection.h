@@ -14,7 +14,6 @@
 #include"CallBack.h"
 #include "Any.h"
 
-
 namespace net{
 
     class EventLoop;
@@ -23,65 +22,46 @@ namespace net{
     public:
 
         TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&local_addr,const InetAddress&peer_addr);
-        ~TcpConnection();
+        ~TcpConnection()noexcept ;
 
         void close();
 
-        void set_message_cb(const MessageCallback & cb){
-            _message_cb=cb;
-        }
+        void set_message_cb(const MessageCallback & cb);
+        void set_high_water_cb(const HighWaterMarkCallback &cb, size_t mark);
+        void set_connection_cb(const ConnectingCallback &cb);
 
-        void set_high_water_cb(const HighWaterMarkCallback &cb, size_t mark){
-            _write_high_level_cb=cb;
-            _high_level_mark=mark;
-        }
+        void set_write_complete_cb(const WriteCompleteCallback &cb);
+        void set_close_cb(const CloseCallback&cb);
+        void set_message_cb( MessageCallback && cb)noexcept;
 
-        void set_connection_cb(const ConnectingCallback &cb){
-            _connecting_cb=cb;
-        }
+        void set_high_water_cb( HighWaterMarkCallback &&cb, size_t mark)noexcept;
 
-        void set_write_complete_cb(const WriteCompleteCallback &cb){
-            _write_complete_cb=cb;
-        }
+        void set_connection_cb( ConnectingCallback &&cb)noexcept;
 
-        void set_close_cb(const CloseCallback&cb){
-            _close_cb=cb;
-        }
+        void set_write_complete_cb( WriteCompleteCallback &&cb)noexcept;
 
-        void enable_write(){
+        void set_close_cb( CloseCallback && cb)noexcept;
 
-        }
+        EventLoop*get_loop()noexcept;
 
-        void enable_read(){
-        }
-
-        EventLoop*get_loop(){return _loop;}
-
-        uint64_t get_id()const{
-            return _id;
-        }
+        uint64_t get_id()const noexcept;
 
         void attach_to_loop();
 
-        void set_context(const Any&a){
-            _context=a;
-        }
+        void set_context(const Any&a);
 
-        void set_context(Any&&a){
-            _context=std::move(a);
-        }
+        void set_context(Any&&a)noexcept;
 
-        Any&get_context(){
-            return _context;
-        }
+        Any&get_context();
 
         void send(const std::string& d);
         void send(Buffer* d);
 
-        bool is_connected()const{return _status==Connected;}
+        bool is_connected()const noexcept;
 
-        InetAddress get_local_addr()const{return _local_addr;}
-        InetAddress get_peer_addr()const{return _peer_addr;}
+        InetAddress get_local_addr()const noexcept;
+
+        InetAddress get_peer_addr()const noexcept;
     private:
         void handle_read();
         void handle_write();

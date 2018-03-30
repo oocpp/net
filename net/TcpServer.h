@@ -20,22 +20,18 @@ namespace net{
     class TcpServer {
     public:
         TcpServer(EventLoop*loop,const InetAddress& addr,const std::string &name,size_t threadSize=0);
-        ~TcpServer();
+        ~TcpServer()noexcept;
 
         void run();
         void stop();
 
-        void set_connection_cb(const ConnectingCallback& cb) {
-            _connecting_cb = cb;
-        }
+        void set_connection_cb(const ConnectingCallback& cb);
+        void set_message_cb(const MessageCallback& cb);
+        void set_write_complete_cb(const WriteCompleteCallback& cb);
 
-        void set_message_cb(const MessageCallback& cb) {
-            _message_cb = cb;
-        }
-
-        void set_write_complete_cb(const WriteCompleteCallback& cb) {
-            _write_complete_cb = cb;
-        }
+        void set_connection_cb( ConnectingCallback&& cb) noexcept;
+        void set_message_cb( MessageCallback&& cb) noexcept;
+        void set_write_complete_cb( WriteCompleteCallback&& cb)noexcept;
 
     private:
         void handle_new_connection(int fd, const InetAddress &addr);

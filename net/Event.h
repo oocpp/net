@@ -23,9 +23,9 @@ namespace net {
         void set_write_cb(const EventCallback &cb);
         void set_error_cb(const EventCallback &cb);
 
-        void set_read_cb( ReadEventCallback &&cb);
-        void set_write_cb( EventCallback &&cb);
-        void set_error_cb( EventCallback &&cb);
+        void set_read_cb( ReadEventCallback &&cb)noexcept;
+        void set_write_cb( EventCallback &&cb)noexcept;
+        void set_error_cb( EventCallback &&cb)noexcept;
 
         void enable_read();
         void enable_write();

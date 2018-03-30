@@ -24,7 +24,7 @@ namespace net{
         ~Accepter()noexcept;
 
         void set_new_connection_cb(const NewConnCallback &cb);
-        void set_new_connection_cb(NewConnCallback &&cb);
+        void set_new_connection_cb(NewConnCallback &&cb)noexcept ;
 
         void listen(int backlog=SOMAXCONN);
         void stop();

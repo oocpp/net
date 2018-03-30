@@ -59,7 +59,7 @@ namespace net {
         _new_connection_cb=cb;
     }
 
-    void Accepter::set_new_connection_cb(Accepter::NewConnCallback &&cb)
+    void Accepter::set_new_connection_cb(Accepter::NewConnCallback &&cb)noexcept
     {
         _new_connection_cb=std::move(cb);
     }
