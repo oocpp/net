@@ -13,7 +13,7 @@ namespace net {
         using time_point =std::chrono::system_clock::time_point;
 
         Timer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
-        Timer(const TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);
+        Timer(TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);
 
         void run() const;
 

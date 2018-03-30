@@ -25,7 +25,7 @@ namespace net {
 
             TimerQueue::duration du = when - std::chrono::system_clock::now();
 
-            struct timespec ts;
+            struct timespec ts{};
             ts.tv_sec = static_cast<time_t>(std::chrono::duration_cast<std::chrono::seconds>(du).count());
 
             ts.tv_nsec = static_cast<long>(std::chrono::duration_cast<std::chrono::nanoseconds>(du % 1s).count());
@@ -43,8 +43,8 @@ namespace net {
 
         void resetTimerfd(int timerfd, TimerQueue::time_point expiration) {
             // wake up loop by timerfd_settime()
-            struct itimerspec newValue;
-            struct itimerspec oldValue;
+            struct itimerspec newValue{};
+            struct itimerspec oldValue{};
             bzero(&newValue, sizeof newValue);
             bzero(&oldValue, sizeof oldValue);
             newValue.it_value = howMuchTimeFromNow(expiration);
@@ -71,15 +71,15 @@ namespace net {
         timerfdChannel_.disable_all();
         Socket::close(timerfd_);
 
-        for (TimerList::iterator it = timers_.begin(); it != timers_.end(); ++it) {
-            delete it->second;
+        for (auto &timer : timers_) {
+            delete timer.second;
         }
     }
 
     uint64_t TimerQueue::addTimer(const TimerCallback &cb,
                                  time_point when,
                                  std::chrono::milliseconds interval) {
-        Timer* timer=new Timer(cb, when, interval);
+        auto * timer=new Timer(cb, when, interval);
 
         loop_->run_in_loop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
         return timer->sequence();
@@ -125,8 +125,8 @@ namespace net {
         callingExpiredTimers_ = true;
         cancelingTimers_.clear();
 
-        for (auto it = expired.begin(); it != expired.end(); ++it) {
-            it->second->run();
+        for (auto &it : expired) {
+            it.second->run();
         }
         callingExpiredTimers_ = false;
 
@@ -140,16 +140,15 @@ namespace net {
 
         Entry sentry(now, reinterpret_cast<Timer *>(UINTPTR_MAX));
 
-        TimerList::iterator end = timers_.lower_bound(sentry);
+        auto end = timers_.lower_bound(sentry);
 
         assert(end == timers_.end() || now < end->first);
 
         std::copy(timers_.begin(), end, back_inserter(expired));
         timers_.erase(timers_.begin(), end);
 
-        for (auto it = expired.begin(); it != expired.end(); ++it) {
-
-            size_t n = activeTimers_.erase(it->second->sequence());
+        for (auto &it : expired) {
+            size_t n = activeTimers_.erase(it.second->sequence());
             assert(n == 1);
         }
 
@@ -160,14 +159,13 @@ namespace net {
     void TimerQueue::reset(const std::vector<Entry> &expired, time_point now) {
         time_point nextExpire;
 
-        for (auto it = expired.begin(); it != expired.end(); ++it) {
-
-            if (it->second->repeat() && cancelingTimers_.find(it->second->sequence()) == cancelingTimers_.end()) {
-                it->second->restart(now);
-                insert(it->second);
-            } else {
-                // FIXME move to a free list
-                delete it->second; // FIXME: no delete please
+        for (auto &it : expired) {
+            if (it.second->repeat() && cancelingTimers_.find(it.second->sequence()) == cancelingTimers_.end()) {
+                it.second->restart(now);
+                insert(it.second);
+            }
+            else {
+                delete it.second;
             }
         }
 
@@ -211,6 +209,13 @@ namespace net {
 
     TimerQueue::time_point TimerQueue::now() {
         return std::chrono::system_clock::now();
+    }
+
+    uint64_t TimerQueue::addTimer(TimerCallback &&cb, TimerQueue::time_point when, std::chrono::milliseconds interval) {
+        auto * timer=new Timer(std::move(cb), when, interval);
+
+        loop_->run_in_loop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
+        return timer->sequence();
     }
 }
 

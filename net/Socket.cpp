@@ -1,5 +1,5 @@
 //
-// Created by lg on 17-4-18.
+// Created by lg on 18-4-18.
 //
 
 
@@ -149,7 +149,7 @@ namespace net {
         int get_socket_error(int sockfd)
         {
             int optval;
-            socklen_t optlen = static_cast<socklen_t>(sizeof optval);
+            auto optlen = static_cast<socklen_t>(sizeof optval);
 
             if (::getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &optval, &optlen) < 0)
             {
@@ -162,9 +162,9 @@ namespace net {
         }
 
         sockaddr_in get_peer_addr(int fd) {
-            struct sockaddr_in peeraddr;
+            struct sockaddr_in peeraddr{};
             bzero(&peeraddr, sizeof peeraddr);
-            socklen_t addrlen = static_cast<socklen_t>(sizeof peeraddr);
+            auto addrlen = static_cast<socklen_t>(sizeof peeraddr);
             if (::getpeername(fd, reinterpret_cast< sockaddr*>(&peeraddr), &addrlen) < 0)
             {
                 LOG_ERROR << "sockets::getPeerAddr";
@@ -173,9 +173,9 @@ namespace net {
         }
 
         sockaddr_in get_local_addr(int fd) {
-            sockaddr_in localaddr;
+            sockaddr_in localaddr{};
             bzero(&localaddr, sizeof localaddr);
-            socklen_t addrlen = static_cast<socklen_t>(sizeof localaddr);
+            auto addrlen = static_cast<socklen_t>(sizeof localaddr);
             if (::getsockname(fd, reinterpret_cast< sockaddr*>(&localaddr), &addrlen) < 0)
             {
                 LOG_ERROR << "sockets::getLocalAddr";

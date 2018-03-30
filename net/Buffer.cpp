@@ -30,7 +30,7 @@ namespace net{
             result.second = errno;
         }
         else if (static_cast<size_t>(result.first) <= w_size) {
-            has_write(result.first);
+            has_write(static_cast<size_t>(result.first));
         }
         else {
             has_write(w_size);

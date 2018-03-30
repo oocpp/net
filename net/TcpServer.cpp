@@ -50,7 +50,7 @@ namespace net {
 
     void TcpServer::stop_in_loop(){
         assert(_loop->in_loop_thread());
-        assert(_status=Stopping);
+        assert(_status==Stopping);
 
         _accepter.stop();
 

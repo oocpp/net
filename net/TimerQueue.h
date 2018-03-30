@@ -24,6 +24,7 @@ namespace net {
         ~TimerQueue()noexcept ;
 
         uint64_t addTimer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
+        uint64_t addTimer(TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);
 
         void cancel(uint64_t timerId);
 

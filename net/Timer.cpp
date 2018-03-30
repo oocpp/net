@@ -8,7 +8,8 @@ namespace net {
     void Timer::restart(time_point now) {
       if (repeat_) {
         expiration_ = now+interval_;
-      } else {
+      }
+      else {
         expiration_ = time_point{};
       }
     }
@@ -22,7 +23,7 @@ namespace net {
     {}
 
 
-    Timer::Timer(const TimerCallback &&cb, Timer::time_point when, std::chrono::milliseconds interval)
+    Timer::Timer(TimerCallback &&cb, Timer::time_point when, std::chrono::milliseconds interval)
             : callback_(std::move(cb)),
             expiration_(when),
             interval_(interval),

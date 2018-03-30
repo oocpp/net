@@ -166,7 +166,7 @@ namespace net{
 
         ssize_t n = ::send(_sockfd, _out_buff.get_read_ptr(), _out_buff.get_readable_size(), MSG_NOSIGNAL);
         if (n > 0) {
-            _out_buff.has_read(n);
+            _out_buff.has_read(static_cast<size_t>(n));
 
             if (_out_buff.get_readable_size() == 0) {
                 _event.disable_write();

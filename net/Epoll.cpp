@@ -34,7 +34,7 @@ namespace net
 
     void Epoll::remove(int fd)
     {
-        epoll_event event;
+        epoll_event event{};
         if (::epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &event) < 0)
         {
             LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_DEL"<< " get_fd =" << fd;
@@ -55,12 +55,12 @@ namespace net
     {
         events.resize(_old_size);
 
-        int numEvents = ::epoll_wait(_epollfd,events.data(), _old_size, timeoutMs);
+        int numEvents = ::epoll_wait(_epollfd, events.data(), static_cast<int>(_old_size), timeoutMs);
 
         int savedErrno = errno;
         if (numEvents > 0)
         {
-            events.resize(numEvents);
+            events.resize(static_cast<size_t >(numEvents));
 
             if (static_cast<size_t>(numEvents) == _old_size)
             {
