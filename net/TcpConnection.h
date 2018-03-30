@@ -46,6 +46,8 @@ namespace net{
 
         uint64_t get_id()const noexcept;
 
+        int get_fd()const noexcept;
+
         void attach_to_loop();
 
         void set_context(const Any&a);
@@ -55,7 +57,8 @@ namespace net{
         Any&get_context();
 
         void send(const std::string& d);
-        void send(Buffer* d);
+        void send(const char*str,size_t len);
+        void send(const Buffer* d);
 
         bool is_connected()const noexcept;
 
@@ -69,7 +72,8 @@ namespace net{
         void handle_close();
         void handle_error();
 
-        void send_in_loop(const std::string& message);
+        void send_in_loop(const char*str,size_t len);
+        void send_string_in_loop(const std::string &str);
 
         enum Status {
             Disconnected = 0,

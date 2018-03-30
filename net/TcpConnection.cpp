@@ -96,31 +96,52 @@ namespace net{
         handle_close();
     }
 
-    void TcpConnection::send(const std::string &d) {
+    void TcpConnection::send(const std::string &str) {
         if(_status!=Connected)
             return ;
 
         if (_loop->in_loop_thread()) {
-            send_in_loop(d);
+            send_in_loop(str.data(),str.size());
             return;
         }
         else{
-            _loop->run_in_loop(std::bind(&TcpConnection::send_in_loop, shared_from_this(), d));
+            _loop->run_in_loop(std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), str));
         }
     }
 
-    void TcpConnection::send_in_loop(const std::string &message) {
+    void TcpConnection::send(const char *str,size_t len) {
+        if(_status!=Connected)
+            return ;
+
+        if (_loop->in_loop_thread()) {
+            send_in_loop(str,len);
+            return;
+        }
+        else{
+            _loop->run_in_loop(std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), std::string(str,len)));
+        }
+    }
+
+    void TcpConnection::send(const Buffer *d) {
+        send(d->get_read_ptr(),d->get_readable_size());
+    }
+
+    void TcpConnection::send_string_in_loop(const std::string &str) {
+        send_in_loop(str.data(),str.size());
+    }
+
+    void TcpConnection::send_in_loop(const char *message,size_t len) {
         if(_status==Disconnected)
             return ;
 
         ssize_t nwritten = 0;
-        size_t remaining = message.size();
+        size_t remaining = len;
         bool write_error = false;
 
         if(!_event.is_write()&&_out_buff.length()==0){
-            nwritten = ::send(_sockfd, message.data(), message.length(), MSG_NOSIGNAL);
+            nwritten = ::send(_sockfd, message, len, MSG_NOSIGNAL);
             if (nwritten >= 0) {
-                remaining = message.length() - nwritten;
+                remaining = len - nwritten;
                 if (remaining == 0 && _write_complete_cb) {
                     _loop->queue_in_loop(std::bind(_write_complete_cb, shared_from_this()));
                 }
@@ -143,16 +164,18 @@ namespace net{
         }
 
         assert(!write_error);
-        assert(remaining <= message.length());
+        assert(remaining <= len);
 
         if (remaining > 0) {
             size_t old_len = _out_buff.length();
-            if (old_len + remaining >= _high_level_mark && old_len < _high_level_mark
-                && _write_high_level_cb) {
+            if (old_len + remaining >= _high_level_mark
+                && old_len < _high_level_mark
+                && _write_high_level_cb)
+            {
                 _loop->queue_in_loop(std::bind(_write_high_level_cb, shared_from_this(), old_len + remaining));
             }
 
-            _out_buff.append(static_cast<const char*>(message.data()) + nwritten, remaining);
+            _out_buff.append(message + nwritten, remaining);
 
             if (!_event.is_write()) {
                 _event.enable_write();
@@ -181,14 +204,11 @@ namespace net{
 
             if (serrno != EWOULDBLOCK) {
                 LOG_WARN << "this=" << this << " TCPConn::HandleWrite errno=" << serrno << " " << strerror(serrno);
-            } else {
+            }
+            else {
                 handle_error();
             }
         }
-    }
-
-    void TcpConnection::send( Buffer *d) {
-        send(std::string(d->get_read_ptr(),d->get_readable_size()));
     }
 
     void TcpConnection::set_message_cb(const MessageCallback &cb) {
@@ -263,5 +283,9 @@ namespace net{
 
     bool TcpConnection::is_connected() const noexcept {
         return _status==Connected;
+    }
+
+    int TcpConnection::get_fd() const noexcept {
+        return _sockfd;
     }
 }

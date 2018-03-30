@@ -109,8 +109,7 @@ namespace net {
     }
 
 
-    void Connector::handle_write()
-    {
+    void Connector::handle_write() {
         LOG_TRACE << "Connector::handleWrite " << _status;
 
         _event.disable_all();
@@ -122,21 +121,25 @@ namespace net {
             if (err) {
                 LOG_WARN << "Connector::handleWrite - SO_ERROR = " << err;
                 retry(sockfd);
-            } else if (Socket::is_self_connect(sockfd)) {
+            }
+            else if (Socket::is_self_connect(sockfd)) {
                 LOG_WARN << "Connector::handleWrite - Self connect";
                 retry(sockfd);
-            } else {
+            }
+            else {
                 Status t = Connecting;
                 if (_status.compare_exchange_strong(t, Connected)) {
                     LOG_TRACE << "connect success";
                     if (_new_conn_cb) {
                         _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
                     }
-                } else {
+                }
+                else {
                     Socket::close(sockfd);
                 }
             }
-        } else {
+        }
+        else {
             assert(_status == Disconnected);
         }
     }
