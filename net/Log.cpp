@@ -8,25 +8,27 @@
 #include<iomanip>
 #include"Log.h"
 
-namespace net{
-    int Log::RANK=0;
+namespace net
+{
+    int Log::RANK = 0;
 
     Log::Log(int n, const char *file, int line, const char *func)
-            :rank(n)
+            : rank(n)
     {
-        const char*p=strrchr(file,'/');
-        if(p==nullptr)
-            p=file;
+        const char *p = strrchr(file, '/');
+        if (p == nullptr)
+            p = file;
         else
             ++p;
 
-        this->out <<std::this_thread::get_id()<<" "
-                  <<std::setw(15)<< p << '('<< line << ") "
-                  <<std::setw(15)<< std::setiosflags(std::ios::left) <<func
-                  <<"     ";
+        this->out << std::this_thread::get_id() << " "
+                  << std::setw(15) << p << '(' << line << ") "
+                  << std::setw(15) << std::setiosflags(std::ios::left) << func
+                  << "     ";
     }
 
-    Log &Log::operator()(const char *s, ...) {
+    Log &Log::operator()(const char *s, ...)
+    {
         char buf[1024];/*注意 最大输出长度1024..自行设置*/
         va_list ap;
         va_start(ap, s);
@@ -37,12 +39,14 @@ namespace net{
         return *this;
     }
 
-    Log &Log::operator<<(std::ostream &(*op)(std::ostream &)) {
+    Log &Log::operator<<(std::ostream &(*op)(std::ostream &))
+    {
         op(this->out);
         return *this;
     }
 
-    Log::~Log() {
+    Log::~Log()
+    {
         if (rank > RANK)
             std::cout << out.rdbuf() << std::endl;
     }

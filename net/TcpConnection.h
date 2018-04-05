@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include <list>
 #include <functional>
 #include <memory>
@@ -14,77 +15,92 @@
 #include"CallBack.h"
 #include "Any.h"
 
-namespace net{
+namespace net
+{
 
     class EventLoop;
 
-    class TcpConnection:public std::enable_shared_from_this<TcpConnection> {
+    class TcpConnection : public std::enable_shared_from_this<TcpConnection>
+    {
     public:
 
-        TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&local_addr,const InetAddress&peer_addr);
-        ~TcpConnection()noexcept ;
+        TcpConnection(uint64_t id, EventLoop *loop, int sockfd, const InetAddress &local_addr
+                      , const InetAddress &peer_addr);
+
+        ~TcpConnection()noexcept;
 
         void close();
 
-        void set_message_cb(const MessageCallback & cb);
+        void set_message_cb(const MessageCallback &cb);
+
         void set_high_water_cb(const HighWaterMarkCallback &cb, size_t mark);
+
         void set_connection_cb(const ConnectingCallback &cb);
 
         void set_write_complete_cb(const WriteCompleteCallback &cb);
-        void set_close_cb(const CloseCallback&cb);
-        void set_message_cb( MessageCallback && cb)noexcept;
 
-        void set_high_water_cb( HighWaterMarkCallback &&cb, size_t mark)noexcept;
+        void set_close_cb(const CloseCallback &cb);
 
-        void set_connection_cb( ConnectingCallback &&cb)noexcept;
+        void set_message_cb(MessageCallback &&cb)noexcept;
 
-        void set_write_complete_cb( WriteCompleteCallback &&cb)noexcept;
+        void set_high_water_cb(HighWaterMarkCallback &&cb, size_t mark)noexcept;
 
-        void set_close_cb( CloseCallback && cb)noexcept;
+        void set_connection_cb(ConnectingCallback &&cb)noexcept;
 
-        EventLoop*get_loop()noexcept;
+        void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
 
-        uint64_t get_id()const noexcept;
+        void set_close_cb(CloseCallback &&cb)noexcept;
 
-        int get_fd()const noexcept;
+        EventLoop *get_loop()noexcept;
+
+        uint64_t get_id() const noexcept;
+
+        int get_fd() const noexcept;
 
         void attach_to_loop();
 
-        void set_context(const Any&a);
+        void set_context(const Any &a);
 
-        void set_context(Any&&a)noexcept;
+        void set_context(Any &&a)noexcept;
 
-        Any&get_context();
+        Any &get_context();
 
-        void send(const std::string& d);
-        void send(const char*str,size_t len);
-        void send(const Buffer* d);
+        void send(const std::string &d);
 
-        bool is_connected()const noexcept;
+        void send(const char *str, size_t len);
 
-        InetAddress get_local_addr()const noexcept;
+        void send(const Buffer *d);
 
-        InetAddress get_peer_addr()const noexcept;
+        bool is_connected() const noexcept;
+
+        InetAddress get_local_addr() const noexcept;
+
+        InetAddress get_peer_addr() const noexcept;
+
     private:
         void handle_read();
+
         void handle_write();
 
         void handle_close();
+
         void handle_error();
 
-        void send_in_loop(const char*str,size_t len);
+        void send_in_loop(const char *str, size_t len);
+
         void send_string_in_loop(const std::string &str);
 
-        enum Status {
+        enum Status
+        {
             Disconnected = 0,
             //Connecting = 1,
-            Connected = 2,
+                    Connected = 2,
             Disconnecting = 3,
         };
     private:
         int _sockfd;
         uint64_t _id;
-        EventLoop*_loop;
+        EventLoop *_loop;
         Event _event;
         std::atomic<Status> _status;
 
@@ -95,9 +111,9 @@ namespace net{
 
         Any _context;
 
-        size_t _high_level_mark=64 * 1024 * 1024; // Default 128MB
+        size_t _high_level_mark = 64 * 1024 * 1024; // Default 128MB
 
-        CloseCallback  _close_cb;
+        CloseCallback _close_cb;
         ConnectingCallback _connecting_cb;
         MessageCallback _message_cb;
         HighWaterMarkCallback _write_high_level_cb;

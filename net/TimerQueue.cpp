@@ -10,9 +10,12 @@
 #include"EventLoop.h"
 
 
-namespace net {
-    namespace {
-        int createTimerfd() {
+namespace net
+{
+    namespace
+    {
+        int createTimerfd()
+        {
             int timerfd = ::timerfd_create(CLOCK_MONOTONIC,
                                            TFD_NONBLOCK | TFD_CLOEXEC);
             if (timerfd < 0) {
@@ -21,7 +24,8 @@ namespace net {
             return timerfd;
         }
 
-        struct timespec howMuchTimeFromNow(TimerQueue::time_point when) {
+        struct timespec howMuchTimeFromNow(TimerQueue::time_point when)
+        {
 
             TimerQueue::duration du = when - std::chrono::system_clock::now();
 
@@ -32,7 +36,8 @@ namespace net {
             return ts;
         }
 
-        void readTimerfd(int timerfd, TimerQueue::time_point now) {
+        void readTimerfd(int timerfd, TimerQueue::time_point now)
+        {
             uint64_t howmany;
             ssize_t n = ::read(timerfd, &howmany, sizeof howmany);
             LOG_TRACE << howmany;
@@ -41,7 +46,8 @@ namespace net {
             }
         }
 
-        void resetTimerfd(int timerfd, TimerQueue::time_point expiration) {
+        void resetTimerfd(int timerfd, TimerQueue::time_point expiration)
+        {
             // wake up loop by timerfd_settime()
             struct itimerspec newValue{};
             struct itimerspec oldValue{};
@@ -57,17 +63,16 @@ namespace net {
 
 
     TimerQueue::TimerQueue(EventLoop *loop)
-            : loop_(loop),
-              timerfd_(createTimerfd()),
-              timerfdChannel_(loop, timerfd_),
-              timers_(),
-              callingExpiredTimers_(false) {
+            : loop_(loop), timerfd_(createTimerfd()), timerfdChannel_(loop, timerfd_), timers_(), callingExpiredTimers_(
+            false)
+    {
 
         timerfdChannel_.set_read_cb(std::bind(&TimerQueue::handleRead, this));
         timerfdChannel_.enable_read();
     }
 
-    TimerQueue::~TimerQueue() noexcept{
+    TimerQueue::~TimerQueue() noexcept
+    {
         timerfdChannel_.disable_all();
         Socket::close(timerfd_);
 
@@ -76,21 +81,22 @@ namespace net {
         }
     }
 
-    uint64_t TimerQueue::addTimer(const TimerCallback &cb,
-                                 time_point when,
-                                 std::chrono::milliseconds interval) {
-        auto * timer=new Timer(cb, when, interval);
+    uint64_t TimerQueue::addTimer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval)
+    {
+        auto *timer = new Timer(cb, when, interval);
 
         loop_->run_in_loop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
         return timer->sequence();
     }
 
 
-    void TimerQueue::cancel(uint64_t timerId) {
+    void TimerQueue::cancel(uint64_t timerId)
+    {
         loop_->run_in_loop(std::bind(&TimerQueue::cancelInLoop, this, timerId));
     }
 
-    void TimerQueue::addTimerInLoop(Timer* timer) {
+    void TimerQueue::addTimerInLoop(Timer *timer)
+    {
 
         bool earliestChanged = insert(timer);
 
@@ -99,7 +105,8 @@ namespace net {
         }
     }
 
-    void TimerQueue::cancelInLoop(uint64_t timerId) {
+    void TimerQueue::cancelInLoop(uint64_t timerId)
+    {
 
         assert(timers_.size() == activeTimers_.size());
 
@@ -108,14 +115,16 @@ namespace net {
             timers_.erase(Entry(it->second->expiration(), it->second));
 
             activeTimers_.erase(it);
-        } else if (callingExpiredTimers_) {
+        }
+        else if (callingExpiredTimers_) {
             cancelingTimers_.insert(timerId);
         }
 
         assert(timers_.size() == activeTimers_.size());
     }
 
-    void TimerQueue::handleRead() {
+    void TimerQueue::handleRead()
+    {
 
         time_point now_time(now());
         readTimerfd(timerfd_, now_time);
@@ -133,7 +142,8 @@ namespace net {
         reset(expired, now_time);
     }
 
-    std::vector<TimerQueue::Entry> TimerQueue::getExpired(time_point now) {
+    std::vector<TimerQueue::Entry> TimerQueue::getExpired(time_point now)
+    {
         assert(timers_.size() == activeTimers_.size());
 
         std::vector<Entry> expired;
@@ -156,7 +166,8 @@ namespace net {
         return expired;
     }
 
-    void TimerQueue::reset(const std::vector<Entry> &expired, time_point now) {
+    void TimerQueue::reset(const std::vector<Entry> &expired, time_point now)
+    {
         time_point nextExpire;
 
         for (auto &it : expired) {
@@ -178,7 +189,8 @@ namespace net {
         }
     }
 
-    bool TimerQueue::insert(Timer* timer) {
+    bool TimerQueue::insert(Timer *timer)
+    {
 
         assert(timers_.size() == activeTimers_.size());
 
@@ -198,7 +210,7 @@ namespace net {
         }
         {
             std::pair<ActiveTimerSet::iterator, bool> result
-                    = activeTimers_.insert(std::pair<uint64_t ,Timer*>( timer->sequence(),timer));
+                    = activeTimers_.insert(std::pair<uint64_t, Timer *>(timer->sequence(), timer));
             assert(result.second);
             (void) result;
         }
@@ -207,12 +219,14 @@ namespace net {
         return earliestChanged;
     }
 
-    TimerQueue::time_point TimerQueue::now() {
+    TimerQueue::time_point TimerQueue::now()
+    {
         return std::chrono::system_clock::now();
     }
 
-    uint64_t TimerQueue::addTimer(TimerCallback &&cb, TimerQueue::time_point when, std::chrono::milliseconds interval) {
-        auto * timer=new Timer(std::move(cb), when, interval);
+    uint64_t TimerQueue::addTimer(TimerCallback &&cb, TimerQueue::time_point when, std::chrono::milliseconds interval)
+    {
+        auto *timer = new Timer(std::move(cb), when, interval);
 
         loop_->run_in_loop(std::bind(&TimerQueue::addTimerInLoop, this, timer));
         return timer->sequence();

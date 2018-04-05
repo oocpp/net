@@ -7,26 +7,29 @@
 #include "Log.h"
 #include<cassert>
 
-namespace net {
+namespace net
+{
 
     Event::Event(EventLoop *loop, int fd, bool r, bool w) noexcept
             : _loop(loop)
-            , _fd(fd)
-            ,_add_to_loop(false)
+              , _fd(fd)
+              , _add_to_loop(false)
             //,_active_event(NoneEvent)
-            ,_events((r ? ReadEvent : NoneEvent) | (w ? WriteEvent : NoneEvent))
-            {
+              , _events((r ? ReadEvent : NoneEvent) | (w ? WriteEvent : NoneEvent))
+    {
 
     }
 
-    void Event::detach_from_loop() {
+    void Event::detach_from_loop()
+    {
         if (is_add_to_loop()) {
             _loop->remove(this);
-            _add_to_loop=false;
+            _add_to_loop = false;
         }
     }
 
-    void Event::attach_to_loop() {
+    void Event::attach_to_loop()
+    {
         assert(!is_none());
 
         if (is_add_to_loop()) {
@@ -38,57 +41,65 @@ namespace net {
         }
     }
 
-    void Event::update() {
+    void Event::update()
+    {
         if (is_none())
             detach_from_loop();
-        else{
+        else {
             attach_to_loop();
         }
     }
 
-    void Event::enable_read() {
-        if(!is_read()){
+    void Event::enable_read()
+    {
+        if (!is_read()) {
             _events |= ReadEvent;
             update();
         }
     }
 
-    void Event::enable_write() {
-        if(!is_write()) {
+    void Event::enable_write()
+    {
+        if (!is_write()) {
             _events |= WriteEvent;
             update();
         }
     }
 
-    void Event::enable_all() {
-        if(!is_write()||!is_read()) {
-            _events |= ReadEvent|WriteEvent;
+    void Event::enable_all()
+    {
+        if (!is_write() || !is_read()) {
+            _events |= ReadEvent | WriteEvent;
             update();
         }
     }
 
-    void Event::disable_read() {
-        if(is_read()) {
+    void Event::disable_read()
+    {
+        if (is_read()) {
             _events &= ~ReadEvent;
             update();
         }
     }
 
-    void Event::disable_write() {
-        if(is_write()) {
+    void Event::disable_write()
+    {
+        if (is_write()) {
             _events &= ~WriteEvent;
             update();
         }
     }
 
-    void Event::disable_all() {
-        if(is_write()||is_read()) {
+    void Event::disable_all()
+    {
+        if (is_write() || is_read()) {
             _events = NoneEvent;
             detach_from_loop();
         }
     }
 
-    void Event::handle_event(uint32_t event) {
+    void Event::handle_event(uint32_t event)
+    {
         if ((event & ReadEvent) && _read_cb) {
             _read_cb();
         }
@@ -98,7 +109,8 @@ namespace net {
         }
     }
 
-    Event::~Event() noexcept {
+    Event::~Event() noexcept
+    {
         assert(!is_add_to_loop());
     }
 
@@ -114,19 +126,22 @@ namespace net {
 
     void Event::set_error_cb(const EventCallback &cb)
     {
-        _error_cb=cb;
+        _error_cb = cb;
     }
 
-    void Event::set_read_cb(ReadEventCallback &&cb) noexcept{
+    void Event::set_read_cb(ReadEventCallback &&cb) noexcept
+    {
         _read_cb = std::move(cb);
     }
 
-    void Event::set_write_cb(EventCallback &&cb) noexcept{
+    void Event::set_write_cb(EventCallback &&cb) noexcept
+    {
         _write_cb = std::move(cb);
     }
 
-    void Event::set_error_cb(EventCallback &&cb)noexcept {
-        _error_cb=std::move(cb);
+    void Event::set_error_cb(EventCallback &&cb)noexcept
+    {
+        _error_cb = std::move(cb);
     }
 
     int Event::get_fd() const noexcept
@@ -146,21 +161,21 @@ namespace net {
 
     void Event::set_fd(int fd) noexcept
     {
-        _fd=fd;
+        _fd = fd;
     }
 
     bool Event::is_write() const noexcept
     {
-        return (_events & WriteEvent)!=0;
+        return (_events & WriteEvent) != 0;
     }
 
     bool Event::is_read() const noexcept
     {
-        return (_events & ReadEvent)!=0;
+        return (_events & ReadEvent) != 0;
     }
 
     bool Event::is_none() const noexcept
     {
-        return _events==NoneEvent;
+        return _events == NoneEvent;
     }
 }

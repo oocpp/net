@@ -7,14 +7,14 @@
 #include "Socket.h"
 #include "Log.h"
 
-namespace net {
-
+namespace net
+{
     Connector::Connector(EventLoop *loop, const InetAddress &addr)noexcept
             : _loop(loop)
-            , _addr(addr)
-            , _status(Disconnected)
-            , _event(loop, -1)
-            , _retry_delay_ms(init_retry_delay_ms + 0)
+              , _addr(addr)
+              , _status(Disconnected)
+              , _event(loop, -1)
+              , _retry_delay_ms(init_retry_delay_ms + 0)
     {
 
     }
@@ -64,7 +64,7 @@ namespace net {
     void Connector::connect()
     {
 
-        if(_status!=Connecting)
+        if (_status != Connecting)
             return;
 
         int fd = Socket::create_nonblocking_socket(_addr.get_family());
@@ -109,7 +109,8 @@ namespace net {
     }
 
 
-    void Connector::handle_write() {
+    void Connector::handle_write()
+    {
         LOG_TRACE << "Connector::handleWrite " << _status;
 
         _event.disable_all();
@@ -170,7 +171,7 @@ namespace net {
 
     void Connector::connecting(int fd)
     {
-        if(_status!=Connecting)
+        if (_status != Connecting)
             return;
 
         _event.set_fd(fd);
@@ -184,18 +185,19 @@ namespace net {
     {
         Socket::close(sockfd);
 
-        if (_status==Connecting) {
+        if (_status == Connecting) {
 
             LOG_INFO << "Connector::retry - Retry connecting to " << _addr.toIpPort()
                      << " in " << _retry_delay_ms.count() << " milliseconds. ";
 
             _retry_delay_ms *= 2;
             if (_retry_delay_ms.count() > max_retry_delay_ms)
-                _retry_delay_ms = std::chrono::milliseconds(max_retry_delay_ms+0);
+                _retry_delay_ms = std::chrono::milliseconds(max_retry_delay_ms + 0);
 
             _loop->run_after(_retry_delay_ms, std::bind(&Connector::connect, shared_from_this()));
 
-        } else {
+        }
+        else {
             LOG_DEBUG << "do not connect";
         }
     }

@@ -6,56 +6,62 @@
 #include"TcpConnection.h"
 #include "Log.h"
 
-namespace net{
+namespace net
+{
     using std::placeholders::_1;
     using std::placeholders::_2;
     std::atomic<uint64_t> TcpClient::id{0};
 
     TcpClient::TcpClient(EventLoop *loop, const InetAddress &serverAddr, const std::string &nameArg)
-    :_loop(loop)
-     ,_connector(new Connector(loop,serverAddr))
-    ,_peer_addr(serverAddr)
-    ,_name(nameArg)
-    ,_connection(nullptr)
-    ,_retry(false)
-    ,_status(Disconnected)
+            : _loop(loop)
+              , _connector(new Connector(loop, serverAddr))
+              , _peer_addr(serverAddr)
+              , _name(nameArg)
+              , _connection(nullptr)
+              , _retry(false)
+              , _status(Disconnected)
     {
-        _connector->set_new_connection_cb(std::bind(&TcpClient::on_new_connection,this,_1,_2));
+        _connector->set_new_connection_cb(std::bind(&TcpClient::on_new_connection, this, _1, _2));
     }
 
-    TcpClient::~TcpClient()noexcept {
-        assert(_status==Disconnected);
+    TcpClient::~TcpClient()noexcept
+    {
+        assert(_status == Disconnected);
     }
 
-    void TcpClient::connect() {
-        assert(_status==Disconnected);
+    void TcpClient::connect()
+    {
+        assert(_status == Disconnected);
 
-        Status t=Disconnected;
-        if(_status.compare_exchange_strong(t,Connecting)){
+        Status t = Disconnected;
+        if (_status.compare_exchange_strong(t, Connecting)) {
             _connector->start();
         }
     }
 
-    void TcpClient::disconnect() {
+    void TcpClient::disconnect()
+    {
         //assert(_status==Connecting);
 
-        Status t=Connected;
-        if(_status.compare_exchange_strong(t,Disconnected)){
+        Status t = Connected;
+        if (_status.compare_exchange_strong(t, Disconnected)) {
             _connection->close();
             _connection.reset();
         }
     }
 
-    void TcpClient::cancel_connect() {
-        Status t=Connecting;
-        if(_status.compare_exchange_strong(t,Disconnected)){
+    void TcpClient::cancel_connect()
+    {
+        Status t = Connecting;
+        if (_status.compare_exchange_strong(t, Disconnected)) {
             _connector->cancel();
         }
     }
 
-    void TcpClient::on_new_connection(int fd,const InetAddress &addr) {
-        Status t=Connecting;
-        if(_status.compare_exchange_strong(t,Connected)) {
+    void TcpClient::on_new_connection(int fd, const InetAddress &addr)
+    {
+        Status t = Connecting;
+        if (_status.compare_exchange_strong(t, Connected)) {
 
             _connection.reset(new TcpConnection(++id, _loop, fd, addr, _peer_addr));
 
@@ -70,14 +76,15 @@ namespace net{
         }
     }
 
-    void TcpClient::on_remove_connection(const TCPConnPtr &conn) {
+    void TcpClient::on_remove_connection(const TCPConnPtr &conn)
+    {
 
-        Status t=Connected;
-        if(_status.compare_exchange_strong(t,Disconnected)){
+        Status t = Connected;
+        if (_status.compare_exchange_strong(t, Disconnected)) {
 
         }
-        else{
-            if(_retry)
+        else {
+            if (_retry)
                 _connector->restart();
         }
 
@@ -85,7 +92,7 @@ namespace net{
 
     void TcpClient::set_retry(bool t)
     {
-        _retry=t;
+        _retry = t;
     }
 
     EventLoop *TcpClient::get_loop()
@@ -98,39 +105,48 @@ namespace net{
         return _name;
     }
 
-    Any &TcpClient::get_context() {
+    Any &TcpClient::get_context()
+    {
         return _context;
     }
 
-    void TcpClient::set_context(Any &&a) {
-        _context=std::move(a);
+    void TcpClient::set_context(Any &&a)
+    {
+        _context = std::move(a);
     }
 
-    void TcpClient::set_context(const Any &a) {
-        _context=a;
+    void TcpClient::set_context(const Any &a)
+    {
+        _context = a;
     }
 
-    void TcpClient::set_connection_cb(const ConnectingCallback &cb) {
+    void TcpClient::set_connection_cb(const ConnectingCallback &cb)
+    {
         _connecting_cb = cb;
     }
 
-    void TcpClient::set_message_cb(const MessageCallback &cb) {
+    void TcpClient::set_message_cb(const MessageCallback &cb)
+    {
         _message_cb = cb;
     }
 
-    void TcpClient::set_write_complete_cb(const WriteCompleteCallback &cb) {
+    void TcpClient::set_write_complete_cb(const WriteCompleteCallback &cb)
+    {
         _write_complete_cb = cb;
     }
 
-    void TcpClient::set_connection_cb(ConnectingCallback &&cb) noexcept{
+    void TcpClient::set_connection_cb(ConnectingCallback &&cb) noexcept
+    {
         _connecting_cb = std::move(cb);
     }
 
-    void TcpClient::set_message_cb(MessageCallback &&cb)noexcept {
+    void TcpClient::set_message_cb(MessageCallback &&cb)noexcept
+    {
         _message_cb = std::move(cb);
     }
 
-    void TcpClient::set_write_complete_cb(WriteCompleteCallback &&cb)noexcept {
+    void TcpClient::set_write_complete_cb(WriteCompleteCallback &&cb)noexcept
+    {
         _write_complete_cb = std::move(cb);
     }
 }

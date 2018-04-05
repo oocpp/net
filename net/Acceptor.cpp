@@ -7,12 +7,13 @@
 #include "TcpConnection.h"
 #include "Log.h"
 
-namespace net {
+namespace net
+{
     Accepter::Accepter(EventLoop *loop, const InetAddress &addr)noexcept
-            :_loop(loop)
-            ,_fd(Socket::create_nonblocking_socket(addr.get_family()))
-            ,_addr(addr)
-            ,_event(loop,_fd,true,false)
+            : _loop(loop)
+              , _fd(Socket::create_nonblocking_socket(addr.get_family()))
+              , _addr(addr)
+              , _event(loop, _fd, true, false)
     {
         Socket::bind(_fd, _addr);
     }
@@ -30,7 +31,7 @@ namespace net {
 
         _event.set_read_cb(std::bind(&Accepter::handle_accept, this));
 
-        _loop->run_in_loop(std::bind(&Event::attach_to_loop,&_event));
+        _loop->run_in_loop(std::bind(&Event::attach_to_loop, &_event));
     }
 
     void Accepter::stop()
@@ -45,22 +46,24 @@ namespace net {
         assert(_loop->in_loop_thread());
 
         InetAddress addr;
-        int connfd = Socket::accept(_fd,addr);
+        int connfd = Socket::accept(_fd, addr);
 
-        if(connfd<0){
-            return ;
+        //LOG_INFO<<"accept :fd = "<<connfd;
+
+        if (connfd < 0) {
+            return;
         }
 
-        _new_connection_cb(connfd,addr);
+        _new_connection_cb(connfd, addr);
     }
 
     void Accepter::set_new_connection_cb(const Accepter::NewConnCallback &cb)
     {
-        _new_connection_cb=cb;
+        _new_connection_cb = cb;
     }
 
     void Accepter::set_new_connection_cb(Accepter::NewConnCallback &&cb)noexcept
     {
-        _new_connection_cb=std::move(cb);
+        _new_connection_cb = std::move(cb);
     }
 }

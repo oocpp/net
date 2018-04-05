@@ -15,11 +15,12 @@
 #include "Socket.h"
 #include"Event.h"
 
-namespace{
-    int createWakeEventfd() {
+namespace
+{
+    int createWakeEventfd()
+    {
         int evtfd = ::eventfd(0, EFD_NONBLOCK | EFD_CLOEXEC);
-        if (evtfd < 0)
-        {
+        if (evtfd < 0) {
             LOG_ERROR << "Failed in eventfd";
             abort();
         }
@@ -27,65 +28,74 @@ namespace{
     }
 
 #pragma GCC diagnostic ignored "-Wold-style-cast"
-    struct IgnoreSigPipe {
-        IgnoreSigPipe() {
+
+    struct IgnoreSigPipe
+    {
+        IgnoreSigPipe()
+        {
             ::signal(SIGPIPE, SIG_IGN);
             //LOG_TRACE << "Ignore SIGPIPE";
         }
     };
+
 #pragma GCC diagnostic error "-Wold-style-cast"
 
     IgnoreSigPipe initObj;
 }
 
-namespace net {
-    EventLoop::~EventLoop()noexcept {
+namespace net
+{
+    EventLoop::~EventLoop()noexcept
+    {
         assert(!_is_looping);
 
         _wake_event.detach_from_loop();
         Socket::close(_wake_fd);
     }
 
-     EventLoop::EventLoop()noexcept
-            :_is_looping(false)
-             ,_is_pending_fns(false)
-            ,_wake_fd(createWakeEventfd())
-            ,_th_id(std::this_thread::get_id())
-             ,_timers(this)
-            ,_wake_event(this,_wake_fd,true) {
+    EventLoop::EventLoop()noexcept
+            : _is_looping(false)
+              , _is_pending_fns(false)
+              , _wake_fd(createWakeEventfd())
+              , _th_id(std::this_thread::get_id())
+              , _timers(this)
+              , _wake_event(this, _wake_fd, true)
+    {
 
         _wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
         _wake_event.attach_to_loop();
     }
 
-    void EventLoop::run() {
+    void EventLoop::run()
+    {
 
         assert(!_is_looping);
-        assert(_th_id==std::this_thread::get_id());
+        assert(_th_id == std::this_thread::get_id());
 
-        bool t=false;
-        if(!_is_looping.compare_exchange_strong(t,true))
-            return ;
+        bool t = false;
+        if (!_is_looping.compare_exchange_strong(t, true))
+            return;
 
-        while(_is_looping){
-            LOG_TRACE<<" looping"<<std::endl;
+        while (_is_looping) {
+            LOG_TRACE << " looping" << std::endl;
 
-            _poll.wait(-1,_events);
+            _poll.wait(-1, _events);
 
-            LOG_TRACE<<"poll "<<_events.size();
-            for(auto &e:_events)
-                reinterpret_cast<Event*>(e.data.ptr)->handle_event(e.events);
+            LOG_TRACE << "poll " << _events.size();
+            for (auto &e:_events)
+                reinterpret_cast<Event *>(e.data.ptr)->handle_event(e.events);
 
             do_pending_fn();
-            LOG_TRACE<<" loop stop"<<std::endl;
+            LOG_TRACE << " loop stop" << std::endl;
         }
-        _is_looping=false;
+        _is_looping = false;
     }
 
-    void EventLoop::stop() {
-        bool t=true;
+    void EventLoop::stop()
+    {
+        bool t = true;
 
-        if(_is_looping.compare_exchange_strong(t,false)) {
+        if (_is_looping.compare_exchange_strong(t, false)) {
             wakeup();
         }
     }
@@ -95,8 +105,7 @@ namespace net {
         LOG_TRACE;
         uint64_t one = 1;
         ssize_t n = ::write(_wake_fd, &one, sizeof one);
-        if (n != sizeof one)
-        {
+        if (n != sizeof one) {
             LOG_ERROR << "EventLoop::wakeup() writes " << n << " bytes instead of 8";
         }
     }
@@ -106,33 +115,36 @@ namespace net {
         LOG_TRACE;
         uint64_t one = 1;
         ssize_t n = ::read(_wake_fd, &one, sizeof one);
-        if (n != sizeof one)
-        {
+        if (n != sizeof one) {
             LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
         }
     }
 
-    void EventLoop::add(Event *e) {
+    void EventLoop::add(Event *e)
+    {
         epoll_event event;
-        event.events=e->get_events();
-        event.data.ptr=e;
-       _poll.add(e->get_fd(),event);
+        event.events = e->get_events();
+        event.data.ptr = e;
+        _poll.add(e->get_fd(), event);
     }
 
-    void EventLoop::update(Event *e) {
+    void EventLoop::update(Event *e)
+    {
         epoll_event event;
-        event.events=e->get_events();
-        event.data.ptr=e;
-        _poll.update(e->get_fd(),event);
+        event.events = e->get_events();
+        event.data.ptr = e;
+        _poll.update(e->get_fd(), event);
     }
 
-    void EventLoop::remove(Event *e) {
+    void EventLoop::remove(Event *e)
+    {
         _poll.remove(e->get_fd());
     }
 
-    void EventLoop::run_in_loop(const std::function<void()> &cb) {
+    void EventLoop::run_in_loop(const std::function<void()> &cb)
+    {
         LOG_TRACE;
-        if(in_loop_thread()){
+        if (in_loop_thread()) {
             cb();
         }
         else {
@@ -140,9 +152,10 @@ namespace net {
         }
     }
 
-    void EventLoop::run_in_loop(std::function<void()> &&cb) {
+    void EventLoop::run_in_loop(std::function<void()> &&cb)
+    {
         LOG_TRACE;
-        if(in_loop_thread()){
+        if (in_loop_thread()) {
             cb();
         }
         else {
@@ -150,78 +163,90 @@ namespace net {
         }
     }
 
-    void EventLoop::queue_in_loop(std::function<void()> &&cb) {
+    void EventLoop::queue_in_loop(std::function<void()> &&cb)
+    {
         {
             std::lock_guard<std::mutex> l(_mu);
             _pending_fns.push_back(std::move(cb));
         }
 
-        if(!in_loop_thread()||_is_pending_fns) {
+        if (!in_loop_thread() || _is_pending_fns) {
             wakeup();
         }
     }
 
-    bool EventLoop::in_loop_thread()const noexcept {
-        return std::this_thread::get_id()==_th_id;
+    bool EventLoop::in_loop_thread() const noexcept
+    {
+        return std::this_thread::get_id() == _th_id;
     }
 
-    void EventLoop::queue_in_loop(const std::function<void()> &cb) {
+    void EventLoop::queue_in_loop(const std::function<void()> &cb)
+    {
         {
             std::lock_guard<std::mutex> l(_mu);
             _pending_fns.push_back(cb);
         }
 
-        if(!in_loop_thread()||_is_pending_fns) {
+        if (!in_loop_thread() || _is_pending_fns) {
             wakeup();
         }
     }
 
-    void EventLoop::do_pending_fn() {
+    void EventLoop::do_pending_fn()
+    {
 
-        std::vector<std::function<void()>>fns;
-        _is_pending_fns=true;
+        std::vector<std::function<void()>> fns;
+        _is_pending_fns = true;
         {
             std::lock_guard<std::mutex> l(_mu);
             fns.swap(_pending_fns);
         }
 
-        LOG_TRACE<<fns.size();
+        LOG_TRACE << fns.size();
 
-        for(auto&f:fns)
+        for (auto &f:fns)
             f();
-        _is_pending_fns=false;
+        _is_pending_fns = false;
     }
 
-    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, const std::function<void()> &cb) {
-        return run_at(TimerQueue::now()+ms, cb);
+    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, const std::function<void()> &cb)
+    {
+        return run_at(TimerQueue::now() + ms, cb);
     }
 
-    uint64_t EventLoop::run_at(TimerQueue::time_point time, const std::function<void()> &cb) {
-        return _timers.addTimer(cb,time,0ms);
+    uint64_t EventLoop::run_at(TimerQueue::time_point time, const std::function<void()> &cb)
+    {
+        return _timers.addTimer(cb, time, 0ms);
     }
 
-    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, const std::function<void()> &cb) {
-        return _timers.addTimer(cb,TimerQueue::now()+ms,ms);
+    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, const std::function<void()> &cb)
+    {
+        return _timers.addTimer(cb, TimerQueue::now() + ms, ms);
     }
 
-    void EventLoop::cancel(uint64_t id) {
+    void EventLoop::cancel(uint64_t id)
+    {
         _timers.cancel(id);
     }
 
-    void EventLoop::set_thread_id(std::thread::id id) noexcept {
-        _th_id=id;
+    void EventLoop::set_thread_id(std::thread::id id) noexcept
+    {
+        _th_id = id;
     }
 
-    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, std::function<void()> &&cb) {
-        return run_at(TimerQueue::now()+ms, std::move(cb));
+    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, std::function<void()> &&cb)
+    {
+        return run_at(TimerQueue::now() + ms, std::move(cb));
     }
 
-    uint64_t EventLoop::run_at(TimerQueue::time_point time, std::function<void()> &&cb) {
-        return _timers.addTimer(std::move(cb),time,0ms);
+    uint64_t EventLoop::run_at(TimerQueue::time_point time, std::function<void()> &&cb)
+    {
+        return _timers.addTimer(std::move(cb), time, 0ms);
     }
 
-    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, std::function<void()> &&cb) {
-        return _timers.addTimer(std::move(cb),TimerQueue::now()+ms,ms);
+    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, std::function<void()> &&cb)
+    {
+        return _timers.addTimer(std::move(cb), TimerQueue::now() + ms, ms);
     }
 
 

@@ -3,17 +3,21 @@
 //
 
 #pragma once
+
 #include<sstream>
 #include<iostream>
 
-namespace net{
+namespace net
+{
 
-    class Log {
+    class Log
+    {
     public:
         Log(int n, const char *file, int line, const char *func);
 
         template<typename T>
-        Log &operator<<(const T &t) {
+        Log &operator<<(const T &t)
+        {
             this->out << t;
             return *this;
         }
@@ -24,7 +28,8 @@ namespace net{
 
         ~Log();
 
-        static void set_rank(int i) { RANK = i; }
+        static void set_rank(int i)
+        { RANK = i; }
 
     private:
         std::stringstream out;

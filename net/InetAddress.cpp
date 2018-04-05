@@ -8,24 +8,24 @@
 #include <cstring>
 #include "InetAddress.h"
 
-namespace net {
+namespace net
+{
 
-    InetAddress::InetAddress(const std::string & ip, in_port_t port,sa_family_t family)
+    InetAddress::InetAddress(const std::string &ip, in_port_t port, sa_family_t family)
     {
-        std::memset(&_addr,0, get_sockaddr_size());
+        std::memset(&_addr, 0, get_sockaddr_size());
 
         _addr.sin_family = family;
         _addr.sin_port = htons(port);
 
-        if (::inet_pton(AF_INET, ip.c_str(), &_addr.sin_addr) <= 0)
-        {
+        if (::inet_pton(AF_INET, ip.c_str(), &_addr.sin_addr) <= 0) {
             LOG_ERROR << "inet_pton 失败";
         }
     }
 
     std::string InetAddress::toIp() const
     {
-        std::string s(16,'\0');
+        std::string s(16, '\0');
         ::inet_ntop(AF_INET, &_addr.sin_addr, &s[0], static_cast<socklen_t>(s.size()));
         return s;
     }
@@ -53,14 +53,16 @@ namespace net {
 
     const sockaddr *InetAddress::get_sockaddr() const
     {
-        return reinterpret_cast<const sockaddr*>(&_addr);
+        return reinterpret_cast<const sockaddr *>(&_addr);
     }
 
-    sockaddr *InetAddress::get_sockaddr() {
-        return reinterpret_cast<sockaddr*>(&_addr);
+    sockaddr *InetAddress::get_sockaddr()
+    {
+        return reinterpret_cast<sockaddr *>(&_addr);
     }
 
-    sa_family_t InetAddress::get_family() const {
+    sa_family_t InetAddress::get_family() const
+    {
         return _addr.sin_family;
     }
 
@@ -68,6 +70,4 @@ namespace net {
     {
         return _addr.sin_port;
     }
-
-
 }

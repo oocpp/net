@@ -4,33 +4,39 @@
 #include<functional>
 #include"EventLoopThread.h"
 
-namespace  net
+namespace net
 {
-    EventLoopThread::~EventLoopThread()noexcept {
-        if(_th.joinable()){
+    EventLoopThread::~EventLoopThread()noexcept
+    {
+        if (_th.joinable()) {
             _th.join();
         }
     }
 
-    EventLoopThread::EventLoopThread()noexcept=default;
+    EventLoopThread::EventLoopThread()noexcept = default;
 
-    void EventLoopThread::join(){
+    void EventLoopThread::join()
+    {
         _th.join();
     }
 
-    void EventLoopThread::run() {
-        _th=std::thread(&EventLoopThread::thread_fn,this);
+    void EventLoopThread::run()
+    {
+        _th = std::thread(&EventLoopThread::thread_fn, this);
     }
 
-    void EventLoopThread::stop() {
+    void EventLoopThread::stop()
+    {
         _loop.stop();
     }
 
-    EventLoop *EventLoopThread::get_loop() {
+    EventLoop *EventLoopThread::get_loop()
+    {
         return &_loop;
     }
 
-    void EventLoopThread::thread_fn() {
+    void EventLoopThread::thread_fn()
+    {
 
         _loop.set_thread_id(std::this_thread::get_id());
         _loop.run();

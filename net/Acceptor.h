@@ -3,6 +3,7 @@
 //
 
 #pragma once
+
 #include <functional>
 #include <memory>
 #include "Socket.h"
@@ -10,29 +11,36 @@
 #include"Event.h"
 #include"CallBack.h"
 
-namespace net{
-
+namespace net
+{
     class TcpConnection;
+
     class InetAddress;
+
     class EventLoop;
 
-    class Accepter {
+    class Accepter
+    {
     public:
         using NewConnCallback = std::function<void(int, const InetAddress &)>;
 
-        Accepter(EventLoop*loop,const InetAddress&addr)noexcept ;
+        Accepter(EventLoop *loop, const InetAddress &addr)noexcept;
+
         ~Accepter()noexcept;
 
         void set_new_connection_cb(const NewConnCallback &cb);
-        void set_new_connection_cb(NewConnCallback &&cb)noexcept ;
 
-        void listen(int backlog=SOMAXCONN);
+        void set_new_connection_cb(NewConnCallback &&cb)noexcept;
+
+        void listen(int backlog = SOMAXCONN);
+
         void stop();
 
     private:
         void handle_accept();
+
     private:
-        EventLoop*_loop;
+        EventLoop *_loop;
         int _fd;
         InetAddress _addr;
 

@@ -8,34 +8,40 @@
 #include"Log.h"
 #include "Socket.h"
 
-namespace net{
+namespace net
+{
 
-    TcpConnection::TcpConnection(uint64_t id,EventLoop*loop,int sockfd,const InetAddress&local_addr,const InetAddress&peer_add)
-    :_sockfd(sockfd)
-     ,_id(id)
-     ,_loop(loop)
-     ,_event(loop,sockfd)
-     ,_status(Disconnected)
-    ,_local_addr(local_addr)
-    ,_peer_addr(peer_add){
+    TcpConnection::TcpConnection(uint64_t id, EventLoop *loop, int sockfd, const InetAddress &local_addr
+                                 , const InetAddress &peer_add)
+            : _sockfd(sockfd)
+              , _id(id)
+              , _loop(loop)
+              , _event(loop, sockfd)
+              , _status(Disconnected)
+              , _local_addr(local_addr)
+              , _peer_addr(peer_add)
+    {
         _event.set_read_cb(std::bind(&TcpConnection::handle_read, this));
         _event.set_write_cb(std::bind(&TcpConnection::handle_write, this));
     }
 
-    TcpConnection::~TcpConnection()noexcept {
+    TcpConnection::~TcpConnection()noexcept
+    {
         LOG_TRACE;
         Socket::close(_sockfd);
     }
 
-    void TcpConnection::close() {
+    void TcpConnection::close()
+    {
         Status t = Connected;
-        if(_status.compare_exchange_strong(t,Disconnecting)) {
+        if (_status.compare_exchange_strong(t, Disconnecting)) {
             LOG_TRACE << "fd=" << _sockfd;
             _loop->queue_in_loop(std::bind(&TcpConnection::handle_close, shared_from_this()));
         }
     }
 
-    void TcpConnection::attach_to_loop() {
+    void TcpConnection::attach_to_loop()
+    {
         _status = Connected;
         _event.enable_read();
 
@@ -44,7 +50,8 @@ namespace net{
         }
     }
 
-    void TcpConnection::handle_read() {
+    void TcpConnection::handle_read()
+    {
         assert(_loop->in_loop_thread());
 
         auto r = _in_buff.read_from_fd(_sockfd);
@@ -63,10 +70,11 @@ namespace net{
         }
     }
 
-    void TcpConnection::handle_close() {
+    void TcpConnection::handle_close()
+    {
         assert(_loop->in_loop_thread());
 
-        if(_status==Disconnected)
+        if (_status == Disconnected)
             return;
 
         _status = Disconnecting;
@@ -81,12 +89,13 @@ namespace net{
         if (_close_cb) {
             _close_cb(conn);
         }
-        LOG_TRACE << " fd=" << _sockfd ;
+        LOG_TRACE << " fd=" << _sockfd;
 
         _status = Disconnected;
     }
 
-    void TcpConnection::handle_error() {
+    void TcpConnection::handle_error()
+    {
         assert(_loop->in_loop_thread());
 
         int err = Socket::get_socket_error(_event.get_fd());
@@ -96,49 +105,55 @@ namespace net{
         handle_close();
     }
 
-    void TcpConnection::send(const std::string &str) {
-        if(_status!=Connected)
-            return ;
+    void TcpConnection::send(const std::string &str)
+    {
+        if (_status != Connected)
+            return;
 
         if (_loop->in_loop_thread()) {
-            send_in_loop(str.data(),str.size());
+            send_in_loop(str.data(), str.size());
             return;
         }
-        else{
+        else {
             _loop->run_in_loop(std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), str));
         }
     }
 
-    void TcpConnection::send(const char *str,size_t len) {
-        if(_status!=Connected)
-            return ;
+    void TcpConnection::send(const char *str, size_t len)
+    {
+        if (_status != Connected)
+            return;
 
         if (_loop->in_loop_thread()) {
-            send_in_loop(str,len);
+            send_in_loop(str, len);
             return;
         }
-        else{
-            _loop->run_in_loop(std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), std::string(str,len)));
+        else {
+            _loop->run_in_loop(
+                    std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), std::string(str, len)));
         }
     }
 
-    void TcpConnection::send(const Buffer *d) {
-        send(d->get_read_ptr(),d->get_readable_size());
+    void TcpConnection::send(const Buffer *d)
+    {
+        send(d->get_read_ptr(), d->get_readable_size());
     }
 
-    void TcpConnection::send_string_in_loop(const std::string &str) {
-        send_in_loop(str.data(),str.size());
+    void TcpConnection::send_string_in_loop(const std::string &str)
+    {
+        send_in_loop(str.data(), str.size());
     }
 
-    void TcpConnection::send_in_loop(const char *message,size_t len) {
-        if(_status==Disconnected)
-            return ;
+    void TcpConnection::send_in_loop(const char *message, size_t len)
+    {
+        if (_status == Disconnected)
+            return;
 
         ssize_t nwritten = 0;
         size_t remaining = len;
         bool write_error = false;
 
-        if(!_event.is_write()&&_out_buff.length()==0){
+        if (!_event.is_write() && _out_buff.length() == 0) {
             nwritten = ::send(_sockfd, message, len, MSG_NOSIGNAL);
             if (nwritten >= 0) {
                 remaining = len - nwritten;
@@ -170,8 +185,7 @@ namespace net{
             size_t old_len = _out_buff.length();
             if (old_len + remaining >= _high_level_mark
                 && old_len < _high_level_mark
-                && _write_high_level_cb)
-            {
+                && _write_high_level_cb) {
                 _loop->queue_in_loop(std::bind(_write_high_level_cb, shared_from_this(), old_len + remaining));
             }
 
@@ -183,7 +197,8 @@ namespace net{
         }
     }
 
-    void TcpConnection::handle_write() {
+    void TcpConnection::handle_write()
+    {
         assert(_loop->in_loop_thread());
         assert(!_event.is_add_to_loop() || _event.is_write());
 
@@ -211,81 +226,100 @@ namespace net{
         }
     }
 
-    void TcpConnection::set_message_cb(const MessageCallback &cb) {
-        _message_cb=cb;
+    void TcpConnection::set_message_cb(const MessageCallback &cb)
+    {
+        _message_cb = cb;
     }
 
-    void TcpConnection::set_high_water_cb(const HighWaterMarkCallback &cb, size_t mark) {
-        _write_high_level_cb=cb;
-        _high_level_mark=mark;
+    void TcpConnection::set_high_water_cb(const HighWaterMarkCallback &cb, size_t mark)
+    {
+        _write_high_level_cb = cb;
+        _high_level_mark = mark;
     }
 
-    void TcpConnection::set_connection_cb(const ConnectingCallback &cb) {
-        _connecting_cb=cb;
+    void TcpConnection::set_connection_cb(const ConnectingCallback &cb)
+    {
+        _connecting_cb = cb;
     }
 
-    void TcpConnection::set_write_complete_cb(const WriteCompleteCallback &cb) {
-        _write_complete_cb=cb;
+    void TcpConnection::set_write_complete_cb(const WriteCompleteCallback &cb)
+    {
+        _write_complete_cb = cb;
     }
 
-    void TcpConnection::set_close_cb(const CloseCallback &cb) {
-        _close_cb=cb;
+    void TcpConnection::set_close_cb(const CloseCallback &cb)
+    {
+        _close_cb = cb;
     }
 
-    void TcpConnection::set_message_cb(MessageCallback &&cb) noexcept{
-        _message_cb= std::move(cb);
+    void TcpConnection::set_message_cb(MessageCallback &&cb) noexcept
+    {
+        _message_cb = std::move(cb);
     }
 
-    void TcpConnection::set_high_water_cb(HighWaterMarkCallback &&cb, size_t mark) noexcept{
-        _write_high_level_cb=std::move(cb);
-        _high_level_mark=mark;
+    void TcpConnection::set_high_water_cb(HighWaterMarkCallback &&cb, size_t mark) noexcept
+    {
+        _write_high_level_cb = std::move(cb);
+        _high_level_mark = mark;
     }
 
-    void TcpConnection::set_connection_cb(ConnectingCallback &&cb) noexcept{
-        _connecting_cb=std::move(cb);
+    void TcpConnection::set_connection_cb(ConnectingCallback &&cb) noexcept
+    {
+        _connecting_cb = std::move(cb);
     }
 
-    void TcpConnection::set_write_complete_cb(WriteCompleteCallback &&cb)noexcept {
-        _write_complete_cb=std::move(cb);
+    void TcpConnection::set_write_complete_cb(WriteCompleteCallback &&cb)noexcept
+    {
+        _write_complete_cb = std::move(cb);
     }
 
-    void TcpConnection::set_close_cb(CloseCallback &&cb)noexcept {
-        _close_cb=std::move(cb);
+    void TcpConnection::set_close_cb(CloseCallback &&cb)noexcept
+    {
+        _close_cb = std::move(cb);
     }
 
-    EventLoop *TcpConnection::get_loop() noexcept{
+    EventLoop *TcpConnection::get_loop() noexcept
+    {
         return _loop;
     }
 
-    uint64_t TcpConnection::get_id() const noexcept{
+    uint64_t TcpConnection::get_id() const noexcept
+    {
         return _id;
     }
 
-    void TcpConnection::set_context(const Any &a) {
-        _context=a;
+    void TcpConnection::set_context(const Any &a)
+    {
+        _context = a;
     }
 
-    void TcpConnection::set_context(Any &&a) noexcept{
-        _context=std::move(a);
+    void TcpConnection::set_context(Any &&a) noexcept
+    {
+        _context = std::move(a);
     }
 
-    Any &TcpConnection::get_context() {
+    Any &TcpConnection::get_context()
+    {
         return _context;
     }
 
-    InetAddress TcpConnection::get_local_addr() const noexcept {
+    InetAddress TcpConnection::get_local_addr() const noexcept
+    {
         return _local_addr;
     }
 
-    InetAddress TcpConnection::get_peer_addr() const noexcept{
+    InetAddress TcpConnection::get_peer_addr() const noexcept
+    {
         return _peer_addr;
     }
 
-    bool TcpConnection::is_connected() const noexcept {
-        return _status==Connected;
+    bool TcpConnection::is_connected() const noexcept
+    {
+        return _status == Connected;
     }
 
-    int TcpConnection::get_fd() const noexcept {
+    int TcpConnection::get_fd() const noexcept
+    {
         return _sockfd;
     }
 }

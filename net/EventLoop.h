@@ -14,32 +14,44 @@
 #include<chrono>
 #include"TimerQueue.h"
 
-namespace net {
+namespace net
+{
 
-    class EventLoop final {
+    class EventLoop final
+    {
     public:
         explicit EventLoop()noexcept;
+
         ~EventLoop()noexcept;
 
         EventLoop(const EventLoop &) = delete;
+
         EventLoop &operator==(const EventLoop &)= delete;
 
         void add(Event *e);
-        void update(Event* e);
-        void remove(Event* e);
+
+        void update(Event *e);
+
+        void remove(Event *e);
 
         void run_in_loop(const std::function<void()> &cb);
+
         void queue_in_loop(const std::function<void()> &cb);
 
         void run_in_loop(std::function<void()> &&cb);
-        void queue_in_loop( std::function<void()> &&cb);
 
-        uint64_t run_after(std::chrono::milliseconds ms,const std::function<void()> &cb);
-        uint64_t run_at(TimerQueue::time_point time,const std::function<void()> &cb);
-        uint64_t run_every(std::chrono::milliseconds ms,const std::function<void()> &cb);
+        void queue_in_loop(std::function<void()> &&cb);
+
+        uint64_t run_after(std::chrono::milliseconds ms, const std::function<void()> &cb);
+
+        uint64_t run_at(TimerQueue::time_point time, const std::function<void()> &cb);
+
+        uint64_t run_every(std::chrono::milliseconds ms, const std::function<void()> &cb);
 
         uint64_t run_after(std::chrono::milliseconds ms, std::function<void()> &&cb);
+
         uint64_t run_at(TimerQueue::time_point time, std::function<void()> &&cb);
+
         uint64_t run_every(std::chrono::milliseconds ms, std::function<void()> &&cb);
 
         void cancel(uint64_t id);
@@ -47,14 +59,19 @@ namespace net {
         void run();
 
         void stop();
-        bool in_loop_thread()const noexcept ;
+
+        bool in_loop_thread() const noexcept;
+
         void set_thread_id(std::thread::id id)noexcept;
+
     private:
 
         void do_pending_fn();
 
         void wakeup();
+
         void handle_wakeup_read();
+
     private:
         Epoll _poll;
         std::atomic<bool> _is_looping;
@@ -67,6 +84,6 @@ namespace net {
         std::mutex _mu;
         std::vector<std::function<void()>> _pending_fns;
 
-        std::vector<epoll_event>_events;
+        std::vector<epoll_event> _events;
     };
 }

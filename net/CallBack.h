@@ -3,9 +3,11 @@
 //
 
 #pragma once
+
 #include<memory>
 
-namespace net {
+namespace net
+{
 
     class TcpConnection;
 
@@ -23,7 +25,7 @@ namespace net {
 
     using WriteCompleteCallback = std::function<void(const TCPConnPtr &)>;
 
-    typedef std::function<void (const TCPConnPtr&, size_t)> HighWaterMarkCallback;
+    typedef std::function<void(const TCPConnPtr &, size_t)> HighWaterMarkCallback;
 
 
     using EventCallback=std::function<void()>;

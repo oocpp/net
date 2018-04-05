@@ -2,17 +2,21 @@
 // Created by lg on 17-4-21.
 //
 #pragma once
+
 #include <thread>
 #include"EventLoop.h"
 
-namespace net {
+namespace net
+{
 
-    class EventLoopThread {
+    class EventLoopThread
+    {
     public:
         EventLoopThread()noexcept;
+
         ~EventLoopThread()noexcept;
 
-        EventLoopThread(const EventLoopThread&)=delete;
+        EventLoopThread(const EventLoopThread &) = delete;
 
         void run();
 
