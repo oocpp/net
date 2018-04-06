@@ -15,12 +15,22 @@ namespace net
     TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize)
             : _loop(loop)
               , _pool(threadSize)
-              , _accepter(loop, addr)
               , _th_size(threadSize)
-              , _status(Init)
+              , _status(Stopped)
     {
         LOG_TRACE << "server";
-        _accepter.set_new_connection_cb(std::bind(&TcpServer::handle_new_connection, this, _1, _2));
+        add_acceptor(addr);
+    }
+
+    void TcpServer::add_acceptor(const InetAddress &addr)
+    {
+        assert(_status == Stopped);
+        LOG_TRACE;
+
+        _accepters.emplace_back(_loop,addr);
+        _accepters.back().set_new_connection_cb(std::bind(&TcpServer::handle_new_connection, this, _1, _2));
+
+        LOG_TRACE<<_accepters.size();
     }
 
     TcpServer::~TcpServer() noexcept
@@ -30,12 +40,13 @@ namespace net
 
     void TcpServer::run()
     {
-        assert(_status == Init);
+        assert(_status == Stopped);
 
-        Status t = Init;
+        Status t = Stopped;
         if (_status.compare_exchange_strong(t, Running)) {
             _pool.run();
-            _accepter.listen();
+            for (auto &t:_accepters)
+                t.listen();
         }
     }
 
@@ -57,7 +68,8 @@ namespace net
         assert(_loop->in_loop_thread());
         assert(_status == Stopping);
 
-        _accepter.stop();
+        for (auto &t:_accepters)
+            t.stop();
 
         for (auto &conn:_connections) {
             conn.second->close();
@@ -117,31 +129,37 @@ namespace net
 
     void TcpServer::set_connection_cb(const ConnectingCallback &cb)
     {
+        assert(_status==Stopped);
         _connecting_cb = cb;
     }
 
     void TcpServer::set_message_cb(const MessageCallback &cb)
     {
+        assert(_status==Stopped);
         _message_cb = cb;
     }
 
     void TcpServer::set_write_complete_cb(const WriteCompleteCallback &cb)
     {
+        assert(_status==Stopped);
         _write_complete_cb = cb;
     }
 
     void TcpServer::set_connection_cb(ConnectingCallback &&cb) noexcept
     {
+        assert(_status==Stopped);
         _connecting_cb = std::move(cb);
     }
 
     void TcpServer::set_message_cb(MessageCallback &&cb) noexcept
     {
+        assert(_status==Stopped);
         _message_cb = std::move(cb);
     }
 
     void TcpServer::set_write_complete_cb(WriteCompleteCallback &&cb) noexcept
     {
+        assert(_status==Stopped);
         _write_complete_cb = std::move(cb);
     }
 

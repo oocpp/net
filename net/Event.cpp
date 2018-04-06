@@ -20,6 +20,20 @@ namespace net
 
     }
 
+    Event::Event(Event &&e) noexcept
+        :_loop(e._loop)
+    , _fd(e._fd)
+    , _add_to_loop(e._add_to_loop)
+    , _events(e._events)
+    , _read_cb(std::move(e._read_cb))
+    , _write_cb(std::move(e._write_cb))
+    , _error_cb(std::move(e._error_cb))
+    {
+        e._loop= nullptr;
+        e._fd=-1;
+        e._add_to_loop= false;
+    }
+
     void Event::detach_from_loop()
     {
         if (is_add_to_loop()) {
@@ -178,4 +192,5 @@ namespace net
     {
         return _events == NoneEvent;
     }
+
 }

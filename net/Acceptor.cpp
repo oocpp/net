@@ -15,8 +15,8 @@ namespace net
               , _addr(addr)
               , _event(loop, _fd, true, false)
     {
+        LOG_TRACE<<"fd = "<<_fd;
         if(_fd<0) {
-            LOG_INFO<<"fd = "<<_fd;
             abort();
         }
         Socket::bind(_fd, _addr);
@@ -25,12 +25,13 @@ namespace net
     Accepter::~Accepter()noexcept
     {
         assert(!_event.is_add_to_loop());
-
+        LOG_TRACE;
         Socket::close(_fd);
     }
 
     void Accepter::listen(int backlog)
     {
+        LOG_TRACE;
         Socket::listen(_fd, backlog);
 
         _event.set_read_cb(std::bind(&Accepter::handle_accept, this));
@@ -72,5 +73,16 @@ namespace net
     void Accepter::set_new_connection_cb(Accepter::NewConnCallback &&cb)noexcept
     {
         _new_connection_cb = std::move(cb);
+    }
+
+    Accepter::Accepter(Accepter &&acc)noexcept
+        :_loop(acc._loop)
+        , _fd(acc._fd)
+        ,_addr(acc._addr)
+        ,_event(std::move(acc._event))
+        ,_new_connection_cb(std::move(acc._new_connection_cb))
+    {
+        acc._loop=nullptr;
+        acc._fd=-1;
     }
 }

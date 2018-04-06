@@ -18,6 +18,9 @@ namespace net
         Event(EventLoop *loop, int fd, bool r = false, bool w = false)noexcept;
 
         ~Event()noexcept;
+        Event(const Event&)=delete;
+
+        Event(Event&&e)noexcept ;
 
         static constexpr uint32_t NoneEvent = 0;
         static constexpr uint32_t ReadEvent = EPOLLIN | EPOLLPRI;

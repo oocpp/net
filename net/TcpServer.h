@@ -8,6 +8,7 @@
 #include<string>
 #include<functional>
 #include<map>
+#include<vector>
 
 #include"EventLoopThreadPool.h"
 #include "InetAddress.h"
@@ -26,6 +27,8 @@ namespace net
         TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize = 0);
 
         ~TcpServer()noexcept;
+
+        void add_acceptor(const InetAddress &addr);
 
         void run();
 
@@ -56,7 +59,6 @@ namespace net
 
         enum Status
         {
-            Init = 0,
             Running = 1,
             Stopping = 2,
             Stopped = 3,
@@ -66,9 +68,10 @@ namespace net
         EventLoopThreadPool _pool;
         InetAddress _addr;
         std::string _name;
-        Accepter _accepter;
         size_t _th_size;
         std::atomic<Status> _status;
+
+        std::vector<Accepter> _accepters;
 
         uint64_t _next_conn_id = 0;
         std::map<uint64_t, TCPConnPtr> _connections;

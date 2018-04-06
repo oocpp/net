@@ -27,6 +27,8 @@ namespace net
         Accepter(EventLoop *loop, const InetAddress &addr)noexcept;
 
         ~Accepter()noexcept;
+        Accepter(Accepter&&acc)noexcept;
+        Accepter(const Accepter&)=delete;
 
         void set_new_connection_cb(const NewConnCallback &cb);
 
