@@ -2,6 +2,7 @@
 // Created by lg on 17-4-21.
 //
 #include<functional>
+#include <cassert>
 #include"EventLoopThread.h"
 
 namespace net
@@ -17,6 +18,7 @@ namespace net
 
     void EventLoopThread::join()
     {
+        assert(_th.joinable());
         _th.join();
     }
 
@@ -37,7 +39,6 @@ namespace net
 
     void EventLoopThread::thread_fn()
     {
-
         _loop.set_thread_id(std::this_thread::get_id());
         _loop.run();
     }

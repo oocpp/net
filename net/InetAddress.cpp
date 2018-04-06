@@ -25,9 +25,9 @@ namespace net
 
     std::string InetAddress::toIp() const
     {
-        std::string s(16, '\0');
-        ::inet_ntop(AF_INET, &_addr.sin_addr, &s[0], static_cast<socklen_t>(s.size()));
-        return s;
+        char s[16]={0};
+        ::inet_ntop(AF_INET, &_addr.sin_addr, &s[0], static_cast<socklen_t>(sizeof s));
+        return std::string(s);
     }
 
     std::string InetAddress::toIpPort() const

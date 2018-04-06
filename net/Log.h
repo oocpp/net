@@ -18,7 +18,9 @@ namespace net
         template<typename T>
         Log &operator<<(const T &t)
         {
-            this->out << t;
+            if (rank > RANK) {
+                this->out << t;
+            }
             return *this;
         }
 
@@ -29,7 +31,9 @@ namespace net
         ~Log();
 
         static void set_rank(int i)
-        { RANK = i; }
+        {
+            RANK = i;
+        }
 
     private:
         std::stringstream out;

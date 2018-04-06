@@ -51,6 +51,8 @@ namespace net
 
         _wake_event.detach_from_loop();
         Socket::close(_wake_fd);
+
+        assert(!_wake_event.is_add_to_loop());
     }
 
     EventLoop::EventLoop()noexcept
@@ -61,14 +63,12 @@ namespace net
               , _timers(this)
               , _wake_event(this, _wake_fd, true)
     {
-
         _wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
         _wake_event.attach_to_loop();
     }
 
     void EventLoop::run()
     {
-
         assert(!_is_looping);
         assert(_th_id == std::this_thread::get_id());
 
@@ -86,8 +86,8 @@ namespace net
                 reinterpret_cast<Event *>(e.data.ptr)->handle_event(e.events);
 
             do_pending_fn();
-            LOG_TRACE << " loop stop" << std::endl;
         }
+        LOG_TRACE << " loop stop" << std::endl;
         _is_looping = false;
     }
 

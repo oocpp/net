@@ -42,6 +42,7 @@ void new_conn(const TCPConnPtr &conn){
 
 
 int main() {
+        Log::set_rank(5);
         EventLoop loop;
 
         InetAddress addr("127.0.0.1",8888);

@@ -44,11 +44,14 @@ namespace net
         }
     }
 
-
     void Connector::stop_in_loop()
     {
+        assert(_loop->in_loop_thread());
+
         _event.disable_all();
         Socket::close(_event.get_fd());
+
+        assert(!_event.is_add_to_loop());
     }
 
     void Connector::cancel()
@@ -63,7 +66,6 @@ namespace net
 
     void Connector::connect()
     {
-
         if (_status != Connecting)
             return;
 
@@ -111,7 +113,7 @@ namespace net
 
     void Connector::handle_write()
     {
-        LOG_TRACE << "Connector::handleWrite " << _status;
+        LOG_TRACE << "state=" << _status;
 
         _event.disable_all();
 
@@ -120,11 +122,11 @@ namespace net
 
             int err = Socket::get_socket_error(sockfd);
             if (err) {
-                LOG_WARN << "Connector::handleWrite - SO_ERROR = " << err;
+                LOG_WARN << " SO_ERROR = " << err;
                 retry(sockfd);
             }
             else if (Socket::is_self_connect(sockfd)) {
-                LOG_WARN << "Connector::handleWrite - Self connect";
+                LOG_WARN << "Self connect";
                 retry(sockfd);
             }
             else {
@@ -147,7 +149,7 @@ namespace net
 
     void Connector::handle_error()
     {
-        LOG_ERROR << "Connector::handleError state=" << _status;
+        LOG_ERROR << "state=" << _status;
         if (_status == Connecting) {
             int sockfd = _event.get_fd();
 
@@ -187,7 +189,7 @@ namespace net
 
         if (_status == Connecting) {
 
-            LOG_INFO << "Connector::retry - Retry connecting to " << _addr.toIpPort()
+            LOG_INFO << "Retry connecting to " << _addr.toIpPort()
                      << " in " << _retry_delay_ms.count() << " milliseconds. ";
 
             _retry_delay_ms *= 2;

@@ -58,6 +58,7 @@ namespace net
 
     size_t Buffer::get_writable_size() const noexcept
     {
+        assert(_buff.size()>=_write_index);
         return _buff.size() - _write_index;
     }
 
@@ -111,21 +112,25 @@ namespace net
 
     size_t Buffer::get_readable_size() const noexcept
     {
+        assert(_write_index>=_read_index);
         return _write_index - _read_index;
     }
 
     const char *Buffer::get_read_ptr() const noexcept
     {
+        assert(_write_index>=_read_index);
         return _buff.data() + _read_index;
     }
 
     char *Buffer::get_read_ptr()noexcept
     {
+        assert(_write_index>=_read_index);
         return _buff.data() + _read_index;
     }
 
     char *Buffer::get_write_ptr()noexcept
     {
+        assert(_buff.size()>=_write_index);
         return _buff.data() + _write_index;
     }
 

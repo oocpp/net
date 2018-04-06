@@ -15,6 +15,10 @@ namespace net
               , _addr(addr)
               , _event(loop, _fd, true, false)
     {
+        if(_fd<0) {
+            LOG_INFO<<"fd = "<<_fd;
+            abort();
+        }
         Socket::bind(_fd, _addr);
     }
 
@@ -39,18 +43,21 @@ namespace net
         assert(_loop->in_loop_thread());
 
         _event.detach_from_loop();
+
+        assert(!_event.is_add_to_loop());
     }
 
     void Accepter::handle_accept()
     {
         assert(_loop->in_loop_thread());
 
-        InetAddress addr;
+        InetAddress addr{};
         int connfd = Socket::accept(_fd, addr);
 
         //LOG_INFO<<"accept :fd = "<<connfd;
 
         if (connfd < 0) {
+            LOG_INFO<<"fd = "<<connfd;
             return;
         }
 
