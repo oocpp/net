@@ -24,6 +24,9 @@ namespace net
 
         ~TimerQueue()noexcept;
 
+        TimerQueue(const TimerQueue &) = delete;
+        TimerQueue &operator==(const TimerQueue &)= delete;
+
         uint64_t addTimer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
 
         uint64_t addTimer(TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);

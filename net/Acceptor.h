@@ -28,7 +28,9 @@ namespace net
 
         ~Accepter()noexcept;
         Accepter(Accepter&&acc)noexcept;
+
         Accepter(const Accepter&)=delete;
+        Accepter &operator==(const Accepter &)= delete;
 
         void set_new_connection_cb(const NewConnCallback &cb);
 

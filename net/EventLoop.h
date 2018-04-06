@@ -25,7 +25,6 @@ namespace net
         ~EventLoop()noexcept;
 
         EventLoop(const EventLoop &) = delete;
-
         EventLoop &operator==(const EventLoop &)= delete;
 
         void add(Event *e);

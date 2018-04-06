@@ -24,6 +24,9 @@ namespace net
 
         ~Epoll()noexcept;
 
+        Epoll(const Epoll&)=delete;
+        Epoll &operator==(const Epoll &)= delete;
+
         void add(int fd, epoll_event event);
 
         void remove(int fd);

@@ -29,6 +29,9 @@ namespace net
 
         ~TcpConnection()noexcept;
 
+        TcpConnection(const TcpConnection &) = delete;
+        TcpConnection &operator==(const TcpConnection &)= delete;
+
         void close();
 
         void set_message_cb(const MessageCallback &cb);

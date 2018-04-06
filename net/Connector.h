@@ -22,6 +22,8 @@ namespace net
         Connector(EventLoop *loop, const InetAddress &addr)noexcept;
 
         ~Connector()noexcept;
+        Connector(const Connector&)=delete;
+        Connector &operator==(const Connector &)= delete;
 
         void set_new_connection_cb(const NewConnCallback &cb);
 

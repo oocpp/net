@@ -17,6 +17,7 @@ namespace net
         ~EventLoopThread()noexcept;
 
         EventLoopThread(const EventLoopThread &) = delete;
+        EventLoopThread &operator==(const EventLoopThread &)= delete;
 
         void run();
 

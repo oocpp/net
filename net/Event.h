@@ -19,6 +19,7 @@ namespace net
 
         ~Event()noexcept;
         Event(const Event&)=delete;
+        Event &operator==(const Event &)= delete;
 
         Event(Event&&e)noexcept ;
 

@@ -17,6 +17,9 @@ namespace net
     public:
         EventLoopThreadPool(size_t threadNum = 0);
 
+        EventLoopThreadPool(const EventLoopThreadPool &) = delete;
+        EventLoopThreadPool &operator==(const EventLoopThreadPool &)= delete;
+
         void run();
 
         void stop();

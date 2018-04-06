@@ -28,6 +28,9 @@ namespace net
 
         ~TcpServer()noexcept;
 
+        TcpServer(const TcpServer &) = delete;
+        TcpServer &operator==(const TcpServer &)= delete;
+
         void add_acceptor(const InetAddress &addr);
 
         void run();

@@ -15,6 +15,8 @@ namespace net
         TcpClient(EventLoop *loop, const InetAddress &serverAddr, const std::string &nameArg);
 
         ~TcpClient()noexcept;
+        TcpClient(const TcpClient &) = delete;
+        TcpClient &operator==(const TcpClient &)= delete;
 
         void connect();
 
