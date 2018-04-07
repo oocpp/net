@@ -6,8 +6,6 @@
 
 namespace net
 {
-    using namespace std::literals::chrono_literals;
-
     class Timer
     {
     public:

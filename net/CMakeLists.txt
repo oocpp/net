@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 project(net)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 11)
 
 include(CheckFunctionExists)
 check_function_exists(accept4 HAVE_ACCEPT4)

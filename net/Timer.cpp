@@ -15,12 +15,20 @@ namespace net
     }
 
     Timer::Timer(const TimerCallback &cb, Timer::time_point when, std::chrono::milliseconds interval)
-            : _callback(cb), _expiration(when), _interval(interval), _repeat(interval > 0ms), _sequence(++id)
+            : _callback(cb)
+              , _expiration(when)
+              , _interval(interval)
+              , _repeat(interval > std::chrono::milliseconds{0})
+              , _sequence(++id)
     {}
 
 
     Timer::Timer(TimerCallback &&cb, Timer::time_point when, std::chrono::milliseconds interval)
-            : _callback(std::move(cb)), _expiration(when), _interval(interval), _repeat(interval > 0ms), _sequence(++id)
+            : _callback(std::move(cb))
+              , _expiration(when)
+              , _interval(interval)
+              , _repeat(interval > std::chrono::milliseconds{0})
+              , _sequence(++id)
     {}
 
     void Timer::run() const

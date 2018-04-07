@@ -201,7 +201,9 @@ namespace net
                 _retry_delay_ms = std::chrono::milliseconds(max_retry_delay_ms + 0);
 
             //_loop->run_after(_retry_delay_ms, std::bind(&Connector::connect, shared_from_this()));
-            _loop->run_after(_retry_delay_ms, [c=shared_from_this()]{c->connect();});
+
+            auto temp=shared_from_this();
+            _loop->run_after(_retry_delay_ms, [temp]{temp->connect();});
 
         }
         else {

@@ -212,7 +212,7 @@ namespace net
 
     uint64_t EventLoop::run_at(TimerQueue::time_point time, const std::function<void()> &cb)
     {
-        return _timers.add_timer(cb, time, 0ms);
+        return _timers.add_timer(cb, time, std::chrono::milliseconds{0});
     }
 
     uint64_t EventLoop::run_every(std::chrono::milliseconds ms, const std::function<void()> &cb)
@@ -237,7 +237,7 @@ namespace net
 
     uint64_t EventLoop::run_at(TimerQueue::time_point time, std::function<void()> &&cb)
     {
-        return _timers.add_timer(std::move(cb), time, 0ms);
+        return _timers.add_timer(std::move(cb), time, std::chrono::milliseconds{0});
     }
 
     uint64_t EventLoop::run_every(std::chrono::milliseconds ms, std::function<void()> &&cb)

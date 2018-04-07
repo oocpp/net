@@ -19,7 +19,7 @@ namespace net
 
         template<typename ValueType>
         explicit Any(ValueType &&value)
-                : _value_ptr(new AnyImpl<std::decay_t<ValueType>>(std::forward<ValueType>(value)))
+                : _value_ptr(new AnyImpl<typename std::decay<ValueType>::type>(std::forward<ValueType>(value)))
         {}
 
         Any(const Any &other)
@@ -141,7 +141,7 @@ namespace net
     template<typename ValueType>
     ValueType any_cast(Any &a)
     {
-        auto const result = any_cast<std::decay_t<ValueType>>(&a);
+        auto const result = any_cast<typename std::decay<ValueType>::type>(&a);
 
         if (!result) {
             throw std::bad_cast();

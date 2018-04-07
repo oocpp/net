@@ -45,12 +45,13 @@ namespace net
 
     timespec TimerQueue::from_now(time_point when)
     {
-        TimerQueue::duration du = when - std::chrono::system_clock::now();
+        using namespace std::chrono;
+        TimerQueue::duration du = when - system_clock::now();
 
-        struct timespec ts{};
-        ts.tv_sec = static_cast<time_t>(std::chrono::duration_cast<std::chrono::seconds>(du).count());
+        timespec ts{};
+        ts.tv_sec = static_cast<time_t>(duration_cast<seconds>(du).count());
 
-        ts.tv_nsec = static_cast<long>(std::chrono::duration_cast<std::chrono::nanoseconds>(du % 1s).count());
+        ts.tv_nsec = static_cast<long>(duration_cast<nanoseconds>(du % seconds{1}).count());
         return ts;
     }
 
