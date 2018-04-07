@@ -50,7 +50,9 @@ namespace net
 
     Log::~Log()
     {
+        if (rank > RANK) {
             std::cout << out.rdbuf() << std::endl;
+        }
     }
 
 }
