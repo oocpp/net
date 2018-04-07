@@ -1,7 +1,3 @@
-//
-// Created by lg on 17-4-18.
-//
-
 #include <arpa/inet.h>
 
 #include "Log.h"

@@ -30,7 +30,7 @@ set(SOURCE_FILES
 SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -Wall")
 SET(CMAKE_CXX_FLAGS_RELEASE  "$ENV{CXXFLAGS} -O3 -Wall")
 
-set(NET_LIBRARY 0)
+set(NET_LIBRARY 1)  #设置为0，用来与main.cpp编译成可执行程序，便于调试
 
 if(NET_LIBRARY)
     SET(lib_name "net")

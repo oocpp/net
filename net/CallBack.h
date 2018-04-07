@@ -1,7 +1,3 @@
-//
-// Created by lg on 18-4-20.
-//
-
 #pragma once
 
 #include<memory>

@@ -1,7 +1,3 @@
-//
-// Created by lg on 18-3-19.
-//
-
 #include <cstring>
 #include "Acceptor.h"
 #include "TcpConnection.h"

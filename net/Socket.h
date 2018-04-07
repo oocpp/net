@@ -1,7 +1,3 @@
-//
-// Created by lg on 17-4-18.
-//
-
 #pragma once
 
 #include <sys/socket.h>

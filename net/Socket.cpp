@@ -1,8 +1,3 @@
-//
-// Created by lg on 18-4-18.
-//
-
-
 #include <netinet/tcp.h>
 #include <fcntl.h>
 #include <unistd.h>

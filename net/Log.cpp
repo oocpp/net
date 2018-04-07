@@ -1,6 +1,3 @@
-//
-// Created by lg on 18-3-28.
-//
 #include<cstdio>
 #include<cstdarg>
 #include<thread>

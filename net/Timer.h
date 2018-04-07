@@ -4,7 +4,6 @@
 #include <chrono>
 #include "CallBack.h"
 
-
 namespace net
 {
     using namespace std::literals::chrono_literals;

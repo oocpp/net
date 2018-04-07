@@ -1,7 +1,3 @@
-//
-// Created by lg on 18-4-19.
-//
-
 #include "Connector.h"
 #include "TcpConnection.h"
 #include "Socket.h"

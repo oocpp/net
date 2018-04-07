@@ -1,7 +1,3 @@
-//
-// Created by lg on 18-3-19.
-//
-
 #pragma once
 
 #include <typeinfo>

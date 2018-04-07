@@ -1,6 +1,3 @@
-//
-// Created by lg on 17-4-21.
-//
 #include<functional>
 #include <cassert>
 #include"EventLoopThread.h"

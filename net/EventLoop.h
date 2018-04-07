@@ -1,8 +1,4 @@
-//
-// Created by lg on 17-4-21.
-//
 #pragma once
-
 
 #include <atomic>
 #include "Epoll.h"

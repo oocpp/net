@@ -1,7 +1,3 @@
-//
-// Created by lg on 17-4-21.
-//
-
 #include <sys/socket.h>
 #include <unistd.h>
 #include <sys/eventfd.h>
