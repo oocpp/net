@@ -30,9 +30,12 @@ namespace net
         LOG_TRACE;
         Socket::listen(_fd, backlog);
 
-        _event.set_read_cb(std::bind(&Accepter::handle_accept, this));
+        //_event.set_read_cb(std::bind(&Accepter::handle_accept, this));
+        //_loop->run_in_loop(std::bind(&Event::attach_to_loop, &_event));
 
-        _loop->run_in_loop(std::bind(&Event::attach_to_loop, &_event));
+        _event.set_read_cb([this]{handle_accept();});
+
+        _loop->run_in_loop([this]{_event.attach_to_loop();});
     }
 
     void Accepter::stop()
