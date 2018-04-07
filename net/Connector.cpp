@@ -36,7 +36,8 @@ namespace net
 
         Status t = Disconnected;
         if (_status.compare_exchange_strong(t, Connecting)) {
-            _loop->run_in_loop(std::bind(&Connector::connect, this));
+           // _loop->run_in_loop(std::bind(&Connector::connect, this));
+            _loop->run_in_loop([this]{connect();});
         }
     }
 
@@ -56,7 +57,8 @@ namespace net
 
         Status t = Connecting;
         if (_status.compare_exchange_strong(t, Disconnected)) {
-            _loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
+            //_loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
+            _loop->run_in_loop([this]{stop_in_loop();});
         }
     }
 
@@ -130,6 +132,7 @@ namespace net
                 if (_status.compare_exchange_strong(t, Connected)) {
                     LOG_TRACE << "connect success";
                     if (_new_conn_cb) {
+                        _retry_delay_ms=std::chrono::milliseconds{init_retry_delay_ms};
                         _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
                     }
                 }
@@ -163,7 +166,8 @@ namespace net
 
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Connecting)) {
-            _loop->run_in_loop(std::bind(&Connector::connect, this));
+            //_loop->run_in_loop(std::bind(&Connector::connect, this));
+            _loop->run_in_loop([this]{connect();});
         }
     }
 
@@ -173,8 +177,12 @@ namespace net
             return;
 
         _event.set_fd(fd);
-        _event.set_write_cb(std::bind(&Connector::handle_write, this));
-        _event.set_error_cb(std::bind(&Connector::handle_error, this));
+        //_event.set_write_cb(std::bind(&Connector::handle_write, this));
+        //_event.set_error_cb(std::bind(&Connector::handle_error, this));
+
+        _event.set_write_cb([this]{handle_write();});
+        _event.set_error_cb([this]{handle_error();});
+
 
         _event.enable_write();
     }
@@ -192,7 +200,8 @@ namespace net
             if (_retry_delay_ms.count() > max_retry_delay_ms)
                 _retry_delay_ms = std::chrono::milliseconds(max_retry_delay_ms + 0);
 
-            _loop->run_after(_retry_delay_ms, std::bind(&Connector::connect, shared_from_this()));
+            //_loop->run_after(_retry_delay_ms, std::bind(&Connector::connect, shared_from_this()));
+            _loop->run_after(_retry_delay_ms, [c=shared_from_this()]{c->connect();});
 
         }
         else {
