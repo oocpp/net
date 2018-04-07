@@ -112,7 +112,7 @@ namespace net
         uint64_t one = 1;
         ssize_t n = ::read(_wake_fd, &one, sizeof one);
         if (n != sizeof one) {
-            LOG_ERROR << "EventLoop::handleRead() reads " << n << " bytes instead of 8";
+            LOG_ERROR << "EventLoop::handle_expire() reads " << n << " bytes instead of 8";
         }
     }
 
@@ -212,12 +212,12 @@ namespace net
 
     uint64_t EventLoop::run_at(TimerQueue::time_point time, const std::function<void()> &cb)
     {
-        return _timers.addTimer(cb, time, 0ms);
+        return _timers.add_timer(cb, time, 0ms);
     }
 
     uint64_t EventLoop::run_every(std::chrono::milliseconds ms, const std::function<void()> &cb)
     {
-        return _timers.addTimer(cb, TimerQueue::now() + ms, ms);
+        return _timers.add_timer(cb, TimerQueue::now() + ms, ms);
     }
 
     void EventLoop::cancel(uint64_t id)
@@ -237,12 +237,12 @@ namespace net
 
     uint64_t EventLoop::run_at(TimerQueue::time_point time, std::function<void()> &&cb)
     {
-        return _timers.addTimer(std::move(cb), time, 0ms);
+        return _timers.add_timer(std::move(cb), time, 0ms);
     }
 
     uint64_t EventLoop::run_every(std::chrono::milliseconds ms, std::function<void()> &&cb)
     {
-        return _timers.addTimer(std::move(cb), TimerQueue::now() + ms, ms);
+        return _timers.add_timer(std::move(cb), TimerQueue::now() + ms, ms);
     }
 
 

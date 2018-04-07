@@ -6,46 +6,46 @@ namespace net
 
     void Timer::restart(time_point now)
     {
-        if (repeat_) {
-            expiration_ = now + interval_;
+        if (_repeat) {
+            _expiration = now + _interval;
         }
         else {
-            expiration_ = time_point{};
+            _expiration = time_point{};
         }
     }
 
     Timer::Timer(const TimerCallback &cb, Timer::time_point when, std::chrono::milliseconds interval)
-            : callback_(cb), expiration_(when), interval_(interval), repeat_(interval > 0ms), sequence_(++id)
+            : _callback(cb), _expiration(when), _interval(interval), _repeat(interval > 0ms), _sequence(++id)
     {}
 
 
     Timer::Timer(TimerCallback &&cb, Timer::time_point when, std::chrono::milliseconds interval)
-            : callback_(std::move(cb)), expiration_(when), interval_(interval), repeat_(interval > 0ms), sequence_(++id)
+            : _callback(std::move(cb)), _expiration(when), _interval(interval), _repeat(interval > 0ms), _sequence(++id)
     {}
 
     void Timer::run() const
     {
-        callback_();
+        _callback();
     }
 
     Timer::time_point Timer::expiration() const noexcept
     {
-        return expiration_;
+        return _expiration;
     }
 
     bool Timer::repeat() const noexcept
     {
-        return repeat_;
+        return _repeat;
     }
 
     uint64_t Timer::sequence() const noexcept
     {
-        return sequence_;
+        return _sequence;
     }
 
-    bool Timer::isValid() const noexcept
+    bool Timer::is_valid() const noexcept
     {
-        return expiration_ > time_point{};
+        return _expiration > time_point{};
     }
 
 }

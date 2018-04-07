@@ -61,7 +61,7 @@ namespace net
         }
         else {
             errno = r.second;
-            LOG_ERROR << "TcpConnection::handleRead";
+            LOG_ERROR << "TcpConnection::handle_expire";
             handle_error();
         }
     }
@@ -149,7 +149,7 @@ namespace net
         size_t remaining = len;
         bool write_error = false;
 
-        if (!_event.is_write() && _out_buff.length() == 0) {
+        if (!_event.is_writable() && _out_buff.length() == 0) {
             nwritten = ::send(_sockfd, message, len, MSG_NOSIGNAL);
             if (nwritten >= 0) {
                 remaining = len - nwritten;
@@ -187,7 +187,7 @@ namespace net
 
             _out_buff.append(message + nwritten, remaining);
 
-            if (!_event.is_write()) {
+            if (!_event.is_writable()) {
                 _event.enable_write();
             }
         }
@@ -196,7 +196,7 @@ namespace net
     void TcpConnection::handle_write()
     {
         assert(_loop->in_loop_thread());
-        assert(!_event.is_add_to_loop() || _event.is_write());
+        assert(!_event.is_add_to_loop() || _event.is_writable());
 
         ssize_t n = ::send(_sockfd, _out_buff.get_read_ptr(), _out_buff.get_readable_size(), MSG_NOSIGNAL);
         if (n > 0) {

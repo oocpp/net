@@ -61,9 +61,9 @@ namespace net
 
         void set_fd(int fd)noexcept;
 
-        bool is_write() const noexcept;
+        bool is_writable() const noexcept;
 
-        bool is_read() const noexcept;
+        bool is_readable() const noexcept;
 
         bool is_none() const noexcept;
 

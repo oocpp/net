@@ -27,15 +27,15 @@ namespace net
 
         void restart(time_point now);
 
-        bool isValid() const noexcept;
+        bool is_valid() const noexcept;
 
     private:
-        TimerCallback callback_;
-        time_point expiration_;
-        std::chrono::milliseconds interval_;
-        bool repeat_;
+        TimerCallback _callback;
+        time_point _expiration;
+        std::chrono::milliseconds _interval;
+        bool _repeat;
 
-        const uint64_t sequence_;
+        const uint64_t _sequence;
 
         static std::atomic<uint64_t> id;
     };

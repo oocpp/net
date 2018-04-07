@@ -11,7 +11,6 @@
 
 namespace net
 {
-
     class EventLoop;
 
     class TimerQueue
@@ -27,41 +26,47 @@ namespace net
         TimerQueue(const TimerQueue &) = delete;
         TimerQueue &operator==(const TimerQueue &)= delete;
 
-        uint64_t addTimer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
+        uint64_t add_timer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
 
-        uint64_t addTimer(TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);
+        uint64_t add_timer(TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);
 
         void cancel(uint64_t timerId);
 
         static time_point now();
 
-        using Entry= std::pair<time_point, Timer *>;
+        using TimerNode= std::pair<time_point, Timer *>;
     private:
+        typedef std::set<TimerNode> TimerList;
 
-        typedef std::set<Entry> TimerList;
+        typedef std::map<uint64_t, Timer *> ActiveTimerMap;
 
-        typedef std::map<uint64_t, Timer *> ActiveTimerSet;
+        timespec from_now(time_point when);
 
-        void addTimerInLoop(Timer *timer);
+        void read_timer(time_point now);
 
-        void cancelInLoop(uint64_t timerId);
+        void reset_timer(time_point expiration);
 
-        void handleRead();
+        void add_timer_in_loop(Timer *timer);
 
-        std::vector<Entry> getExpired(time_point now);
+        void cancel_in_loop(uint64_t timerId);
 
-        void reset(const std::vector<Entry> &expired, time_point now);
+        void handle_expire();
+
+        std::vector<TimerNode> get_expired(time_point now);
+
+        void reset(const std::vector<TimerNode> &expired, time_point now);
 
         bool insert(Timer *timer);
 
-        EventLoop *loop_;
-        const int timerfd_;
-        Event timerfdChannel_;
-        TimerList timers_;
+    private:
+        EventLoop *_loop;
+        const int _timer_fd;
+        Event _timer_event;
+        TimerList _timers;
 
-        ActiveTimerSet activeTimers_;
-        bool callingExpiredTimers_;
-        std::set<uint64_t> cancelingTimers_;
+        ActiveTimerMap _active_timers;
+        bool _calling_expired_timers;
+        std::set<uint64_t> _canceling_timers;
     };
 
 }

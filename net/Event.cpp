@@ -62,7 +62,7 @@ namespace net
 
     void Event::enable_read()
     {
-        if (!is_read()) {
+        if (!is_readable()) {
             _events |= ReadEvent;
             update();
         }
@@ -70,7 +70,7 @@ namespace net
 
     void Event::enable_write()
     {
-        if (!is_write()) {
+        if (!is_writable()) {
             _events |= WriteEvent;
             update();
         }
@@ -78,7 +78,7 @@ namespace net
 
     void Event::enable_all()
     {
-        if (!is_write() || !is_read()) {
+        if (!is_writable() || !is_readable()) {
             _events |= ReadEvent | WriteEvent;
             update();
         }
@@ -86,7 +86,7 @@ namespace net
 
     void Event::disable_read()
     {
-        if (is_read()) {
+        if (is_readable()) {
             _events &= ~ReadEvent;
             update();
         }
@@ -94,7 +94,7 @@ namespace net
 
     void Event::disable_write()
     {
-        if (is_write()) {
+        if (is_writable()) {
             _events &= ~WriteEvent;
             update();
         }
@@ -102,7 +102,7 @@ namespace net
 
     void Event::disable_all()
     {
-        if (is_write() || is_read()) {
+        if (is_writable() || is_readable()) {
             _events = NoneEvent;
             detach_from_loop();
         }
@@ -174,12 +174,12 @@ namespace net
         _fd = fd;
     }
 
-    bool Event::is_write() const noexcept
+    bool Event::is_writable() const noexcept
     {
         return (_events & WriteEvent) != 0;
     }
 
-    bool Event::is_read() const noexcept
+    bool Event::is_readable() const noexcept
     {
         return (_events & ReadEvent) != 0;
     }
