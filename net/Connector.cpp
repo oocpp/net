@@ -132,7 +132,7 @@ namespace net
                 if (_status.compare_exchange_strong(t, Connected)) {
                     LOG_TRACE << "connect success";
                     if (_new_conn_cb) {
-                        _retry_delay_ms=std::chrono::milliseconds{init_retry_delay_ms};
+                        _retry_delay_ms=std::chrono::milliseconds{init_retry_delay_ms+0};
                         _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
                     }
                 }
