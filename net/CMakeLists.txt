@@ -27,7 +27,7 @@ set(SOURCE_FILES
         Log.cpp
         )
 
-SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -Wall")
+SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -g -Wall")
 SET(CMAKE_CXX_FLAGS_RELEASE  "$ENV{CXXFLAGS} -O3 -Wall")
 
 set(NET_LIBRARY 1)  #设置为0，用来与main.cpp编译成可执行程序，便于调试
