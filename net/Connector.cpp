@@ -58,7 +58,9 @@ namespace net
         Status t = Connecting;
         if (_status.compare_exchange_strong(t, Disconnected)) {
             //_loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
-            _loop->run_in_loop([this]{stop_in_loop();});
+
+            auto temp=shared_from_this();
+            _loop->run_in_loop([temp]{temp->stop_in_loop();});
         }
     }
 
@@ -132,8 +134,8 @@ namespace net
                 if (_status.compare_exchange_strong(t, Connected)) {
                     LOG_TRACE << "connect success";
                     if (_new_conn_cb) {
-                        _retry_delay_ms=std::chrono::milliseconds{init_retry_delay_ms+0};
                         _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
+                        _retry_delay_ms=std::chrono::milliseconds{init_retry_delay_ms+0};
                     }
                 }
                 else {

@@ -29,7 +29,8 @@ namespace net
             , _timer_event(loop, _timer_fd)
             , _calling_expired_timers(false)
     {
-        _timer_event.set_read_cb(std::bind(&TimerQueue::handle_expire, this));
+        //_timer_event.set_read_cb(std::bind(&TimerQueue::handle_expire, this));
+        _timer_event.set_read_cb([this]{handle_expire();});
         _timer_event.enable_read();
     }
 
@@ -84,14 +85,24 @@ namespace net
     {
         auto *timer = new Timer(cb, when, interval);
 
-        _loop->run_in_loop(std::bind(&TimerQueue::add_timer_in_loop, this, timer));
+        //_loop->run_in_loop(std::bind(&TimerQueue::add_timer_in_loop, this, timer));
+        _loop->run_in_loop([this,timer]{add_timer_in_loop(timer);});
         return timer->sequence();
     }
 
+    uint64_t TimerQueue::add_timer(TimerCallback &&cb, TimerQueue::time_point when, std::chrono::milliseconds interval)
+    {
+        auto *timer = new Timer(std::move(cb), when, interval);
+
+        //_loop->run_in_loop(std::bind(&TimerQueue::add_timer_in_loop, this, timer));
+        _loop->run_in_loop([this,timer]{add_timer_in_loop(timer);});
+        return timer->sequence();
+    }
 
     void TimerQueue::cancel(uint64_t timerId)
     {
-        _loop->run_in_loop(std::bind(&TimerQueue::cancel_in_loop, this, timerId));
+        //_loop->run_in_loop(std::bind(&TimerQueue::cancel_in_loop, this, timerId));
+        _loop->run_in_loop([this,timerId]{cancel_in_loop(timerId);});
     }
 
     void TimerQueue::add_timer_in_loop(Timer *timer)
@@ -222,12 +233,5 @@ namespace net
         return std::chrono::system_clock::now();
     }
 
-    uint64_t TimerQueue::add_timer(TimerCallback &&cb, TimerQueue::time_point when, std::chrono::milliseconds interval)
-    {
-        auto *timer = new Timer(std::move(cb), when, interval);
-
-        _loop->run_in_loop(std::bind(&TimerQueue::add_timer_in_loop, this, timer));
-        return timer->sequence();
-    }
 }
 

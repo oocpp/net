@@ -59,7 +59,8 @@ namespace net
               , _timers(this)
               , _wake_event(this, _wake_fd, true)
     {
-        _wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
+        //_wake_event.set_read_cb(std::bind(&EventLoop::handle_wakeup_read, this));
+        _wake_event.set_read_cb([this]{handle_wakeup_read();});
         _wake_event.attach_to_loop();
     }
 
