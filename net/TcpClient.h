@@ -19,7 +19,7 @@ namespace net
 
         void disconnect();
 
-        void cancel_connect();
+        bool cancel_connect();
 
         void set_retry(bool t = true);
 

@@ -1,6 +1,7 @@
 #include "TcpClient.h"
 #include"TcpConnection.h"
 #include "Log.h"
+#include "Socket.h"
 
 namespace net
 {
@@ -17,7 +18,9 @@ namespace net
               , _retry(true)
               , _status(Disconnected)
     {
-        _connector->set_new_connection_cb(std::bind(&TcpClient::on_new_connection, this, _1, _2));
+        //_connector->set_new_connection_cb(std::bind(&TcpClient::on_new_connection, this, _1, _2));
+
+        _connector->set_new_connection_cb([this](int fd, const InetAddress &addr){on_new_connection(fd,addr);});
     }
 
     TcpClient::~TcpClient()noexcept
@@ -41,17 +44,22 @@ namespace net
 
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Disconnected)) {
-            _connection->close();
+            _connection->close(false);
             _connection.reset();
         }
     }
 
-    void TcpClient::cancel_connect()
+    bool TcpClient::cancel_connect()
     {
         Status t = Connecting;
         if (_status.compare_exchange_strong(t, Disconnected)) {
             _connector->cancel();
+            return true;
         }
+        else if(_status==Disconnected){
+            return true;
+        }
+        return false;
     }
 
     void TcpClient::on_new_connection(int fd, const InetAddress &addr)
@@ -64,25 +72,32 @@ namespace net
             _connection->set_message_cb(_message_cb);
             _connection->set_connection_cb(_connecting_cb);
             _connection->set_write_complete_cb(_write_complete_cb);
-            _connection->set_close_cb(std::bind(&TcpClient::on_remove_connection, this, _1));
+            //temp->set_close_cb(std::bind(&TcpClient::on_remove_connection, this, _1));
 
-            _loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, _connection));
+            //_loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, _connection));
+
+            _connection->set_close_cb([this](const TCPConnPtr &conn){on_remove_connection(conn);});
+
+            auto temp=_connection;
+            _loop->run_in_loop([temp]{temp->attach_to_loop();});
 
             LOG_TRACE << "Client new conn";
+        }
+        else{
+            Socket::close(fd);
         }
     }
 
     void TcpClient::on_remove_connection(const TCPConnPtr &conn)
     {
-        if (_retry) {
-            Status t = Connected;
-            if (_status.compare_exchange_strong(t, Connecting)) {
-                _connector->restart();
-                LOG_INFO<<"retry";
-                return;
-            }
+        Status t = Connected;
+        if (_retry && _status.compare_exchange_strong(t, Connecting)) {
+            _connector->restart();
+            LOG_INFO << "retry";
+            return;
         }
 
+        _connection.reset();
         _status = Disconnected;
     }
 

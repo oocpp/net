@@ -24,7 +24,8 @@ namespace net
         LOG_TRACE;
 
         _accepters.emplace_back(_loop,addr);
-        _accepters.back().set_new_connection_cb(std::bind(&TcpServer::handle_new_connection, this, _1, _2));
+        //_accepters.back().set_new_connection_cb(std::bind(&TcpServer::handle_new_connection, this, _1, _2));
+        _accepters.back().set_new_connection_cb([this](int fd, const InetAddress &addr){handle_new_connection(fd,addr);});
 
         LOG_TRACE<<_accepters.size();
     }
@@ -53,7 +54,8 @@ namespace net
         Status t = Running;
 
         if (_status.compare_exchange_strong(t, Stopping)) {
-            _loop->run_in_loop(std::bind(&TcpServer::stop_in_loop, this));
+            //_loop->run_in_loop(std::bind(&TcpServer::stop_in_loop, this));
+            _loop->run_in_loop([this]{stop_in_loop();});
             _pool.join();
         }
         _status = Stopped;
@@ -68,8 +70,9 @@ namespace net
             t.stop();
 
         for (auto &conn:_connections) {
-            conn.second->close();
+            conn.second->close(false);
         }
+        _connections.clear();
         _pool.stop();
     }
 
@@ -92,16 +95,20 @@ namespace net
         conn->set_message_cb(_message_cb);
         conn->set_connection_cb(_connecting_cb);
         conn->set_write_complete_cb(_write_complete_cb);
-        conn->set_close_cb(std::bind(&TcpServer::remove_connection, this, _1));
+        //conn->set_close_cb(std::bind(&TcpServer::remove_connection, this, _1));
 
-        loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, conn));
+        //loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, conn));
+
+        conn->set_close_cb([this](const TCPConnPtr &conn){remove_connection(conn);});
+
+        loop->run_in_loop([conn]{conn->attach_to_loop();});
         _connections[conn->get_id()] = conn;
     }
 
     void TcpServer::remove_connection(const TCPConnPtr &conn)
     {
-
-        _loop->run_in_loop(std::bind(&TcpServer::remove_connection_in_loop, this, conn));
+        //_loop->run_in_loop(std::bind(&TcpServer::remove_connection_in_loop, this, conn));
+        _loop->run_in_loop([this,conn]{remove_connection_in_loop(conn);});
     }
 
     void TcpServer::remove_connection_in_loop(const TCPConnPtr &conn)
