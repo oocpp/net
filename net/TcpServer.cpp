@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include "TcpServer.h"
 #include"Acceptor.h"
 #include "Log.h"
@@ -59,6 +60,8 @@ namespace net
             _pool.join();
         }
         _status = Stopped;
+
+        assert(_connections.empty());
     }
 
     void TcpServer::stop_in_loop()

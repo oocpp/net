@@ -79,7 +79,7 @@ namespace net
         if (_status == Disconnected)
             return;
 
-        _status = Disconnecting;
+        _status = Disconnected;
         _event.disable_all();
 
         TCPConnPtr conn(shared_from_this());
@@ -88,12 +88,12 @@ namespace net
             _connecting_cb(conn);
         }
 
-        if (call_close_cb&&_close_cb) {
+        if (call_close_cb/*&&_close_cb*/) {
             _close_cb(conn);
         }
         LOG_TRACE << " fd=" << _sockfd;
 
-        _status = Disconnected;
+        //_status = Disconnected;
     }
 
     void TcpConnection::handle_error()

@@ -7,32 +7,35 @@ namespace net
 {
     Accepter::Accepter(EventLoop *loop, const InetAddress &addr)noexcept
             : _loop(loop)
-              , _fd(Socket::create_nonblocking_socket(addr.get_family()))
+              , _fd(-1)
               , _addr(addr)
               , _event(loop, _fd, true, false)
     {
-        LOG_TRACE<<"fd = "<<_fd;
-        if(_fd<0) {
-            abort();
-        }
-        Socket::bind(_fd, _addr);
+
     }
 
     Accepter::~Accepter()noexcept
     {
         assert(!_event.is_add_to_loop());
         LOG_TRACE;
-        Socket::close(_fd);
     }
 
     void Accepter::listen(int backlog)
     {
         LOG_TRACE;
+        _fd=Socket::create_nonblocking_socket(_addr.get_family());
+        if(_fd<0) {
+            LOG_TRACE<<"fd = "<<_fd;
+            abort();
+        }
+
+        Socket::bind(_fd, _addr);
         Socket::listen(_fd, backlog);
 
         //_event.set_read_cb(std::bind(&Accepter::handle_accept, this));
         //_loop->run_in_loop(std::bind(&Event::attach_to_loop, &_event));
 
+        _event.set_fd(_fd);
         _event.set_read_cb([this]{handle_accept();});
 
         _loop->run_in_loop([this]{_event.attach_to_loop();});
@@ -43,6 +46,7 @@ namespace net
         assert(_loop->in_loop_thread());
 
         _event.detach_from_loop();
+        Socket::close(_fd);
 
         assert(!_event.is_add_to_loop());
     }
@@ -52,16 +56,20 @@ namespace net
         assert(_loop->in_loop_thread());
 
         InetAddress addr{};
-        int connfd = Socket::accept(_fd, addr);
 
-        //LOG_INFO<<"accept :fd = "<<connfd;
+        while(true) {
+            int connfd=Socket::accept(_fd, addr);
+            if(connfd<0)
+                break;
+            //LOG_INFO<<"accept :fd = "<<connfd;
 
-        if (connfd < 0) {
-            LOG_INFO<<"fd = "<<connfd;
-            return;
+            //if (connfd < 0) {
+            //    LOG_INFO << "fd = " << connfd;
+            //    return;
+           // }
+
+            _new_connection_cb(connfd, addr);
         }
-
-        _new_connection_cb(connfd, addr);
     }
 
     void Accepter::set_new_connection_cb(const Accepter::NewConnCallback &cb)

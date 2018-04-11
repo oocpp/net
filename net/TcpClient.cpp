@@ -90,14 +90,15 @@ namespace net
 
     void TcpClient::on_remove_connection(const TCPConnPtr &conn)
     {
+        _connection.reset();
+
         Status t = Connected;
         if (_retry && _status.compare_exchange_strong(t, Connecting)) {
-            _connector->restart();
             LOG_INFO << "retry";
+            _connector->restart();
             return;
         }
 
-        _connection.reset();
         _status = Disconnected;
     }
 

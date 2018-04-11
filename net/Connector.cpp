@@ -72,6 +72,8 @@ namespace net
         int fd = Socket::create_nonblocking_socket(_addr.get_family());
         int rt = Socket::connect(fd, _addr);
 
+        LOG_TRACE << "connect";
+
         int serrno = (rt == 0) ? 0 : errno;
 
         switch (serrno) {
@@ -106,8 +108,6 @@ namespace net
                 Socket::close(fd);
                 break;
         }
-
-        LOG_TRACE << "connecting .........";
     }
 
 
@@ -133,10 +133,10 @@ namespace net
                 Status t = Connecting;
                 if (_status.compare_exchange_strong(t, Connected)) {
                     LOG_TRACE << "connect success";
-                    if (_new_conn_cb) {
+                    //if (_new_conn_cb) {
                         _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
                         _retry_delay_ms=std::chrono::milliseconds{init_retry_delay_ms+0};
-                    }
+                    //}
                 }
                 else {
                     Socket::close(sockfd);
@@ -187,6 +187,8 @@ namespace net
 
 
         _event.enable_write();
+
+        LOG_TRACE << "connecting";
     }
 
     void Connector::retry(int sockfd)
