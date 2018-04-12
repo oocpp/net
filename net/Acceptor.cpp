@@ -67,7 +67,7 @@ namespace net
             //    LOG_INFO << "fd = " << connfd;
             //    return;
            // }
-
+            assert(_new_connection_cb);
             _new_connection_cb(connfd, addr);
         }
     }

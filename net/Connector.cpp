@@ -12,7 +12,8 @@ namespace net
               , _event(loop, -1)
               , _retry_delay_ms(init_retry_delay_ms + 0)
     {
-
+        _event.set_write_cb([this]{handle_write();});
+        _event.set_error_cb([this]{handle_error();});
     }
 
     Connector::~Connector() noexcept
@@ -53,14 +54,16 @@ namespace net
 
     void Connector::cancel()
     {
-        assert(_status == Connecting);
-
+        //assert(_status == Connecting);
         Status t = Connecting;
+        std::unique_lock<std::mutex> l(_m);
+
         if (_status.compare_exchange_strong(t, Disconnected)) {
+            l.unlock();
             //_loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
 
-            auto temp=shared_from_this();
-            _loop->run_in_loop([temp]{temp->stop_in_loop();});
+            auto temp = shared_from_this();
+            _loop->run_in_loop([temp] { temp->stop_in_loop(); });
         }
     }
 
@@ -101,11 +104,13 @@ namespace net
             case ENOTSOCK:
                 LOG_ERROR << "connect error in Connector::start_in_loop " << serrno;
                 Socket::close(fd);
+                _status=Disconnected;
                 break;
 
             default:
                 LOG_ERROR << "Unexpected error in Connector::start_in_loop " << serrno;
                 Socket::close(fd);
+                _status=Disconnected;
                 break;
         }
     }
@@ -131,14 +136,18 @@ namespace net
             }
             else {
                 Status t = Connecting;
+                std::unique_lock<std::mutex> l(_m);
+
                 if (_status.compare_exchange_strong(t, Connected)) {
+                    assert(_new_conn_cb);
+                    _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
+
+                    l.unlock();
                     LOG_TRACE << "connect success";
-                    //if (_new_conn_cb) {
-                        _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
-                        _retry_delay_ms=std::chrono::milliseconds{init_retry_delay_ms+0};
-                    //}
+                    _retry_delay_ms = std::chrono::milliseconds{init_retry_delay_ms + 0};
                 }
                 else {
+                    l.unlock();
                     Socket::close(sockfd);
                 }
             }
@@ -182,8 +191,8 @@ namespace net
         //_event.set_write_cb(std::bind(&Connector::handle_write, this));
         //_event.set_error_cb(std::bind(&Connector::handle_error, this));
 
-        _event.set_write_cb([this]{handle_write();});
-        _event.set_error_cb([this]{handle_error();});
+        //_event.set_write_cb([this]{handle_write();});
+        //_event.set_error_cb([this]{handle_error();});
 
 
         _event.enable_write();

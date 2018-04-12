@@ -110,6 +110,13 @@ namespace net
 
     void Event::handle_event(uint32_t event)
     {
+        if ((event & ErrorEvent)) {
+            //if(_error_cb)
+            assert(_error_cb);
+            _error_cb();
+            return ;
+        }
+
         if ((event & ReadEvent) && _read_cb) {
             _read_cb();
         }

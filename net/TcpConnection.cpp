@@ -22,11 +22,13 @@ namespace net
 
         _event.set_read_cb([this]{handle_read();});
         _event.set_write_cb([this]{handle_write();});
+        _event.set_error_cb([this]{handle_error();});
     }
 
     TcpConnection::~TcpConnection()noexcept
     {
         LOG_TRACE;
+        assert(_status==Disconnected);
         Socket::close(_sockfd);
     }
 
@@ -62,8 +64,10 @@ namespace net
             _message_cb(shared_from_this(), &_in_buff);
         }
         else if (r.first == 0) {
-            _status = Disconnecting;
-            handle_close();
+            Status t = Connected;
+            if (_status.compare_exchange_strong(t, Disconnecting)) {
+                handle_close();
+            }
         }
         else {
             errno = r.second;
@@ -76,24 +80,24 @@ namespace net
     {
         assert(_loop->in_loop_thread());
 
-        if (_status == Disconnected)
-            return;
+        //Status t = Disconnecting;
+        //if (_status.compare_exchange_strong(t, Disconnected)) {
 
-        _status = Disconnected;
-        _event.disable_all();
+            _event.disable_all();
 
-        TCPConnPtr conn(shared_from_this());
+            TCPConnPtr conn(shared_from_this());
 
-        if (_connecting_cb) {
-            _connecting_cb(conn);
-        }
+            if (_connecting_cb) {
+                _connecting_cb(conn);
+            }
 
-        if (call_close_cb/*&&_close_cb*/) {
-            _close_cb(conn);
-        }
-        LOG_TRACE << " fd=" << _sockfd;
+            if (call_close_cb/*&&_close_cb*/) {
+                _close_cb(conn);
+            }
+            LOG_TRACE << " fd=" << _sockfd;
 
-        //_status = Disconnected;
+            _status = Disconnected;
+        //}
     }
 
     void TcpConnection::handle_error()
@@ -103,8 +107,10 @@ namespace net
         int err = Socket::get_socket_error(_event.get_fd());
         LOG_ERROR << "TcpConnection::handleError - SO_ERROR = " << err;
 
-        _status = Disconnecting;
-        handle_close();
+        Status t = Connected;
+        if (_status.compare_exchange_strong(t, Disconnecting)) {
+            handle_close();
+        }
     }
 
     void TcpConnection::send(const std::string &str)

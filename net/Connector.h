@@ -5,6 +5,7 @@
 #include<chrono>
 #include "InetAddress.h"
 #include "Event.h"
+#include <mutex>
 
 namespace net
 {
@@ -24,6 +25,10 @@ namespace net
         void set_new_connection_cb(const NewConnCallback &cb);
 
         void set_new_connection_cb(NewConnCallback &&cb)noexcept;
+
+        void set_error_cb(const NewConnCallback &cb);
+
+        void set_error_cb(NewConnCallback &&cb)noexcept;
 
         void start();
 
@@ -58,9 +63,11 @@ namespace net
         EventLoop *_loop;
         InetAddress _addr;
         NewConnCallback _new_conn_cb;
+        NewConnCallback _error_cb;
         std::atomic<Status> _status;
         Event _event;
         std::chrono::milliseconds _retry_delay_ms;
 
+        std::mutex _m;
     };
 }
