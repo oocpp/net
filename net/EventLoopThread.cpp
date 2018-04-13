@@ -39,4 +39,10 @@ namespace net
         _loop.reset_thread_id();
         _loop.run();
     }
+
+    void EventLoopThread::stop_and_join()
+    {
+        stop();
+        join();
+    }
 }

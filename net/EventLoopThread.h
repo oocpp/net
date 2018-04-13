@@ -22,6 +22,8 @@ namespace net
 
         void join();
 
+        void stop_and_join();
+
         EventLoop *get_loop();
 
     private:
