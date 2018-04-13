@@ -40,26 +40,20 @@ namespace net
 
     void TcpClient::disconnect()
     {
-        //assert(_status==Connecting);
+        if (_status == Disconnected)
+            return;
 
-        Status t = Connected;
-        if (_status.compare_exchange_strong(t, Disconnected)) {
+        _status = Disconnected;
+        _connector->cancel();
+        _loop->run_in_loop([this] { disconnect_in_loop(); });
+    }
+
+    void TcpClient::disconnect_in_loop()
+    {
+        if (_connection) {
             _connection->close(false);
             _connection.reset();
         }
-    }
-
-    bool TcpClient::cancel_connect()
-    {
-        Status t = Connecting;
-        if (_status.compare_exchange_strong(t, Disconnected)) {
-            _connector->cancel();
-            return true;
-        }
-        else if(_status==Disconnected){
-            return true;
-        }
-        return false;
     }
 
     void TcpClient::on_new_connection(int fd, const InetAddress &addr)
@@ -96,10 +90,10 @@ namespace net
         if (_retry && _status.compare_exchange_strong(t, Connecting)) {
             LOG_INFO << "retry";
             _connector->restart();
-            return;
         }
-
-        _status = Disconnected;
+        else {
+            _status = Disconnected;
+        }
     }
 
     void TcpClient::set_retry(bool t)
@@ -167,4 +161,5 @@ namespace net
         assert(_status == Disconnected);
         _write_complete_cb = std::move(cb);
     }
+
 }

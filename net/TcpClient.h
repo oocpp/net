@@ -19,8 +19,6 @@ namespace net
 
         void disconnect();
 
-        bool cancel_connect();
-
         void set_retry(bool t = true);
 
         EventLoop *get_loop();
@@ -49,6 +47,8 @@ namespace net
         { return _status == Connecting; }
 
     private:
+        void disconnect_in_loop();
+
         void on_new_connection(int fd, const InetAddress &addr);
 
         void on_remove_connection(const TCPConnPtr &conn);

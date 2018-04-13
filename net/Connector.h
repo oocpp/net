@@ -67,7 +67,5 @@ namespace net
         std::atomic<Status> _status;
         Event _event;
         std::chrono::milliseconds _retry_delay_ms;
-
-        std::mutex _m;
     };
 }

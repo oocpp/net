@@ -54,17 +54,14 @@ namespace net
 
     void Connector::cancel()
     {
-        //assert(_status == Connecting);
-        Status t = Connecting;
-        std::unique_lock<std::mutex> l(_m);
+        if (_status == Disconnected)
+            return;
 
-        if (_status.compare_exchange_strong(t, Disconnected)) {
-            l.unlock();
-            //_loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
+        _status = Disconnected;
+        //_loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
 
-            auto temp = shared_from_this();
-            _loop->run_in_loop([temp] { temp->stop_in_loop(); });
-        }
+        auto temp = shared_from_this();
+        _loop->run_in_loop([temp] { temp->stop_in_loop(); });
     }
 
     void Connector::connect()
@@ -136,18 +133,15 @@ namespace net
             }
             else {
                 Status t = Connecting;
-                std::unique_lock<std::mutex> l(_m);
 
                 if (_status.compare_exchange_strong(t, Connected)) {
                     assert(_new_conn_cb);
                     _new_conn_cb(sockfd, InetAddress(Socket::get_local_addr(sockfd)));
 
-                    l.unlock();
                     LOG_TRACE << "connect success";
                     _retry_delay_ms = std::chrono::milliseconds{init_retry_delay_ms + 0};
                 }
                 else {
-                    l.unlock();
                     Socket::close(sockfd);
                 }
             }
