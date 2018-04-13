@@ -111,6 +111,7 @@ namespace net
     void Event::handle_event(uint32_t event)
     {
         if ((event & ErrorEvent)) {
+            LOG_TRACE<<"Error Event";
             //if(_error_cb)
             assert(_error_cb);
             _error_cb();

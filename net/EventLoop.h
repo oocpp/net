@@ -57,7 +57,7 @@ namespace net
 
         bool in_loop_thread() const noexcept;
 
-        void set_thread_id(std::thread::id id)noexcept;
+        void reset_thread_id()noexcept;
 
     private:
 

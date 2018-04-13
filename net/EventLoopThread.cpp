@@ -36,7 +36,7 @@ namespace net
 
     void EventLoopThread::thread_fn()
     {
-        _loop.set_thread_id(std::this_thread::get_id());
+        _loop.reset_thread_id();
         _loop.run();
     }
 }

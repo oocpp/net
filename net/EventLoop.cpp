@@ -226,9 +226,9 @@ namespace net
         _timers.cancel(id);
     }
 
-    void EventLoop::set_thread_id(std::thread::id id) noexcept
+    void EventLoop::reset_thread_id() noexcept
     {
-        _th_id = id;
+        _th_id = std::this_thread::get_id();
     }
 
     uint64_t EventLoop::run_after(std::chrono::milliseconds ms, std::function<void()> &&cb)
