@@ -5,7 +5,6 @@
 
 namespace net
 {
-
     Event::Event(EventLoop *loop, int fd, bool r, bool w) noexcept
             : _loop(loop)
               , _fd(fd)

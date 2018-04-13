@@ -5,7 +5,6 @@
 
 namespace net
 {
-
     class EventLoopThread
     {
     public:

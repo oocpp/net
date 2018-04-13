@@ -6,7 +6,6 @@
 
 namespace net
 {
-
     TcpConnection::TcpConnection(uint64_t id, EventLoop *loop, int sockfd, const InetAddress &local_addr
                                  , const InetAddress &peer_add)
             : _sockfd(sockfd)

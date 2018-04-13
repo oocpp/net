@@ -3,7 +3,6 @@
 #include <string>
 #include <netinet/in.h>
 
-
 namespace net
 {
     class InetAddress final

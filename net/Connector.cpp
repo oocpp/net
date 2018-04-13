@@ -112,7 +112,6 @@ namespace net
         }
     }
 
-
     void Connector::handle_write()
     {
         LOG_TRACE << "state=" << _status;

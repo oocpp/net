@@ -11,8 +11,6 @@ namespace net
 {
     class TcpConnection;
 
-    class InetAddress;
-
     class EventLoop;
 
     class Accepter

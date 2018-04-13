@@ -1,12 +1,11 @@
 #include <arpa/inet.h>
+#include <cstring>
 
 #include "Log.h"
-#include <cstring>
 #include "InetAddress.h"
 
 namespace net
 {
-
     InetAddress::InetAddress(const std::string &ip, in_port_t port, sa_family_t family)
     {
         std::memset(&_addr, 0, get_sockaddr_size());
@@ -28,7 +27,7 @@ namespace net
 
     std::string InetAddress::toIpPort() const
     {
-        return std::to_string(ntohs(_addr.sin_port));
+        return std::to_string(ntohs(_addr.sin_port))+":"+std::to_string(toPort());
     }
 
     in_port_t InetAddress::toPort() const
@@ -38,7 +37,7 @@ namespace net
 
     uint32_t InetAddress::ipNetEndian() const
     {
-        return uint32_t();
+        return _addr.sin_addr.s_addr;
     }
 
     InetAddress::InetAddress(const struct sockaddr_in &addr)
