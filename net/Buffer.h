@@ -5,6 +5,7 @@
 #include <cassert>
 #include <utility>
 #include <string>
+#include <cstring>
 
 namespace net
 {
@@ -15,6 +16,10 @@ namespace net
 
     public:
         Buffer()noexcept;
+
+        Buffer(Buffer&&b)noexcept;
+
+        void swap(Buffer&b)noexcept ;
 
         std::pair<ssize_t, int> read_from_fd(int fd);
 
@@ -44,9 +49,44 @@ namespace net
 
         void has_write(size_t n)noexcept;
 
+    public:
+
+        void reserve_head_space(size_t len);
+
+        void fill_head_space(size_t index,const std::string &str);
+
+        void fill_head_space(size_t index,const char *str,size_t len);
+
+        void append(void *data, size_t len)noexcept;
+
+        void appendInt64(int64_t x);
+
+        void appendInt32(int32_t x);
+
+        void appendInt16(int16_t x);
+
+        void appendInt8(int8_t x);
+
+        int64_t readInt64();
+
+        int32_t readInt32();
+
+        int16_t readInt16();
+
+        int8_t readInt8();
+
+        int64_t peekInt64() const;
+
+        int32_t peekInt32() const;
+
+        int16_t peekInt16() const;
+
+        int8_t peekInt8() const;
+
     private:
         std::vector<char> _buff;
         size_t _read_index;
         size_t _write_index;
+        size_t _reserve_index;
     };
 }

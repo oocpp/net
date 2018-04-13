@@ -6,8 +6,27 @@ namespace net
 
     Buffer::Buffer()noexcept
             : _read_index(0)
-              , _write_index(0)
+            , _write_index(0)
+            ,_reserve_index(0)
     {
+
+    }
+
+    void Buffer::swap(Buffer&b) noexcept
+    {
+        _buff.swap(b._buff);
+        std::swap(_read_index,b._read_index);
+        std::swap(_write_index,b._write_index);
+        std::swap(_reserve_index,b._reserve_index);
+    }
+
+    Buffer::Buffer(Buffer&&b) noexcept
+        : _buff(std::move(b._buff))
+        ,_read_index(b._read_index)
+        , _write_index(b._write_index)
+        ,_reserve_index(b._reserve_index)
+    {
+
     }
 
     std::pair<ssize_t, int> Buffer::read_from_fd(int fd)
@@ -50,6 +69,7 @@ namespace net
             else {
                 std::copy(_buff.begin() + _read_index, _buff.begin() + _write_index, _buff.begin());
                 _write_index -= _read_index;
+                _reserve_index-=_read_index;
                 _read_index = 0;
             }
         }
@@ -71,6 +91,7 @@ namespace net
     {
         _read_index = 0;
         _write_index = 0;
+        _reserve_index=0;
     }
 
     void Buffer::append(const char *data, size_t len)
@@ -143,5 +164,109 @@ namespace net
     {
         _write_index += n;
         assert(_write_index <= _buff.size());
+    }
+
+    void Buffer::reserve_head_space(size_t len)
+    {
+        ensure_writable_bytes(len);
+        _reserve_index=_write_index;
+        has_write(len);
+    }
+
+    void Buffer::fill_head_space(size_t index, const std::string &str)
+    {
+        std::copy(str.begin(), str.end(), _buff.begin() + _reserve_index);
+    }
+
+    void Buffer::fill_head_space(size_t index, const char *str,size_t len)
+    {
+        std::copy_n(str, len, _buff.begin() + _reserve_index);
+    }
+
+    void Buffer::append(void *data, size_t len) noexcept
+    {
+        append(static_cast<char*>(data),len);
+    }
+
+    void Buffer::appendInt64(int64_t x)
+    {
+        int64_t be64 = htobe64(x);
+        append(&be64, sizeof be64);
+    }
+
+    void Buffer::appendInt32(int32_t x)
+    {
+        int32_t be32 = htobe32(x);
+        append(&be32, sizeof be32);
+    }
+
+    void Buffer::appendInt16(int16_t x)
+    {
+        int16_t be16 = htobe16(x);
+        append(&be16, sizeof be16);
+    }
+
+    void Buffer::appendInt8(int8_t x)
+    {
+        append(&x, sizeof x);
+    }
+
+    int8_t Buffer::peekInt8() const
+    {
+        assert(get_readable_size() >= sizeof(int8_t));
+        int8_t x = *get_read_ptr();
+        return x;
+    }
+
+    int16_t Buffer::peekInt16() const
+    {
+        assert(get_readable_size() >= sizeof(int16_t));
+        int16_t be16 = 0;
+        ::memcpy(&be16, get_read_ptr(), sizeof be16);
+        return be16toh(be16);
+    }
+
+    int32_t Buffer::peekInt32() const
+    {
+        assert(get_readable_size() >= sizeof(int32_t));
+        int32_t be32 = 0;
+        ::memcpy(&be32, get_read_ptr(), sizeof be32);
+        return be32toh(be32);
+    }
+
+    int64_t Buffer::peekInt64() const
+    {
+        assert(get_readable_size() >= sizeof(int64_t));
+        int64_t be64 = 0;
+        ::memcpy(&be64, get_read_ptr(), sizeof be64);
+        return be64toh(be64);
+    }
+
+    int8_t Buffer::readInt8()
+    {
+        int8_t result = peekInt8();
+        has_read(sizeof(int8_t));
+        return result;
+    }
+
+    int16_t Buffer::readInt16()
+    {
+        int16_t result = peekInt16();
+        has_read(sizeof(int16_t));
+        return result;
+    }
+
+    int32_t Buffer::readInt32()
+    {
+        int32_t result = peekInt32();
+        has_read(sizeof(int32_t));
+        return result;
+    }
+
+    int64_t Buffer::readInt64()
+    {
+        int64_t result = peekInt64();
+        has_read(sizeof(int64_t));
+        return result;
     }
 }
