@@ -40,7 +40,7 @@ namespace net
             //_loop->queue_in_loop(std::bind(&TcpConnection::handle_close, shared_from_this()));
 
             auto temp=shared_from_this();
-            _loop->queue_in_loop([temp,call_close_cb]{temp->handle_close(call_close_cb);});
+            _loop->run_in_loop([temp,call_close_cb]{temp->handle_close(call_close_cb);});
         }
     }
 
