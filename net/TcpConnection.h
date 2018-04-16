@@ -68,7 +68,7 @@ namespace net
 
         void send(const char *str, size_t len);
 
-        void send(const Buffer *d);
+        void send(Buffer *d);
 
         bool is_connected() const noexcept;
 
