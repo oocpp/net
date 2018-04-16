@@ -115,7 +115,7 @@ class Client
 
   void onConnect()
   {
-    if (numConnected_ == sessionCount_)
+    if (++numConnected_ == sessionCount_)
     {
       LOG_WARN << "all connected";
     }
@@ -123,7 +123,7 @@ class Client
 
   void onDisconnect(const TCPConnPtr& conn)
   {
-    if (numConnected_ == 0)
+    if (--numConnected_ == 0)
     {
       LOG_WARN << "all disconnected";
 
@@ -165,7 +165,7 @@ class Client
   chrono::seconds timeout_;
   std::vector<Session*> sessions_;
   string message_;
-  atomic<int64_t >numConnected_;
+  atomic<int64_t >numConnected_{0};
 };
 
 void Session::onConnection(const TCPConnPtr& conn)

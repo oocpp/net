@@ -74,15 +74,15 @@ namespace net
             return;
 
         while (_is_looping) {
-            LOG_TRACE << " looping" << std::endl;
 
             _poll.wait(-1, _events);
 
-            LOG_TRACE << "poll " << _events.size();
             for (auto &e:_events)
                 reinterpret_cast<Event *>(e.data.ptr)->handle_event(e.events);
 
             do_pending_fn();
+
+            LOG_TRACE << "poll " << _events.size();
         }
         LOG_TRACE << " loop stop" << std::endl;
         _is_looping = false;

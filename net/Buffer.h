@@ -83,6 +83,7 @@ namespace net
         int8_t peek_int8() const;
 
     private:
+        static constexpr size_t INIT_SIZE=1024;
         std::vector<char> _buff;
         size_t _read_index;
         size_t _write_index;

@@ -5,7 +5,8 @@ namespace net
 {
 
     Buffer::Buffer()noexcept
-            : _read_index(0)
+            :_buff(INIT_SIZE)
+            ,_read_index(0)
             , _write_index(0)
             ,_reserve_index(0)
     {
