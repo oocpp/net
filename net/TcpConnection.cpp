@@ -21,7 +21,7 @@ namespace net
 
         _event.set_read_cb([this]{handle_read();});
         _event.set_write_cb([this]{handle_write();});
-        _event.set_error_cb([this]{handle_error();});
+        _event.set_close_cb([this] { handle_close(); });
     }
 
     TcpConnection::~TcpConnection()noexcept
@@ -39,7 +39,7 @@ namespace net
             //_loop->queue_in_loop(std::bind(&TcpConnection::handle_close, shared_from_this()));
 
             auto temp=shared_from_this();
-            _loop->run_in_loop([temp,call_close_cb]{temp->handle_close(call_close_cb);});
+            _loop->queue_in_loop([temp,call_close_cb]{temp->handle_close(call_close_cb);});
         }
     }
 
@@ -67,7 +67,7 @@ namespace net
         }
         else {
             errno = r.second;
-            LOG_ERROR << "TcpConnection::handle_expire";
+            LOG_ERROR << "TcpConnection::handle_expire ->"<< r.second;
             handle_error();
         }
     }
@@ -133,9 +133,10 @@ namespace net
         }
     }
 
-    void TcpConnection::send(const Buffer *d)
+    void TcpConnection::send(Buffer *d)
     {
         send(d->get_read_ptr(), d->get_readable_size());
+        d->clear();
     }
 
     void TcpConnection::send_string_in_loop(const std::string &str)
