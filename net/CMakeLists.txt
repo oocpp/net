@@ -3,6 +3,22 @@ project(net)
 
 set(CMAKE_CXX_STANDARD 11)
 
+set(CXX_FLAGS
+        -Wall
+        -Wextra
+        -Werror
+        -Wconversion
+        -Wno-unused-parameter
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wpointer-arith
+        -Wshadow
+        -Wwrite-strings
+        )
+
+SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -g")
+SET(CMAKE_CXX_FLAGS_RELEASE  "$ENV{CXXFLAGS} -O3")
+
 include(CheckFunctionExists)
 check_function_exists(accept4 HAVE_ACCEPT4)
 
@@ -26,9 +42,6 @@ set(SOURCE_FILES
         TimerQueue.cpp
         Log.cpp
         )
-
-SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -g -Wall")
-SET(CMAKE_CXX_FLAGS_RELEASE  "$ENV{CXXFLAGS} -O3 -Wall")
 
 set(NET_LIBRARY 1)  #设置为0，用来与main.cpp编译成可执行程序，便于调试
 
