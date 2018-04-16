@@ -14,6 +14,7 @@ namespace net
     private:
         void ensure_writable_bytes(size_t len);
 
+        void append(void *data, size_t len)noexcept;
     public:
         Buffer()noexcept;
 
@@ -57,31 +58,29 @@ namespace net
 
         void fill_head_space(size_t index,const char *str,size_t len);
 
-        void append(void *data, size_t len)noexcept;
+        void append_int64(int64_t x);
 
-        void appendInt64(int64_t x);
+        void append_int32(int32_t x);
 
-        void appendInt32(int32_t x);
+        void append_int16(int16_t x);
 
-        void appendInt16(int16_t x);
+        void append_int8(int8_t x);
 
-        void appendInt8(int8_t x);
+        int64_t read_int64();
 
-        int64_t readInt64();
+        int32_t read_int32();
 
-        int32_t readInt32();
+        int16_t read_int16();
 
-        int16_t readInt16();
+        int8_t read_int8();
 
-        int8_t readInt8();
+        int64_t peek_int64() const;
 
-        int64_t peekInt64() const;
+        int32_t peek_int32() const;
 
-        int32_t peekInt32() const;
+        int16_t peek_int16() const;
 
-        int16_t peekInt16() const;
-
-        int8_t peekInt8() const;
+        int8_t peek_int8() const;
 
     private:
         std::vector<char> _buff;

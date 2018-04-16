@@ -188,37 +188,37 @@ namespace net
         append(static_cast<char*>(data),len);
     }
 
-    void Buffer::appendInt64(int64_t x)
+    void Buffer::append_int64(int64_t x)
     {
         int64_t be64 = htobe64(x);
         append(&be64, sizeof be64);
     }
 
-    void Buffer::appendInt32(int32_t x)
+    void Buffer::append_int32(int32_t x)
     {
         int32_t be32 = htobe32(x);
         append(&be32, sizeof be32);
     }
 
-    void Buffer::appendInt16(int16_t x)
+    void Buffer::append_int16(int16_t x)
     {
         int16_t be16 = htobe16(x);
         append(&be16, sizeof be16);
     }
 
-    void Buffer::appendInt8(int8_t x)
+    void Buffer::append_int8(int8_t x)
     {
         append(&x, sizeof x);
     }
 
-    int8_t Buffer::peekInt8() const
+    int8_t Buffer::peek_int8() const
     {
         assert(get_readable_size() >= sizeof(int8_t));
         int8_t x = *get_read_ptr();
         return x;
     }
 
-    int16_t Buffer::peekInt16() const
+    int16_t Buffer::peek_int16() const
     {
         assert(get_readable_size() >= sizeof(int16_t));
         int16_t be16 = 0;
@@ -226,7 +226,7 @@ namespace net
         return be16toh(be16);
     }
 
-    int32_t Buffer::peekInt32() const
+    int32_t Buffer::peek_int32() const
     {
         assert(get_readable_size() >= sizeof(int32_t));
         int32_t be32 = 0;
@@ -234,7 +234,7 @@ namespace net
         return be32toh(be32);
     }
 
-    int64_t Buffer::peekInt64() const
+    int64_t Buffer::peek_int64() const
     {
         assert(get_readable_size() >= sizeof(int64_t));
         int64_t be64 = 0;
@@ -242,30 +242,30 @@ namespace net
         return be64toh(be64);
     }
 
-    int8_t Buffer::readInt8()
+    int8_t Buffer::read_int8()
     {
-        int8_t result = peekInt8();
+        int8_t result = peek_int8();
         has_read(sizeof(int8_t));
         return result;
     }
 
-    int16_t Buffer::readInt16()
+    int16_t Buffer::read_int16()
     {
-        int16_t result = peekInt16();
+        int16_t result = peek_int16();
         has_read(sizeof(int16_t));
         return result;
     }
 
-    int32_t Buffer::readInt32()
+    int32_t Buffer::read_int32()
     {
-        int32_t result = peekInt32();
+        int32_t result = peek_int32();
         has_read(sizeof(int32_t));
         return result;
     }
 
-    int64_t Buffer::readInt64()
+    int64_t Buffer::read_int64()
     {
-        int64_t result = peekInt64();
+        int64_t result = peek_int64();
         has_read(sizeof(int64_t));
         return result;
     }
