@@ -11,7 +11,7 @@ namespace net
 
     TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize)
             : _loop(loop)
-              , _pool(threadSize)
+              , _pool(loop,threadSize)
               , _th_size(threadSize)
               , _status(Stopped)
     {
@@ -127,10 +127,7 @@ namespace net
 
     EventLoop *TcpServer::get_next_loop()
     {
-        if (_th_size > 0)
-            return _pool.get_next_loop();
-        return _loop;
-
+        return _pool.get_next_loop();
     }
 
     void TcpServer::set_connection_cb(const ConnectingCallback &cb)

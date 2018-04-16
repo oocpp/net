@@ -11,7 +11,7 @@ namespace net
     class EventLoopThreadPool
     {
     public:
-        EventLoopThreadPool(size_t threadNum = 0);
+        EventLoopThreadPool(EventLoop*loop,size_t threadNum = 0);
 
         EventLoopThreadPool(const EventLoopThreadPool &) = delete;
         EventLoopThreadPool &operator==(const EventLoopThreadPool &)= delete;
@@ -27,6 +27,7 @@ namespace net
     private:
         size_t next_loop_index();
 
+        EventLoop*_loop;
         std::vector<EventLoopThread> _threads;
         size_t _loop_index;
     };

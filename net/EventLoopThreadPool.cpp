@@ -18,8 +18,9 @@ void net::EventLoopThreadPool::join()
         t.join();
 }
 
-net::EventLoopThreadPool::EventLoopThreadPool(size_t threadNum)
-        : _threads(threadNum)
+net::EventLoopThreadPool::EventLoopThreadPool(EventLoop*loop,size_t threadNum)
+        :_loop(loop)
+        ,_threads(threadNum)
           , _loop_index(0)
 {
 
@@ -34,5 +35,10 @@ size_t net::EventLoopThreadPool::next_loop_index()
 
 net::EventLoop *net::EventLoopThreadPool::get_next_loop()
 {
-    return _threads[next_loop_index()].get_loop();
+    if (_threads.empty()) {
+        return _loop;
+    }
+    else{
+        return _threads[next_loop_index()].get_loop();
+    }
 }
