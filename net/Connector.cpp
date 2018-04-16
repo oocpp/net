@@ -13,7 +13,7 @@ namespace net
               , _retry_delay_ms(init_retry_delay_ms + 0)
     {
         _event.set_write_cb([this]{handle_write();});
-        //_event.set_close_cb([this] { handle_error(); });
+        //_event.set_error_cb([this]{handle_error();});
     }
 
     Connector::~Connector() noexcept
@@ -183,10 +183,10 @@ namespace net
 
         _event.set_fd(fd);
         //_event.set_write_cb(std::bind(&Connector::handle_write, this));
-        //_event.set_close_cb(std::bind(&Connector::handle_error, this));
+        //_event.set_error_cb(std::bind(&Connector::handle_error, this));
 
         //_event.set_write_cb([this]{handle_write();});
-        //_event.set_close_cb([this]{handle_error();});
+        //_event.set_error_cb([this]{handle_error();});
 
 
         _event.enable_write();
