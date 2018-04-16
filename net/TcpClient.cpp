@@ -43,9 +43,10 @@ namespace net
         if (_status == Disconnected)
             return;
 
-        _status = Disconnected;
-        _connector->cancel();
-        _loop->run_in_loop([this] { disconnect_in_loop(); });
+        if (_status.exchange(Disconnected) == Connecting)
+            _connector->cancel();
+        else
+            _loop->run_in_loop([this] { disconnect_in_loop(); });
     }
 
     void TcpClient::disconnect_in_loop()

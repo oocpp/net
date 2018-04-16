@@ -57,11 +57,12 @@ namespace net
         if (_status == Disconnected)
             return;
 
-        _status = Disconnected;
-        //_loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
+        if(_status.exchange(Disconnected) ==Connecting) {
+            //_loop->run_in_loop(std::bind(&Connector::stop_in_loop, this));
 
-        auto temp = shared_from_this();
-        _loop->run_in_loop([temp] { temp->stop_in_loop(); });
+            auto temp = shared_from_this();
+            _loop->run_in_loop([temp] { temp->stop_in_loop(); });
+        }
     }
 
     void Connector::connect()
