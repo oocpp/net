@@ -22,19 +22,19 @@ namespace net
         static constexpr uint32_t NoneEvent = 0;
         static constexpr uint32_t ReadEvent = EPOLLIN | EPOLLPRI;
         static constexpr uint32_t WriteEvent = EPOLLOUT;
-        //static constexpr uint32_t ErrorEvent = EPOLLERR;
+        static constexpr uint32_t CloseEvent = EPOLLRDHUP;
 
         void set_read_cb(const ReadEventCallback &cb);
 
         void set_write_cb(const EventCallback &cb);
 
-        void set_error_cb(const EventCallback &cb);
+        void set_close_cb(const EventCallback &cb);
 
         void set_read_cb(ReadEventCallback &&cb)noexcept;
 
         void set_write_cb(EventCallback &&cb)noexcept;
 
-        void set_error_cb(EventCallback &&cb)noexcept;
+        void set_close_cb(EventCallback &&cb)noexcept;
 
         void enable_read();
 
@@ -79,7 +79,7 @@ namespace net
 
         ReadEventCallback _read_cb;
         EventCallback _write_cb;
-        EventCallback _error_cb;
+        EventCallback _close_cb;
     };
 }
 

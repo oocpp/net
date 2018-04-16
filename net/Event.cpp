@@ -22,7 +22,7 @@ namespace net
     , _events(e._events)
     , _read_cb(std::move(e._read_cb))
     , _write_cb(std::move(e._write_cb))
-    , _error_cb(std::move(e._error_cb))
+    , _close_cb(std::move(e._close_cb))
     {
         e._loop= nullptr;
         e._fd=-1;
@@ -116,8 +116,11 @@ namespace net
        //     _error_cb();
         //    return ;
         //}
-        if ((event & ReadEvent) && _read_cb) {
-            _read_cb();
+
+        if ((event & CloseEvent) && _close_cb) {
+            LOG_TRACE<<"event close";
+            _close_cb();
+            return;
         }
 
         if ((event & ReadEvent) && _read_cb) {
@@ -144,9 +147,9 @@ namespace net
         _write_cb = cb;
     }
 
-    void Event::set_error_cb(const EventCallback &cb)
+    void Event::set_close_cb(const EventCallback &cb)
     {
-        _error_cb = cb;
+        _close_cb = cb;
     }
 
     void Event::set_read_cb(ReadEventCallback &&cb) noexcept
@@ -159,9 +162,9 @@ namespace net
         _write_cb = std::move(cb);
     }
 
-    void Event::set_error_cb(EventCallback &&cb)noexcept
+    void Event::set_close_cb(EventCallback &&cb)noexcept
     {
-        _error_cb = std::move(cb);
+        _close_cb = std::move(cb);
     }
 
     int Event::get_fd() const noexcept
