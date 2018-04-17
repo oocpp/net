@@ -1,28 +1,9 @@
-cmake_minimum_required(VERSION 3.9)
-project(net)
-
 set(CMAKE_CXX_STANDARD 11)
-
-set(CXX_FLAGS
-        -Wall
-        -Wextra
-        -Werror
-        -Wconversion
-        -Wno-unused-parameter
-        -Wold-style-cast
-        -Woverloaded-virtual
-        -Wpointer-arith
-        -Wshadow
-        -Wwrite-strings
-        )
-
-SET(CMAKE_CXX_FLAGS_DEBUG  "$ENV{CXXFLAGS} -g")
-SET(CMAKE_CXX_FLAGS_RELEASE  "$ENV{CXXFLAGS} -O3")
 
 include(CheckFunctionExists)
 check_function_exists(accept4 HAVE_ACCEPT4)
 
-link_libraries(pthread)
+link_libraries(${DEPENDENT_LIBRARIES})
 
 set(SOURCE_FILES
         Socket.cpp
@@ -43,16 +24,17 @@ set(SOURCE_FILES
         Log.cpp
         )
 
+set(target_name ${lib_name})
+
 set(NET_LIBRARY 1)  #设置为0，用来与main.cpp编译成可执行程序，便于调试
 
 if(NET_LIBRARY)
-    SET(lib_name "net")
-    add_library(${lib_name} STATIC ${SOURCE_FILES})
+    add_library(${target_name} STATIC ${SOURCE_FILES})
 
-    set_target_properties(${lib_name}
+    set_target_properties(${target_name}
             PROPERTIES
-            OUTPUT_NAME_DEBUG ${lib_name}d
-            OUTPUT_NAME ${lib_name}
+            OUTPUT_NAME_DEBUG ${target_name}d
+            OUTPUT_NAME ${target_name}
             )
 
     set(HEAD_FILES
@@ -76,8 +58,11 @@ if(NET_LIBRARY)
             CallBack.h
             )
 
-    INSTALL(TARGETS ${lib_name} ARCHIVE DESTINATION ${PROJECT_SOURCE_DIR}/../net_library/lib_static/)
-    INSTALL(FILES ${HEAD_FILES} DESTINATION ${PROJECT_SOURCE_DIR}/../net_library/include/)
+    INSTALL(FILES ${HEAD_FILES} DESTINATION ${PROJECT_BINARY_DIR}/include/)
+    ADD_CUSTOM_COMMAND(TARGET ${target_name}
+            POST_BUILD
+            COMMAND make install
+    )
 
 else()
     add_executable(net main.cpp ${SOURCE_FILES})
