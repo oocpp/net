@@ -78,8 +78,9 @@ namespace net
 
         void close(int sockfd)
         {
-            ::close(sockfd);
-            LOG_INFO << "fd= " << sockfd << "close";
+            if(::close(sockfd)<0) {
+                LOG_ERROR << "fd= " << sockfd << "close";
+            }
         }
 
         int accept(int sockfd, InetAddress &peeraddr)
@@ -118,10 +119,7 @@ namespace net
                         break;
                 }
             }
-            else {
-                SetKeepAlive(connfd, true);
-                setTcpNoDelay(connfd, true);
-            }
+
             return connfd;
         }
 
@@ -134,15 +132,12 @@ namespace net
 
         int create_nonblocking_socket(sa_family_t family)
         {
-
             int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
 
             if (sockfd < 0) {
                 LOG_ERROR << "sockets::createNonblockingOrDie";
             }
 
-            setTcpNoDelay(sockfd, true);
-            SetKeepAlive(sockfd, true);
             SetReuseAddr(sockfd);
             SetReusePort(sockfd);
             return sockfd;
@@ -171,7 +166,6 @@ namespace net
         sockaddr_in get_peer_addr(int fd)
         {
             struct sockaddr_in peeraddr{};
-            bzero(&peeraddr, sizeof peeraddr);
             auto addrlen = static_cast<socklen_t>(sizeof peeraddr);
             if (::getpeername(fd, reinterpret_cast< sockaddr *>(&peeraddr), &addrlen) < 0) {
                 LOG_ERROR << "sockets::getPeerAddr";
@@ -182,7 +176,6 @@ namespace net
         sockaddr_in get_local_addr(int fd)
         {
             sockaddr_in localaddr{};
-            bzero(&localaddr, sizeof localaddr);
             auto addrlen = static_cast<socklen_t>(sizeof localaddr);
             if (::getsockname(fd, reinterpret_cast< sockaddr *>(&localaddr), &addrlen) < 0) {
                 LOG_ERROR << "sockets::getLocalAddr";
