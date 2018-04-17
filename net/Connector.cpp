@@ -33,6 +33,16 @@ namespace net
         _new_conn_cb = std::move(cb);
     }
 
+    void Connector::set_connect_error_cb(Connector::NewConnCallback &&cb) noexcept
+    {
+        _error_cb = cb;
+    }
+
+    void Connector::set_connect_error_cb(const Connector::NewConnCallback &cb)
+    {
+        _error_cb = std::move(cb);
+    }
+
     void Connector::start()
     {
         LOG_TRACE << "state = " << _status;
