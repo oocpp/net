@@ -172,6 +172,7 @@ void Session::onConnection(const TCPConnPtr& conn)
 {
   if (conn->is_connected())
   {
+      conn->set_tcp_no_delay(true);
     conn->send(owner_->message());
     owner_->onConnect();
   }

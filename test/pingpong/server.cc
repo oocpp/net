@@ -19,6 +19,8 @@ using namespace std::placeholders;
 
 void onConnection(const TCPConnPtr& conn)
 {
+    if(conn->is_connected())
+    conn->set_tcp_no_delay(true);
 }
 
 void onMessage(const TCPConnPtr& conn, Buffer* buf)
