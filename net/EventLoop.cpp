@@ -83,8 +83,8 @@ namespace net
             LOG_TRACE<<_events.size();
             do_pending_fn();
         }
+        do_pending_fn();
         LOG_TRACE << " loop stop" << std::endl;
-        _is_looping = false;
     }
 
     void EventLoop::stop()

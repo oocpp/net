@@ -31,16 +31,19 @@ private:
         LOG_INFO<<conn->get_peer_addr().toIp()<<":"<<conn->get_peer_addr().toPort()<<" is "
                 <<((conn->is_connected())?"up":"down");
 
-        if(conn->is_connected())
+        if(conn->is_connected()) {
+            conn->set_tcp_no_delay(true);
             conns.insert(conn);
+        }
         else
             conns.erase(conn);
     }
 
     void onMessage(const TCPConnPtr &conn,Buffer*message){
+        
         for(auto&t:conns) {
             if (t != conn) {
-                t->send(message);
+                t->send(message->get_read_ptr(),message->get_readable_size());
             }
         }
         message->clear();

@@ -39,8 +39,10 @@ private:
         LOG_INFO << conn->get_local_addr().toIp() << ":" << conn->get_local_addr().toPort() << " is "
                  << ((conn->is_connected()) ? "up" : "down");
 
-        if (conn->is_connected())
+        if (conn->is_connected()) {
+            conn->set_tcp_no_delay(true);
             std::atomic_store(&conns, conn);
+        }
         else
             conns.reset();
     }
@@ -59,7 +61,7 @@ private:
 
 int main() {
 
-    Log::set_rank(2);
+    Log::set_rank(0);
 
     EventLoopThread loop;
     loop.run();
