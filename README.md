@@ -5,7 +5,7 @@ net是一个基于Reactor 模式的现代化C++11网络库。
 
 自带TCP协议的异步非阻塞式的服务器和客户端库。
 
-实现上深度借鉴[muduo]和[evpp]两个开源网络库。
+实现上深度借鉴[muduo](https://github.com/chenshuo/muduo)和[evpp](https://github.com/Qihoo360/evpp)两个开源网络库。
 
 性能上没太多测试，不过个人感觉性能还不错。。。
 
