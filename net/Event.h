@@ -11,7 +11,7 @@ namespace net
     class Event
     {
     public:
-        Event(EventLoop *loop, int fd, bool r = false, bool w = false)noexcept;
+        Event(EventLoop *loop, int fd = -1, bool r = false, bool w = false)noexcept;
 
         ~Event()noexcept;
         Event(const Event&)=delete;

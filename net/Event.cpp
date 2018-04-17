@@ -7,22 +7,21 @@ namespace net
 {
     Event::Event(EventLoop *loop, int fd, bool r, bool w) noexcept
             : _loop(loop)
-              , _fd(fd)
-              , _add_to_loop(false)
-            //,_active_event(NoneEvent)
-              , _events((r ? ReadEvent : NoneEvent) | (w ? WriteEvent : NoneEvent))
+            , _fd(fd)
+            , _add_to_loop(false)
+            , _events((r ? ReadEvent : NoneEvent) | (w ? WriteEvent : NoneEvent))
     {
 
     }
 
     Event::Event(Event &&e) noexcept
         :_loop(e._loop)
-    , _fd(e._fd)
-    , _add_to_loop(e._add_to_loop)
-    , _events(e._events)
-    , _read_cb(std::move(e._read_cb))
-    , _write_cb(std::move(e._write_cb))
-    , _close_cb(std::move(e._close_cb))
+        , _fd(e._fd)
+        , _add_to_loop(e._add_to_loop)
+        , _events(e._events)
+        , _read_cb(std::move(e._read_cb))
+        , _write_cb(std::move(e._write_cb))
+        , _close_cb(std::move(e._close_cb))
     {
         e._loop= nullptr;
         e._fd=-1;
@@ -109,16 +108,7 @@ namespace net
 
     void Event::handle_event(uint32_t event)
     {
-       // if ((event & ErrorEvent)) {
-       //     LOG_TRACE<<"Error Event";
-       //     //if(_error_cb)
-       //     assert(_error_cb);
-       //     _error_cb();
-        //    return ;
-        //}
-
         if ((event & CloseEvent) && _close_cb) {
-            LOG_TRACE<<"event close";
             _close_cb();
             return;
         }
