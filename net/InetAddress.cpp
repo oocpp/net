@@ -1,5 +1,6 @@
 #include <arpa/inet.h>
 #include <cstring>
+#include <cassert>
 
 #include "Log.h"
 #include "InetAddress.h"
@@ -35,15 +36,10 @@ namespace net
         return ntohs(_addr.sin_port);
     }
 
-    uint32_t InetAddress::ipNetEndian() const
-    {
-        return _addr.sin_addr.s_addr;
-    }
-
     InetAddress::InetAddress(const struct sockaddr_in &addr)
             : _addr(addr)
     {
-
+        assert(addr.sin_family==AF_INET);
     }
 
     const sockaddr *InetAddress::get_sockaddr() const
@@ -64,5 +60,17 @@ namespace net
     in_port_t InetAddress::get_port() const
     {
         return _addr.sin_port;
+    }
+
+    uint32_t InetAddress::get_ip() const
+    {
+        return _addr.sin_addr.s_addr;
+    }
+
+    bool InetAddress::operator==(const InetAddress &another) const noexcept
+    {
+        return (another.get_family() == _addr.sin_family
+                &&another.get_port() == _addr.sin_port
+                && another.get_ip() == _addr.sin_addr.s_addr);
     }
 }
