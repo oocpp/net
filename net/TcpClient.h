@@ -53,6 +53,8 @@ namespace net
 
         void on_remove_connection(const TCPConnPtr &conn);
 
+        void handle_connect_failed(int fd, const InetAddress &addr);
+
         enum Status
         {
             Disconnected = 0,

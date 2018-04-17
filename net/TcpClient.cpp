@@ -18,9 +18,9 @@ namespace net
               , _retry(true)
               , _status(Disconnected)
     {
-        //_connector->set_new_connection_cb(std::bind(&TcpClient::on_new_connection, this, _1, _2));
-
         _connector->set_new_connection_cb([this](int fd, const InetAddress &addr){on_new_connection(fd,addr);});
+
+        _connector->set_connect_error_cb([this](int fd, const InetAddress &addr) { handle_connect_failed(fd, addr); });
     }
 
     TcpClient::~TcpClient()noexcept
@@ -161,6 +161,12 @@ namespace net
     {
         assert(_status == Disconnected);
         _write_complete_cb = std::move(cb);
+    }
+
+    void TcpClient::handle_connect_failed(int fd, const InetAddress &addr)
+    {
+        LOG_ERROR<<"connect failed";
+        abort();
     }
 
 }
