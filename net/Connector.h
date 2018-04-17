@@ -26,9 +26,9 @@ namespace net
 
         void set_new_connection_cb(NewConnCallback &&cb)noexcept;
 
-        void set_error_cb(const NewConnCallback &cb);
+        void set_connect_error_cb(const NewConnCallback &cb);
 
-        void set_error_cb(NewConnCallback &&cb)noexcept;
+        void set_connect_error_cb(NewConnCallback &&cb)noexcept;
 
         void start();
 
@@ -47,7 +47,7 @@ namespace net
 
         void handle_write();
 
-        void handle_error();
+        void handle_error(int sockfd);
 
         enum Status
         {
@@ -61,7 +61,7 @@ namespace net
         static constexpr int max_retry_delay_ms = 10 * 1000;
     private:
         EventLoop *_loop;
-        InetAddress _addr;
+        InetAddress _peer_addr;
         NewConnCallback _new_conn_cb;
         NewConnCallback _error_cb;
         std::atomic<Status> _status;
