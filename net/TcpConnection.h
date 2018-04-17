@@ -76,6 +76,7 @@ namespace net
 
         InetAddress get_peer_addr() const noexcept;
 
+        void set_tcp_no_delay(bool on);
     private:
         void handle_read();
 

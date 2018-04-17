@@ -322,4 +322,9 @@ namespace net
     {
         return _sockfd;
     }
+
+    void TcpConnection::set_tcp_no_delay(bool on)
+    {
+        Socket::setTcpNoDelay(_sockfd,on);
+    }
 }
