@@ -18,8 +18,8 @@ namespace net
               , _retry(true)
               , _status(Disconnected)
     {
+        LOG_TRACE;
         _connector->set_new_connection_cb([this](int fd, const InetAddress &addr){on_new_connection(fd,addr);});
-
         _connector->set_connect_error_cb([this](int fd, const InetAddress &addr) { handle_connect_failed(fd, addr); });
     }
 
@@ -30,6 +30,7 @@ namespace net
 
     void TcpClient::connect()
     {
+        LOG_TRACE;
         assert(_status == Disconnected);
 
         Status t = Disconnected;
@@ -40,6 +41,7 @@ namespace net
 
     void TcpClient::disconnect()
     {
+        LOG_TRACE;
         if (_status == Disconnected)
             return;
 
@@ -67,9 +69,6 @@ namespace net
             _connection->set_message_cb(_message_cb);
             _connection->set_connection_cb(_connecting_cb);
             _connection->set_write_complete_cb(_write_complete_cb);
-            //temp->set_close_cb(std::bind(&TcpClient::on_remove_connection, this, _1));
-
-            //_loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, _connection));
 
             _connection->set_close_cb([this](const TCPConnPtr &conn){on_remove_connection(conn);});
 

@@ -12,10 +12,11 @@ namespace net
     TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize)
             : _loop(loop)
               , _pool(loop,threadSize)
+              ,_name(name)
               , _th_size(threadSize)
               , _status(Stopped)
     {
-        LOG_TRACE << "server";
+        LOG_TRACE << "server:"<<_name;
         add_acceptor(addr);
     }
 
@@ -25,7 +26,6 @@ namespace net
         LOG_TRACE;
 
         _accepters.emplace_back(_loop,addr);
-        //_accepters.back().set_new_connection_cb(std::bind(&TcpServer::handle_new_connection, this, _1, _2));
         _accepters.back().set_new_connection_cb([this](int fd, const InetAddress &addr){handle_new_connection(fd,addr);});
 
         LOG_TRACE<<_accepters.size();
@@ -38,6 +38,7 @@ namespace net
 
     void TcpServer::run()
     {
+        LOG_TRACE;
         assert(_status == Stopped);
 
         Status t = Stopped;
@@ -50,12 +51,12 @@ namespace net
 
     void TcpServer::stop()
     {
+        LOG_TRACE;
         assert(_status == Running);
 
         Status t = Running;
 
         if (_status.compare_exchange_strong(t, Stopping)) {
-            //_loop->run_in_loop(std::bind(&TcpServer::stop_in_loop, this));
             _loop->run_in_loop([this]{stop_in_loop();});
             _pool.join();
         }
@@ -96,9 +97,6 @@ namespace net
         conn->set_message_cb(_message_cb);
         conn->set_connection_cb(_connecting_cb);
         conn->set_write_complete_cb(_write_complete_cb);
-        //conn->set_close_cb(std::bind(&TcpServer::remove_connection, this, _1));
-
-        //loop->run_in_loop(std::bind(&TcpConnection::attach_to_loop, conn));
 
         conn->set_close_cb([this](const TCPConnPtr &conn){remove_connection(conn);});
 
@@ -108,7 +106,6 @@ namespace net
 
     void TcpServer::remove_connection(const TCPConnPtr &conn)
     {
-        //_loop->run_in_loop(std::bind(&TcpServer::remove_connection_in_loop, this, conn));
         _loop->run_in_loop([this,conn]{remove_connection_in_loop(conn);});
     }
 
@@ -117,8 +114,6 @@ namespace net
         assert(_loop->in_loop_thread());
 
         _connections.erase(conn->get_id());
-        //EventLoop* loop = conn->get_loop();
-        //loop->queue_in_loop(std::bind(&TcpConnection::connectDestroyed, conn));
 
         LOG_TRACE << "remove id=" << conn->get_id();
     }
@@ -163,5 +158,4 @@ namespace net
         assert(_status==Stopped);
         _write_complete_cb = std::move(cb);
     }
-
 }

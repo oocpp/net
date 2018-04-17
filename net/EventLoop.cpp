@@ -68,21 +68,20 @@ namespace net
     {
         assert(!_is_looping);
         assert(_th_id == std::this_thread::get_id());
+        LOG_TRACE;
 
         bool t = false;
         if (!_is_looping.compare_exchange_strong(t, true))
             return;
 
         while (_is_looping) {
-
             _poll.wait(-1, _events);
 
             for (auto &e:_events)
                 reinterpret_cast<Event *>(e.data.ptr)->handle_event(e.events);
 
+            LOG_TRACE<<_events.size();
             do_pending_fn();
-
-            LOG_TRACE << "poll " << _events.size();
         }
         LOG_TRACE << " loop stop" << std::endl;
         _is_looping = false;
@@ -90,8 +89,9 @@ namespace net
 
     void EventLoop::stop()
     {
-        bool t = true;
+        LOG_TRACE;
 
+        bool t = true;
         if (_is_looping.compare_exchange_strong(t, false)) {
             wakeup();
         }
@@ -99,7 +99,6 @@ namespace net
 
     void EventLoop::wakeup()
     {
-        LOG_TRACE;
         uint64_t one = 1;
         ssize_t n = ::write(_wake_fd, &one, sizeof one);
         if (n != sizeof one) {
@@ -109,7 +108,6 @@ namespace net
 
     void EventLoop::handle_wakeup_read()
     {
-        LOG_TRACE;
         uint64_t one = 1;
         ssize_t n = ::read(_wake_fd, &one, sizeof one);
         if (n != sizeof one) {
@@ -140,7 +138,6 @@ namespace net
 
     void EventLoop::run_in_loop(const std::function<void()> &cb)
     {
-        LOG_TRACE;
         if (in_loop_thread()) {
             cb();
         }
@@ -151,7 +148,6 @@ namespace net
 
     void EventLoop::run_in_loop(std::function<void()> &&cb)
     {
-        LOG_TRACE;
         if (in_loop_thread()) {
             cb();
         }
@@ -191,15 +187,12 @@ namespace net
 
     void EventLoop::do_pending_fn()
     {
-
         std::vector<std::function<void()>> fns;
         _is_pending_fns = true;
         {
             std::lock_guard<std::mutex> l(_mu);
             fns.swap(_pending_fns);
         }
-
-        LOG_TRACE << fns.size();
 
         for (auto &f:fns)
             f();
@@ -245,6 +238,4 @@ namespace net
     {
         return _timers.add_timer(std::move(cb), TimerQueue::now() + ms, ms);
     }
-
-
 }

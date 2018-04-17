@@ -16,9 +16,6 @@ namespace net
               , _local_addr(local_addr)
               , _peer_addr(peer_add)
     {
-        //_event.set_read_cb(std::bind(&TcpConnection::handle_read, this));
-        //_event.set_write_cb(std::bind(&TcpConnection::handle_write, this));
-
         _event.set_read_cb([this]{handle_read();});
         _event.set_write_cb([this]{handle_write();});
         _event.set_close_cb([this] { handle_close(); });
@@ -26,7 +23,6 @@ namespace net
 
     TcpConnection::~TcpConnection()noexcept
     {
-        LOG_TRACE;
         assert(_status==Disconnected);
         Socket::close(_sockfd);
     }
@@ -35,8 +31,6 @@ namespace net
     {
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Disconnecting)) {
-            LOG_TRACE << "fd=" << _sockfd;
-            //_loop->queue_in_loop(std::bind(&TcpConnection::handle_close, shared_from_this()));
 
             auto temp=shared_from_this();
             _loop->queue_in_loop([temp,call_close_cb]{temp->handle_close(call_close_cb);});
@@ -113,7 +107,6 @@ namespace net
             return;
         }
         else {
-            //_loop->run_in_loop(std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), str));
             auto temp=shared_from_this();
             _loop->run_in_loop([temp,str](){temp->send_string_in_loop(str);});
         }
