@@ -87,11 +87,9 @@ namespace net
             LOG_INFO << "server is stopping";
             return;
         }
-
-        LOG_TRACE << "get_fd=" << fd;
+        Socket::SetKeepAlive(fd,true);
 
         EventLoop *loop = get_next_loop();
-
 
         TCPConnPtr conn(new TcpConnection(_next_conn_id++, loop, fd, _addr, addr));
 
