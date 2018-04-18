@@ -270,4 +270,9 @@ namespace net
         has_read(sizeof(int64_t));
         return result;
     }
+
+    void Buffer::reserve(size_t len)
+    {
+        _buff.resize(len);
+    }
 }

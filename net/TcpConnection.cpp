@@ -16,14 +16,14 @@ namespace net
               , _local_addr(local_addr)
               , _peer_addr(peer_add)
     {
-        _event.set_read_cb([this]{handle_read();});
-        _event.set_write_cb([this]{handle_write();});
+        _event.set_read_cb([this] { handle_read(); });
+        _event.set_write_cb([this] { handle_write(); });
         _event.set_close_cb([this] { handle_close(); });
     }
 
     TcpConnection::~TcpConnection()noexcept
     {
-        assert(_status==Disconnected);
+        assert(_status == Disconnected);
         Socket::close(_sockfd);
     }
 
@@ -32,8 +32,8 @@ namespace net
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Disconnecting)) {
 
-            auto temp=shared_from_this();
-            _loop->queue_in_loop([temp,call_close_cb]{temp->handle_close(call_close_cb);});
+            auto temp = shared_from_this();
+            _loop->queue_in_loop([temp, call_close_cb] { temp->handle_close(call_close_cb); });
         }
     }
 
@@ -57,11 +57,11 @@ namespace net
             _message_cb(shared_from_this(), &_in_buff);
         }
         else if (r.first == 0) {
-             handle_close();
+            handle_close();
         }
         else {
             errno = r.second;
-            LOG_ERROR << "TcpConnection::handle_expire ->"<< r.second;
+            LOG_ERROR << "TcpConnection::handle_expire ->" << r.second;
             handle_error();
         }
     }
@@ -70,7 +70,7 @@ namespace net
     {
         assert(_loop->in_loop_thread());
 
-        if (_status.exchange(Disconnected)!=Disconnected) {
+        if (_status.exchange(Disconnected) != Disconnected) {
 
             _event.disable_all();
 
@@ -107,8 +107,8 @@ namespace net
             return;
         }
         else {
-            auto temp=shared_from_this();
-            _loop->run_in_loop([temp,str](){temp->send_string_in_loop(str);});
+            auto temp = shared_from_this();
+            _loop->run_in_loop([temp, str]() { temp->send_string_in_loop(str); });
         }
     }
 
@@ -122,7 +122,8 @@ namespace net
             return;
         }
         else {
-            _loop->run_in_loop(std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), std::string(str, len)));
+            _loop->run_in_loop(
+                    std::bind(&TcpConnection::send_string_in_loop, shared_from_this(), std::string(str, len)));
         }
     }
 
@@ -318,6 +319,16 @@ namespace net
 
     void TcpConnection::set_tcp_no_delay(bool on)
     {
-        Socket::setTcpNoDelay(_sockfd,on);
+        Socket::setTcpNoDelay(_sockfd, on);
+    }
+
+    void TcpConnection::reserve_input_buffer(size_t len)
+    {
+        _in_buff.reserve(len);
+    }
+
+    void TcpConnection::reserve_output_buffer(size_t len)
+    {
+        _out_buff.reserve(len);
     }
 }

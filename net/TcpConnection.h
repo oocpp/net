@@ -77,6 +77,10 @@ namespace net
         InetAddress get_peer_addr() const noexcept;
 
         void set_tcp_no_delay(bool on);
+
+        void reserve_input_buffer(size_t len);
+        
+        void reserve_output_buffer(size_t len);
     private:
         void handle_read();
 
@@ -111,7 +115,7 @@ namespace net
 
         Any _context;
 
-        size_t _high_level_mark = 64 * 1024 * 1024; // Default 128MB
+        size_t _high_level_mark = 64 * 1024 * 1024; // Default 64MB
 
         CloseCallback _close_cb;
         ConnectingCallback _connecting_cb;
