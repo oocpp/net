@@ -7,7 +7,7 @@
 
 namespace net
 {
-    InetAddress::InetAddress(const std::string &ip, in_port_t port, sa_family_t family)
+    InetAddress::InetAddress(const std::string &ip, uint16_t port, sa_family_t family)
     {
         std::memset(&_addr, 0, get_sockaddr_size());
 

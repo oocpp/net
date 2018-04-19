@@ -10,7 +10,7 @@ namespace net
     public:
         InetAddress() = default;
 
-        explicit InetAddress(const std::string &ip, in_port_t port = 0, sa_family_t family = AF_INET);
+        explicit InetAddress(const std::string &ip, uint16_t port = 0, sa_family_t family = AF_INET);
 
         explicit InetAddress(const sockaddr_in &addr);
 
