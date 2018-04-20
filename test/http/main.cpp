@@ -30,7 +30,7 @@ int main() {
     Log::set_rank(2);
     EventLoop loop;
 
-    InetAddress addr("112.74.86.0", 55555);
+    InetAddress addr("127.0.0.1", 55555);
     TcpServer ser(&loop, addr, "http server", 3);
 
     ser.set_message_cb(http_echo);

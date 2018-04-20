@@ -23,23 +23,18 @@ namespace net
 
     class Log
     {
-    public:
-
+    private:
+        Log & init_impl(const char *file,const int line, const char *func);
     public:
         Log() = default;
 
         template<int N>
-        Log &init(const char *file, int line, const char *func)
+        Log &init(const char *file,const int line, const char *func)
         {
-            this->func = func;
-            this->file = file + N;
-            this->line = line;
-
-            print_time();
-            return *this;
+            return init_impl(file+N,line,func);
         }
 
-        ~Log() ;
+        ~Log()noexcept ;
 
         Log &print_time();
 
@@ -76,15 +71,15 @@ namespace net
 }
 
 #define LOG_TRACE if(net::Log::get_rank()<1)\
-    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__)<<"[trace] "
+    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__).print_time()<<"[trace] "
 #define LOG_DEBUG if(net::Log::get_rank()<2)\
-    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__)<<"[debug] "
+    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__).print_time()<<"[debug] "
 #define LOG_INFO  if(net::Log::get_rank()<3)\
-    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__)<<"[info ] "
+    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__).print_time()<<" [info] "
 #define LOG_WARN  if(net::Log::get_rank()<4)\
-    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__)<<"[warn ] "
+    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__).print_time()<<" [warn] "
 #define LOG_ERROR if(net::Log::get_rank()<5)\
-    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__)<<"[error] "
+    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__).print_time()<<"[error] "
 #define LOG_FATAL if(net::Log::get_rank()<6)\
-    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__)<<"[fatal] "
+    net::Log{}.init<net::impl::get_base_index(__FILE__,sizeof(__FILE__)-1)>(__FILE__,__LINE__,__func__).print_time()<<"[fatal] "
 
