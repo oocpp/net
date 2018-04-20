@@ -3,6 +3,8 @@
 #include<cstring>
 #include<iomanip>
 #include <cassert>
+#include <syscall.h>
+#include <unistd.h>
 #include"Log.h"
 
 namespace net
@@ -59,11 +61,13 @@ namespace net
                                tm_time.tm_year + 1900, tm_time.tm_mon + 1, tm_time.tm_mday,
                                tm_time.tm_hour, tm_time.tm_min, tm_time.tm_sec);
             assert(len == 17);
-
         }
 
-        static thread_local std::thread::id id = std::this_thread::get_id();
-        out << t_time << '.' << std::setfill('0') << std::setw(6) << micr << ' ' << id << ' ';
+        static thread_local pid_t th_id = []{
+                return static_cast<pid_t>(::syscall(SYS_gettid));
+        }();
+
+        out << t_time << '.' << std::setfill('0') << std::setw(6) << micr << ' ' <<std::setfill('0') << std::setw(6)<< th_id << ' ';
         return *this;
     }
 

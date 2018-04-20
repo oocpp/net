@@ -13,7 +13,7 @@ class ChatServer{
 public:
     ChatServer(EventLoop*loop,const InetAddress&addr)
             :loop(loop)
-            ,ser(loop,addr,"ChatServer",0){
+            ,ser(loop,addr,"ChatServer",2){
         ser.set_connection_cb(std::bind(&ChatServer::onConnection,this,_1));
         ser.set_message_cb(std::bind(&ChatServer::onMessage,this,_1,_2));
     }
@@ -60,18 +60,24 @@ int main()
     Log::set_rank(2);
 
     EventLoop loop;
+
     InetAddress addr("127.0.0.1", 55555);
     ChatServer c(&loop, addr);
 
     c.start();
 
-    loop.run();
+    //loop.run_after(60s,[&c,&loop]{
+    //    c.stop();
+    //    loop.stop();
+    //});
 
-std::this_thread::sleep_for(5s);
-    c.start();
-    loop.run_after(8s,[&c,&loop]{c.stop();
+    thread A([&c,&loop]{
+        this_thread::sleep_for(30s);
+        c.stop();
         loop.stop();
     });
+
     loop.run();
 
+    A.join();
 }

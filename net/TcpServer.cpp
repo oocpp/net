@@ -58,11 +58,7 @@ namespace net
 
         if (_status.compare_exchange_strong(t, Stopping)) {
             _loop->run_in_loop([this]{stop_in_loop();});
-            _pool.join();
         }
-        _status = Stopped;
-
-        assert(_connections.empty());
     }
 
     void TcpServer::stop_in_loop()
@@ -78,6 +74,10 @@ namespace net
         }
         _connections.clear();
         _pool.stop();
+        _pool.join();
+
+        _status = Stopped;
+        assert(_connections.empty());
     }
 
     void TcpServer::handle_new_connection(int fd, const InetAddress &addr)
@@ -92,7 +92,8 @@ namespace net
 
         EventLoop *loop = get_next_loop();
 
-        TCPConnPtr conn(new TcpConnection(_next_conn_id++, loop, fd, _addr, addr));
+        //TCPConnPtr conn(new TcpConnection(_next_conn_id++, loop, fd, _addr, addr));
+        TCPConnPtr conn {std::make_shared<TcpConnection>(_next_conn_id++, loop, fd, _addr, addr)};
 
         conn->set_message_cb(_message_cb);
         conn->set_connection_cb(_connecting_cb);

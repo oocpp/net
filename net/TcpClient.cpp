@@ -11,7 +11,7 @@ namespace net
 
     TcpClient::TcpClient(EventLoop *loop, const InetAddress &serverAddr, const std::string &nameArg)
             : _loop(loop)
-              , _connector(new Connector(loop, serverAddr))
+              , _connector(std::make_shared<Connector>(loop, serverAddr))
               , _peer_addr(serverAddr)
               , _name(nameArg)
               , _connection(nullptr)
@@ -64,7 +64,8 @@ namespace net
         Status t = Connecting;
         if (_status.compare_exchange_strong(t, Connected)) {
 
-            _connection.reset(new TcpConnection(++id, _loop, fd, addr, _peer_addr));
+           // _connection.reset(new TcpConnection(++id, _loop, fd, addr, _peer_addr));
+            _connection = std::make_shared<TcpConnection>(++id, _loop, fd, addr, _peer_addr);
 
             _connection->set_message_cb(_message_cb);
             _connection->set_connection_cb(_connecting_cb);

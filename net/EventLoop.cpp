@@ -170,7 +170,8 @@ namespace net
 
     bool EventLoop::in_loop_thread() const noexcept
     {
-        return std::this_thread::get_id() == _th_id;
+        static thread_local std::thread::id th_id = std::this_thread::get_id();
+        return th_id == _th_id;
     }
 
     void EventLoop::queue_in_loop(const std::function<void()> &cb)

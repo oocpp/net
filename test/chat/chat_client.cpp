@@ -61,7 +61,7 @@ private:
 
 int main() {
 
-    Log::set_rank(0);
+    Log::set_rank(2);
 
     EventLoopThread loop;
     loop.run();
@@ -76,6 +76,6 @@ int main() {
        c.write(str);
 
     c.disconnect();
-    cout<<"4444444444444444444"<<endl;
+    LOG_INFO<<"client quit";
     loop.stop_and_join();
 }
