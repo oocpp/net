@@ -11,7 +11,6 @@ namespace net
 {
     namespace Socket
     {
-
         void SetKeepAlive(int fd, bool on)
         {
             int optval = on ? 1 : 0;

@@ -1,10 +1,10 @@
 #pragma once
 
-#include<memory>
+#include <memory>
+#include <functional>
 
 namespace net
 {
-
     class TcpConnection;
 
     class Buffer;
@@ -21,12 +21,7 @@ namespace net
 
     using WriteCompleteCallback = std::function<void(const TCPConnPtr &)>;
 
-    typedef std::function<void(const TCPConnPtr &, size_t)> HighWaterMarkCallback;
-
+    using HighWaterMarkCallback = std::function<void(const TCPConnPtr &, size_t)> ;
 
     using EventCallback=std::function<void()>;
-
-    using ReadEventCallback =std::function<void()>;
-
-    using TimerCallback = std::function<void()>;
 }

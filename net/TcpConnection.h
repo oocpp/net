@@ -1,19 +1,15 @@
 #pragma once
 
-#include <list>
-#include <functional>
-#include <memory>
-
+#include <atomic>
+#include "CallBack.h"
 #include "InetAddress.h"
 #include "Buffer.h"
 #include "Epoll.h"
-#include"EventLoop.h"
-#include"CallBack.h"
 #include "Any.h"
+#include "Event.h"
 
 namespace net
 {
-
     class EventLoop;
 
     class TcpConnection : public std::enable_shared_from_this<TcpConnection>
@@ -105,7 +101,7 @@ namespace net
         int _sockfd;
         uint64_t _id;
         EventLoop *_loop;
-        Event _event;
+        impl::Event _event;
         std::atomic<Status> _status;
 
         InetAddress _local_addr;

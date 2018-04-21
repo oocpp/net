@@ -1,7 +1,9 @@
 #include "TcpClient.h"
-#include"TcpConnection.h"
+#include "TcpConnection.h"
 #include "Log.h"
 #include "Socket.h"
+#include "Connector.h"
+#include "EventLoop.h"
 
 namespace net
 {
@@ -11,7 +13,7 @@ namespace net
 
     TcpClient::TcpClient(EventLoop *loop, const InetAddress &serverAddr, const std::string &nameArg)
             : _loop(loop)
-              , _connector(std::make_shared<Connector>(loop, serverAddr))
+              , _connector(std::make_shared<impl::Connector>(loop, serverAddr))
               , _peer_addr(serverAddr)
               , _name(nameArg)
               , _connection(nullptr)
@@ -168,5 +170,4 @@ namespace net
         LOG_ERROR<<"connect failed";
         abort();
     }
-
 }

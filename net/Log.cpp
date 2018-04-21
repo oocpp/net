@@ -67,7 +67,7 @@ namespace net
                 return static_cast<pid_t>(::syscall(SYS_gettid));
         }();
 
-        out << t_time << '.' << std::setfill('0') << std::setw(6) << micr << ' ' <<std::setfill('0') << std::setw(6)<< th_id << ' ';
+        out << t_time << '.' << std::setfill('0') << std::setw(6) << micr << ' ' <<std::setfill('0') << std::setw(5)<< th_id << ' ';
         return *this;
     }
 

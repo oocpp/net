@@ -4,12 +4,11 @@
 #include <csignal>
 #include <cassert>
 #include "EventLoop.h"
-
 #include "Log.h"
 #include "EventLoopThread.h"
 #include "Acceptor.h"
 #include "Socket.h"
-#include"Event.h"
+#include "Event.h"
 
 namespace
 {
@@ -78,7 +77,7 @@ namespace net
             _poll.wait(-1, _events);
 
             for (auto &e:_events)
-                reinterpret_cast<Event *>(e.data.ptr)->handle_event(e.events);
+                reinterpret_cast<impl::Event *>(e.data.ptr)->handle_event(e.events);
 
             LOG_TRACE<<_events.size();
             do_pending_fn();
@@ -115,7 +114,7 @@ namespace net
         }
     }
 
-    void EventLoop::add(Event *e)
+    void EventLoop::add(impl::Event *e)
     {
         epoll_event event;
         event.events = e->get_events();
@@ -123,7 +122,7 @@ namespace net
         _poll.add(e->get_fd(), event);
     }
 
-    void EventLoop::update(Event *e)
+    void EventLoop::update(impl::Event *e)
     {
         epoll_event event;
         event.events = e->get_events();
@@ -131,12 +130,12 @@ namespace net
         _poll.update(e->get_fd(), event);
     }
 
-    void EventLoop::remove(Event *e)
+    void EventLoop::remove(impl::Event *e)
     {
         _poll.remove(e->get_fd());
     }
 
-    void EventLoop::run_in_loop(const std::function<void()> &cb)
+    void EventLoop::run_in_loop(const EventCallback &cb)
     {
         if (in_loop_thread()) {
             cb();
@@ -146,7 +145,7 @@ namespace net
         }
     }
 
-    void EventLoop::run_in_loop(std::function<void()> &&cb)
+    void EventLoop::run_in_loop(EventCallback &&cb)
     {
         if (in_loop_thread()) {
             cb();
@@ -156,7 +155,7 @@ namespace net
         }
     }
 
-    void EventLoop::queue_in_loop(std::function<void()> &&cb)
+    void EventLoop::queue_in_loop(EventCallback &&cb)
     {
         {
             std::lock_guard<std::mutex> l(_mu);
@@ -174,7 +173,7 @@ namespace net
         return th_id == _th_id;
     }
 
-    void EventLoop::queue_in_loop(const std::function<void()> &cb)
+    void EventLoop::queue_in_loop(const EventCallback &cb)
     {
         {
             std::lock_guard<std::mutex> l(_mu);
@@ -200,19 +199,19 @@ namespace net
         _is_pending_fns = false;
     }
 
-    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, const std::function<void()> &cb)
+    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, const EventCallback &cb)
     {
-        return run_at(TimerQueue::now() + ms, cb);
+        return run_at(impl::TimerQueue::now() + ms, cb);
     }
 
-    uint64_t EventLoop::run_at(TimerQueue::time_point time, const std::function<void()> &cb)
+    uint64_t EventLoop::run_at(impl::TimerQueue::time_point time, const EventCallback &cb)
     {
         return _timers.add_timer(cb, time, std::chrono::milliseconds{0});
     }
 
-    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, const std::function<void()> &cb)
+    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, const EventCallback &cb)
     {
-        return _timers.add_timer(cb, TimerQueue::now() + ms, ms);
+        return _timers.add_timer(cb, impl::TimerQueue::now() + ms, ms);
     }
 
     void EventLoop::cancel(uint64_t id)
@@ -225,18 +224,18 @@ namespace net
         _th_id = std::this_thread::get_id();
     }
 
-    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, std::function<void()> &&cb)
+    uint64_t EventLoop::run_after(std::chrono::milliseconds ms, EventCallback &&cb)
     {
-        return run_at(TimerQueue::now() + ms, std::move(cb));
+        return run_at(impl::TimerQueue::now() + ms, std::move(cb));
     }
 
-    uint64_t EventLoop::run_at(TimerQueue::time_point time, std::function<void()> &&cb)
+    uint64_t EventLoop::run_at(impl::TimerQueue::time_point time, EventCallback &&cb)
     {
         return _timers.add_timer(std::move(cb), time, std::chrono::milliseconds{0});
     }
 
-    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, std::function<void()> &&cb)
+    uint64_t EventLoop::run_every(std::chrono::milliseconds ms, EventCallback &&cb)
     {
-        return _timers.add_timer(std::move(cb), TimerQueue::now() + ms, ms);
+        return _timers.add_timer(std::move(cb), impl::TimerQueue::now() + ms, ms);
     }
 }

@@ -1,6 +1,5 @@
 #pragma once
 
-#include<functional>
 #include <sys/epoll.h>
 #include"CallBack.h"
 
@@ -8,78 +7,82 @@ namespace net
 {
     class EventLoop;
 
-    class Event
+    namespace impl
     {
-    public:
-        Event(EventLoop *loop, int fd = -1, bool r = false, bool w = false)noexcept;
+        class Event
+        {
+        public:
+            Event(EventLoop *loop, int fd = -1, bool r = false, bool w = false)noexcept;
 
-        ~Event()noexcept;
-        Event(const Event&)=delete;
-        Event &operator==(const Event &)= delete;
+            ~Event()noexcept;
 
-        Event(Event&&e)noexcept ;
+            Event(const Event &) = delete;
 
-        static constexpr uint32_t NoneEvent = 0;
-        static constexpr uint32_t ReadEvent = EPOLLIN | EPOLLPRI;
-        static constexpr uint32_t WriteEvent = EPOLLOUT;
-        static constexpr uint32_t CloseEvent = EPOLLRDHUP;
+            Event &operator==(const Event &)= delete;
 
-        void set_read_cb(const ReadEventCallback &cb);
+            Event(Event &&e)noexcept;
 
-        void set_write_cb(const EventCallback &cb);
+            static constexpr uint32_t NoneEvent = 0;
+            static constexpr uint32_t ReadEvent = EPOLLIN | EPOLLPRI;
+            static constexpr uint32_t WriteEvent = EPOLLOUT;
+            static constexpr uint32_t CloseEvent = EPOLLRDHUP;
 
-        void set_close_cb(const EventCallback &cb);
+            void set_read_cb(const EventCallback &cb);
 
-        void set_read_cb(ReadEventCallback &&cb)noexcept;
+            void set_write_cb(const EventCallback &cb);
 
-        void set_write_cb(EventCallback &&cb)noexcept;
+            void set_close_cb(const EventCallback &cb);
 
-        void set_close_cb(EventCallback &&cb)noexcept;
+            void set_read_cb(EventCallback &&cb)noexcept;
 
-        void enable_read();
+            void set_write_cb(EventCallback &&cb)noexcept;
 
-        void enable_write();
+            void set_close_cb(EventCallback &&cb)noexcept;
 
-        void enable_all();
+            void enable_read();
 
-        void disable_read();
+            void enable_write();
 
-        void disable_write();
+            void enable_all();
 
-        void disable_all();
+            void disable_read();
 
-        int get_fd() const noexcept;
+            void disable_write();
 
-        uint32_t get_events() const noexcept;
+            void disable_all();
 
-        void attach_to_loop();
+            int get_fd() const noexcept;
 
-        void detach_from_loop();
+            uint32_t get_events() const noexcept;
 
-        void handle_event(uint32_t event);
+            void attach_to_loop();
 
-        bool is_add_to_loop() const noexcept;
+            void detach_from_loop();
 
-        void set_fd(int fd)noexcept;
+            void handle_event(uint32_t event);
 
-        bool is_writable() const noexcept;
+            bool is_add_to_loop() const noexcept;
 
-        bool is_readable() const noexcept;
+            void set_fd(int fd)noexcept;
 
-        bool is_none() const noexcept;
+            bool is_writable() const noexcept;
 
-    private:
-        void update();
+            bool is_readable() const noexcept;
 
-    private:
-        EventLoop *_loop;
-        int _fd;
-        bool _add_to_loop;
-        uint32_t _events;
+            bool is_none() const noexcept;
 
-        ReadEventCallback _read_cb;
-        EventCallback _write_cb;
-        EventCallback _close_cb;
-    };
+        private:
+            void update();
+
+        private:
+            EventLoop *_loop;
+            int _fd;
+            bool _add_to_loop;
+            uint32_t _events;
+
+            EventCallback _read_cb;
+            EventCallback _write_cb;
+            EventCallback _close_cb;
+        };
+    }
 }
-

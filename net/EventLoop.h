@@ -1,18 +1,16 @@
 #pragma once
-
+#include <vector>
 #include <atomic>
-#include "Epoll.h"
-#include<memory>
-#include<vector>
-#include"Event.h"
-#include<mutex>
+#include <mutex>
 #include <thread>
-#include<chrono>
-#include"TimerQueue.h"
+#include <chrono>
+#include "Epoll.h"
+#include "CallBack.h"
+#include "Event.h"
+#include "TimerQueue.h"
 
 namespace net
 {
-
     class EventLoop final
     {
     public:
@@ -23,31 +21,31 @@ namespace net
         EventLoop(const EventLoop &) = delete;
         EventLoop &operator==(const EventLoop &)= delete;
 
-        void add(Event *e);
+        void add(impl::Event *e);
 
-        void update(Event *e);
+        void update(impl::Event *e);
 
-        void remove(Event *e);
+        void remove(impl::Event *e);
 
-        void run_in_loop(const std::function<void()> &cb);
+        void run_in_loop(const EventCallback &cb);
 
-        void queue_in_loop(const std::function<void()> &cb);
+        void queue_in_loop(const EventCallback &cb);
 
-        void run_in_loop(std::function<void()> &&cb);
+        void run_in_loop(EventCallback &&cb);
 
-        void queue_in_loop(std::function<void()> &&cb);
+        void queue_in_loop(EventCallback &&cb);
 
-        uint64_t run_after(std::chrono::milliseconds ms, const std::function<void()> &cb);
+        uint64_t run_after(std::chrono::milliseconds ms, const EventCallback &cb);
 
-        uint64_t run_at(TimerQueue::time_point time, const std::function<void()> &cb);
+        uint64_t run_at(impl::TimerQueue::time_point time, const EventCallback &cb);
 
-        uint64_t run_every(std::chrono::milliseconds ms, const std::function<void()> &cb);
+        uint64_t run_every(std::chrono::milliseconds ms, const EventCallback &cb);
 
-        uint64_t run_after(std::chrono::milliseconds ms, std::function<void()> &&cb);
+        uint64_t run_after(std::chrono::milliseconds ms, EventCallback &&cb);
 
-        uint64_t run_at(TimerQueue::time_point time, std::function<void()> &&cb);
+        uint64_t run_at(impl::TimerQueue::time_point time, EventCallback &&cb);
 
-        uint64_t run_every(std::chrono::milliseconds ms, std::function<void()> &&cb);
+        uint64_t run_every(std::chrono::milliseconds ms, EventCallback &&cb);
 
         void cancel(uint64_t id);
 
@@ -68,16 +66,16 @@ namespace net
         void handle_wakeup_read();
 
     private:
-        Epoll _poll;
+        impl::Epoll _poll;
         std::atomic<bool> _is_looping;
         std::atomic<bool> _is_pending_fns;
         int _wake_fd;
         std::thread::id _th_id;
-        TimerQueue _timers;
-        Event _wake_event;
+        impl::TimerQueue _timers;
+        impl::Event _wake_event;
 
         std::mutex _mu;
-        std::vector<std::function<void()>> _pending_fns;
+        std::vector<EventCallback> _pending_fns;
 
         std::vector<epoll_event> _events;
     };

@@ -40,4 +40,3 @@ namespace net
         void setTcpNoDelay(int fd, bool on);
     };
 }
-

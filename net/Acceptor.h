@@ -1,11 +1,9 @@
 #pragma once
 
 #include <functional>
-#include <memory>
 #include "Socket.h"
-#include"InetAddress.h"
-#include"Event.h"
-#include"CallBack.h"
+#include "InetAddress.h"
+#include "Event.h"
 
 namespace net
 {
@@ -13,38 +11,41 @@ namespace net
 
     class EventLoop;
 
-    class Accepter
+    namespace impl
     {
-    public:
-        using NewConnCallback = std::function<void(int, const InetAddress &)>;
+        class Accepter
+        {
+        public:
+            using NewConnCallback = std::function<void(int, const InetAddress &)>;
 
-        Accepter(EventLoop *loop, const InetAddress &addr)noexcept;
+            Accepter(EventLoop *loop, const InetAddress &listen_addr)noexcept;
 
-        ~Accepter()noexcept;
+            ~Accepter()noexcept;
 
-        Accepter(Accepter &&acc)noexcept;
+            Accepter(Accepter &&acc)noexcept;
 
-        Accepter(const Accepter &) = delete;
+            Accepter(const Accepter &) = delete;
 
-        Accepter &operator==(const Accepter &)= delete;
+            Accepter &operator==(const Accepter &)= delete;
 
-        void set_new_connection_cb(const NewConnCallback &cb);
+            void set_new_connection_cb(const NewConnCallback &cb);
 
-        void set_new_connection_cb(NewConnCallback &&cb)noexcept;
+            void set_new_connection_cb(NewConnCallback &&cb)noexcept;
 
-        void listen(int backlog = SOMAXCONN);
+            void listen(int backlog = SOMAXCONN);
 
-        void stop();
+            void stop();
 
-    private:
-        void handle_accept();
+        private:
+            void handle_accept();
 
-    private:
-        EventLoop *_loop;
-        int _fd;
-        InetAddress _addr;
+        private:
+            EventLoop *_loop;
+            int _fd;
+            InetAddress _listen_addr;
 
-        Event _event;
-        NewConnCallback _new_connection_cb;
-    };
+            Event _event;
+            NewConnCallback _new_connection_cb;
+        };
+    }
 }

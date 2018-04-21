@@ -6,35 +6,38 @@
 
 namespace net
 {
-    class Timer
+    namespace impl
     {
-    public:
-        using time_point =std::chrono::system_clock::time_point;
+        class Timer
+        {
+        public:
+            using time_point =std::chrono::system_clock::time_point;
 
-        Timer(const TimerCallback &cb, time_point when, std::chrono::milliseconds interval);
+            Timer(const EventCallback &cb, time_point when, std::chrono::milliseconds interval);
 
-        Timer(TimerCallback &&cb, time_point when, std::chrono::milliseconds interval);
+            Timer(EventCallback &&cb, time_point when, std::chrono::milliseconds interval);
 
-        void run() const;
+            void run() const;
 
-        time_point expiration() const noexcept;
+            time_point expiration() const noexcept;
 
-        bool repeat() const noexcept;
+            bool repeat() const noexcept;
 
-        uint64_t sequence() const noexcept;
+            uint64_t sequence() const noexcept;
 
-        void restart(time_point now);
+            void restart(time_point now);
 
-        bool is_valid() const noexcept;
+            bool is_valid() const noexcept;
 
-    private:
-        TimerCallback _callback;
-        time_point _expiration;
-        std::chrono::milliseconds _interval;
-        bool _repeat;
+        private:
+            EventCallback _callback;
+            time_point _expiration;
+            std::chrono::milliseconds _interval;
+            bool _repeat;
 
-        const uint64_t _sequence;
+            const uint64_t _sequence;
 
-        static std::atomic<uint64_t> id;
-    };
+            static std::atomic<uint64_t> id;
+        };
+    }
 }

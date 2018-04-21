@@ -13,29 +13,31 @@
 
 namespace net
 {
-    class Epoll
+    namespace impl
     {
-    public:
-        Epoll()noexcept;
+        class Epoll
+        {
+        public:
+            Epoll()noexcept;
 
-        ~Epoll()noexcept;
+            ~Epoll()noexcept;
 
-        Epoll(const Epoll&)=delete;
-        Epoll &operator==(const Epoll &)= delete;
+            Epoll(const Epoll &) = delete;
 
-        void add(int fd, epoll_event event);
+            Epoll &operator==(const Epoll &)= delete;
 
-        void remove(int fd);
+            void add(int fd, epoll_event event);
 
-        void update(int fd, epoll_event event);
+            void remove(int fd);
 
-        void wait(int timeout, std::vector<epoll_event> &events);
+            void update(int fd, epoll_event event);
 
-    private:
-        int _epollfd;
-        size_t _old_size;
-        static constexpr size_t init_event_vector_size = 16;
-    };
+            void wait(int timeout, std::vector<epoll_event> &events);
+
+        private:
+            int _epollfd;
+            size_t _old_size;
+            static constexpr size_t init_event_vector_size = 16;
+        };
+    }
 }
-
-

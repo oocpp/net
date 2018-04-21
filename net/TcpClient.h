@@ -1,11 +1,18 @@
 #pragma once
 
-#include "EventLoop.h"
-#include "Connector.h"
+#include <atomic>
+#include "CallBack.h"
+#include "InetAddress.h"
 #include "Any.h"
 
 namespace net
 {
+    class EventLoop;
+
+    namespace impl{
+        class Connector;
+    }
+
     class TcpClient
     {
     public:
@@ -64,7 +71,7 @@ namespace net
         };
 
         static std::atomic<uint64_t> id;
-        using ConnectorPtr = std::shared_ptr<Connector>;
+        using ConnectorPtr = std::shared_ptr<impl::Connector>;
     private:
         EventLoop *_loop;
         ConnectorPtr _connector;
@@ -80,6 +87,3 @@ namespace net
         Any _context;
     };
 }
-
-
-
