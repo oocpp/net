@@ -12,7 +12,7 @@ namespace net
                 : _loop(loop)
                   , _fd(-1)
                   , _listen_addr(listen_addr)
-                  , _event(loop, _fd, true, false)
+                  , _event(loop)
         {
             LOG_TRACE;
         }
@@ -38,7 +38,7 @@ namespace net
             _event.set_fd(_fd);
             _event.set_read_cb([this] { handle_accept(); });
 
-            _loop->run_in_loop([this] { _event.attach_to_loop(); });
+            _loop->run_in_loop([this] { _event.enable_read(); });
         }
 
         void Accepter::stop()
@@ -46,7 +46,7 @@ namespace net
             assert(_loop->in_loop_thread());
             LOG_TRACE;
 
-            _event.detach_from_loop();
+            _event.disable_all();
             Socket::close(_fd);
 
             assert(!_event.is_add_to_loop());
@@ -55,6 +55,7 @@ namespace net
         void Accepter::handle_accept()
         {
             assert(_loop->in_loop_thread());
+            assert(_event.is_readable());
 
             InetAddress addr{};
             int connfd = -1;

@@ -9,7 +9,7 @@
 
 namespace net
 {
-    int Log::RANK = 0;
+    Log::LogRank Log::RANK = Log::INFO;
 
     Log &Log::init_impl(const char *file, const int line, const char *func)
     {

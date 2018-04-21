@@ -67,16 +67,17 @@ namespace net
         if (_status.compare_exchange_strong(t, Connected)) {
 
            // _connection.reset(new TcpConnection(++id, _loop, fd, addr, _peer_addr));
-            _connection = std::make_shared<TcpConnection>(++id, _loop, fd, addr, _peer_addr);
+            auto conn {std::make_shared<TcpConnection>(++id, _loop, fd, addr, _peer_addr)};
 
-            _connection->set_message_cb(_message_cb);
-            _connection->set_connection_cb(_connecting_cb);
-            _connection->set_write_complete_cb(_write_complete_cb);
+            conn->set_message_cb(_message_cb);
+            conn->set_connection_cb(_connecting_cb);
+            conn->set_write_complete_cb(_write_complete_cb);
 
-            _connection->set_close_cb([this](const TCPConnPtr &conn){on_remove_connection(conn);});
+            conn->set_close_cb([this](const TCPConnPtr &conn){on_remove_connection(conn);});
 
-            auto temp=_connection;
-            _loop->run_in_loop([temp]{temp->attach_to_loop();});
+            std::atomic_store(&_connection,conn);
+
+            _loop->run_in_loop([conn]{conn->attach_to_loop();});
 
             LOG_TRACE << "Client new conn";
         }
@@ -99,12 +100,12 @@ namespace net
         }
     }
 
-    void TcpClient::set_retry(bool t)
+    void TcpClient::set_retry(bool t)noexcept
     {
         _retry = t;
     }
 
-    EventLoop *TcpClient::get_loop()
+    EventLoop *TcpClient::get_loop() const noexcept
     {
         return _loop;
     }
@@ -169,5 +170,10 @@ namespace net
     {
         LOG_ERROR<<"connect failed";
         abort();
+    }
+
+    TCPConnPtr TcpClient::get_conn() const
+    {
+        return std::atomic_load(&_connection);
     }
 }

@@ -38,5 +38,7 @@ namespace net
         void SetKeepAlive(int fd, bool on);
 
         void setTcpNoDelay(int fd, bool on);
+
+        void setNonBlockAndCloseOnExec(int sockfd);
     };
 }

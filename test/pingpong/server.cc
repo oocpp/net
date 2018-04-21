@@ -37,7 +37,7 @@ int main(int argc, char* argv[])
   }
   else
   {
-    Log::set_rank(2);
+    Log::set_rank(Log::INFO);
 
     const char* ip = argv[1];
     uint16_t port = static_cast<uint16_t>(atoi(argv[2]));

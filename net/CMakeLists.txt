@@ -56,6 +56,7 @@ if(NET_LIBRARY)
             Log.h
             Any.h
             CallBack.h
+            NetFwd.h
             )
 
     INSTALL(FILES ${HEAD_FILES} DESTINATION ${PROJECT_BINARY_DIR}/include/)

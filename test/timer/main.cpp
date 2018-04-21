@@ -6,7 +6,7 @@ using namespace std;
 using namespace net;
 
 int main() {
-    Log::set_rank(8);
+    Log::set_rank(Log::INFO);
     EventLoop loop;
 
     auto timer=loop.run_every(3s,[](){

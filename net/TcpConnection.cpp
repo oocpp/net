@@ -12,7 +12,7 @@ namespace net
             : _sockfd(sockfd)
               , _id(id)
               , _loop(loop)
-              , _event(loop, sockfd)
+              , _event(loop, sockfd,true)
               , _status(Disconnected)
               , _local_addr(local_addr)
               , _peer_addr(peer_add)
@@ -40,8 +40,9 @@ namespace net
 
     void TcpConnection::attach_to_loop()
     {
+        assert(_event.is_readable());
         _status = Connected;
-        _event.enable_read();
+        _event.attach_to_loop();
 
         if (_connecting_cb) {
             _connecting_cb(shared_from_this());

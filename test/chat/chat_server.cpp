@@ -57,7 +57,7 @@ private:
 
 int main()
 {
-    Log::set_rank(2);
+    Log::set_rank(Log::INFO);
 
     EventLoop loop;
 

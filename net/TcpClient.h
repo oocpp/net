@@ -26,9 +26,11 @@ namespace net
 
         void disconnect();
 
-        void set_retry(bool t = true);
+        void set_retry(bool t = true) noexcept;
 
-        EventLoop *get_loop();
+        EventLoop *get_loop() const noexcept;
+
+        TCPConnPtr get_conn() const;
 
         const std::string &get_name();
 
