@@ -12,9 +12,7 @@ using namespace net;
 int main() {
     EventLoop loop;
 
-    InetAddress addr("127.0.0.1", 55555);
-
-    TcpClient client(&loop,addr,"ChatClient");
+    TcpClient client(&loop,InetAddress("127.0.0.1", 55555),"ChatClient");
 
     client.set_message_cb([](const TCPConnPtr& conn, Buffer* msg) {
         LOG_INFO<<"receive:"<<msg->get_read_ptr();

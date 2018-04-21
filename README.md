@@ -1,5 +1,6 @@
 # net
-# 个人毕设作品。。。。。。正在完善。目前初步完成。。。
+# 个人毕设作品。。。。。。
+# 目前初步完成。继续完善中。。。
 
 net是一个基于Reactor 模式的现代化C++11网络库。
 
@@ -13,6 +14,7 @@ net是一个基于Reactor 模式的现代化C++11网络库。
 
 需要的linux版本没测试。。。有时间再说。。。
 
+#### 使用时,需要确保TcpClient和TcpServer的生命周期至少在EvnetLoop::run()函数退出之后结束
 
 # 特性
 
@@ -31,3 +33,85 @@ net是一个基于Reactor 模式的现代化C++11网络库。
 客户端断线自动重连
 
 服务端可同时监听多个ip/port
+
+# 例子
+## Tcp Echo Server
+```cpp
+#include"TcpServer.h"
+#include"NetFwd.h"
+
+using namespace net;
+
+int main(int argc, char* argv[]) {
+    InetAddress addr("127.0.0.1",55555);
+
+    EventLoop loop;
+
+    TcpServer server(&loop, addr, "TCPEchoServer", 3);
+
+    server.set_message_cb([](const TCPConnPtr& conn, Buffer* msg) {
+        conn->send(msg);
+    });
+
+    server.set_connection_cb([](const TCPConnPtr & conn) {
+        if (conn->is_connected()) {
+            LOG_INFO << "A new connection from " << conn->get_peer_addr().toIpPort();
+        } else {
+            LOG_INFO << "Lost the connection from " << conn->get_peer_addr().toIpPort();
+        }
+    });
+
+    server.run();
+    loop.run();
+}
+```
+
+## Tcp Echo Client
+```cpp
+#include <iostream>
+#include <unistd.h>
+#include "TcpClient.h"
+#include "NetFwd.h"
+#include "Socket.h"
+#include <string>
+
+using namespace std;
+using namespace net;
+
+
+int main() {
+    EventLoop loop;
+
+    TcpClient client(&loop,InetAddress("127.0.0.1", 55555),"ChatClient");
+
+    client.set_message_cb([](const TCPConnPtr& conn, Buffer* msg) {
+        LOG_INFO<<"receive:"<<msg->get_read_ptr();
+    });
+
+    Socket::setNonBlockAndCloseOnExec(STDIN_FILENO);
+
+    impl::Event e{&loop,STDIN_FILENO};
+
+    e.set_read_cb([&client]{
+        string s;
+        getline(cin,s);
+        client.get_conn()->send(s);
+    });
+
+    client.set_connection_cb([&e](const TCPConnPtr& conn) {
+        if(conn->is_connected())
+            e.enable_read();
+        else
+            e.disable_all();
+    });
+
+    client.set_message_cb([&e](const TCPConnPtr& conn,Buffer*msg) {
+        msg->append("\0",1);
+        LOG_INFO<<"receive:"<<msg->get_read_ptr();
+        msg->clear();
+    });
+
+    client.connect();
+    loop.run();
+}
+```
