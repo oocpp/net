@@ -83,6 +83,7 @@ namespace net
             do_pending_fn();
         }
         do_pending_fn();
+        _timers.cancel_all();
         LOG_TRACE << " loop stop" << std::endl;
     }
 

@@ -38,12 +38,24 @@ namespace net
 
         TimerQueue::~TimerQueue() noexcept
         {
+            assert(_timer_set.empty());
+            assert(_timer_map.empty());
+            assert(_canceling_timers.empty());
+
             _timer_event.disable_all();
             Socket::close(_timer_fd);
+        }
 
-            for (auto &timer : _timers) {
+        void TimerQueue::cancel_all()
+        {
+            assert(_loop->in_loop_thread());
+
+            for (auto &timer : _timer_set) {
                 delete timer.second;
             }
+            _timer_set.clear();
+            _timer_map.clear();
+            _canceling_timers.clear();
         }
 
         timespec TimerQueue::from_now(time_point when)
@@ -62,7 +74,7 @@ namespace net
         {
             uint64_t howmany;
             ssize_t n = ::read(_timer_fd, &howmany, sizeof howmany);
-            LOG_TRACE << howmany;
+            LOG_TRACE << "timeout:"<< howmany;
             if (n != sizeof howmany) {
                 LOG_ERROR << "TimerQueue::handle_expire() reads " << n << " bytes instead of 8";
             }
@@ -118,19 +130,19 @@ namespace net
         void TimerQueue::cancel_in_loop(uint64_t timerId)
         {
 
-            assert(_timers.size() == _active_timers.size());
+            assert(_timer_set.size() == _timer_map.size());
 
-            auto it = _active_timers.find(timerId);
-            if (it != _active_timers.end()) {
-                _timers.erase(TimerNode(it->second->expiration(), it->second));
-
-                _active_timers.erase(it);
+            auto it = _timer_map.find(timerId);
+            if (it != _timer_map.end()) {
+                _timer_set.erase(TimerNode(it->second->expiration(), it->second));
+                delete it->second;
+                _timer_map.erase(it);
             }
             else if (_calling_expired_timers) {
                 _canceling_timers.insert(timerId);
             }
 
-            assert(_timers.size() == _active_timers.size());
+            assert(_timer_set.size() == _timer_map.size());
         }
 
         void TimerQueue::handle_expire()
@@ -153,25 +165,25 @@ namespace net
 
         std::vector<TimerQueue::TimerNode> TimerQueue::get_expired(time_point now)
         {
-            assert(_timers.size() == _active_timers.size());
+            assert(_timer_set.size() == _timer_map.size());
 
             std::vector<TimerNode> expired;
 
             TimerNode sentry(now, reinterpret_cast<Timer *>(UINTPTR_MAX));
 
-            auto end = _timers.lower_bound(sentry);
+            auto end = _timer_set.lower_bound(sentry);
 
-            assert(end == _timers.end() || now < end->first);
+            assert(end == _timer_set.end() || now < end->first);
 
-            std::copy(_timers.begin(), end, back_inserter(expired));
-            _timers.erase(_timers.begin(), end);
+            std::copy(_timer_set.begin(), end, back_inserter(expired));
+            _timer_set.erase(_timer_set.begin(), end);
 
             for (auto &it : expired) {
-                size_t n = _active_timers.erase(it.second->sequence());
+                size_t n = _timer_map.erase(it.second->sequence());
                 assert(n == 1);
             }
 
-            assert(_timers.size() == _active_timers.size());
+            assert(_timer_set.size() == _timer_map.size());
             return expired;
         }
 
@@ -189,8 +201,8 @@ namespace net
                 }
             }
 
-            if (!_timers.empty()) {
-                nextExpire = _timers.begin()->second->expiration();
+            if (!_timer_set.empty()) {
+                nextExpire = _timer_set.begin()->second->expiration();
             }
 
             if (nextExpire > time_point{}) {
@@ -201,30 +213,30 @@ namespace net
         bool TimerQueue::insert(Timer *timer)
         {
 
-            assert(_timers.size() == _active_timers.size());
+            assert(_timer_set.size() == _timer_map.size());
 
             bool earliestChanged = false;
 
             time_point when = timer->expiration();
 
-            auto it = _timers.begin();
-            if (it == _timers.end() || when < it->first) {
+            auto it = _timer_set.begin();
+            if (it == _timer_set.end() || when < it->first) {
                 earliestChanged = true;
             }
 
             {
-                std::pair<TimerList::iterator, bool> result = _timers.insert(TimerNode(when, timer));
+                std::pair<TimerSet::iterator, bool> result = _timer_set.insert(TimerNode(when, timer));
                 assert(result.second);
                 (void) result;
             }
             {
-                std::pair<ActiveTimerMap::iterator, bool> result
-                        = _active_timers.insert(std::pair<uint64_t, Timer *>(timer->sequence(), timer));
+                std::pair<TimerMap::iterator, bool> result
+                        = _timer_map.insert(std::pair<uint64_t, Timer *>(timer->sequence(), timer));
                 assert(result.second);
                 (void) result;
             }
 
-            assert(_timers.size() == _active_timers.size());
+            assert(_timer_set.size() == _timer_map.size());
             return earliestChanged;
         }
 

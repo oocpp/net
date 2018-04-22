@@ -35,13 +35,15 @@ namespace net
 
             void cancel(uint64_t timerId);
 
+            void cancel_all();
+
             static time_point now();
 
             using TimerNode= std::pair<time_point, Timer *>;
         private:
-            typedef std::set<TimerNode> TimerList;
+            typedef std::set<TimerNode> TimerSet;
 
-            typedef std::map<uint64_t, Timer *> ActiveTimerMap;
+            typedef std::map<uint64_t, Timer *> TimerMap;
 
             timespec from_now(time_point when);
 
@@ -65,9 +67,9 @@ namespace net
             EventLoop *_loop;
             const int _timer_fd;
             Event _timer_event;
-            TimerList _timers;
+            TimerSet _timer_set;
 
-            ActiveTimerMap _active_timers;
+            TimerMap _timer_map;
             bool _calling_expired_timers;
             std::set<uint64_t> _canceling_timers;
         };
