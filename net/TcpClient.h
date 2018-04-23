@@ -26,6 +26,8 @@ namespace net
 
         void disconnect();
 
+        void force_disconnect();
+
         void set_retry(bool t = true) noexcept;
 
         EventLoop *get_loop() const noexcept;
@@ -57,6 +59,8 @@ namespace net
 
     private:
         void disconnect_in_loop();
+
+        void force_disconnect_in_loop();
 
         void on_new_connection(int fd, const InetAddress &addr);
 

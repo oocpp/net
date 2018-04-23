@@ -61,6 +61,26 @@ namespace net
         }
     }
 
+    void TcpClient::force_disconnect()
+    {
+        LOG_TRACE;
+        if (_status == Disconnected)
+            return;
+
+        if (_status.exchange(Disconnected) == Connecting)
+            _connector->cancel();
+        else
+            _loop->run_in_loop([this] { force_disconnect_in_loop(); });
+    }
+
+    void TcpClient::force_disconnect_in_loop()
+    {
+        if (_connection) {
+            _connection->force_close();
+            _connection.reset();
+        }
+    }
+
     void TcpClient::on_new_connection(int fd, const InetAddress &addr)
     {
         Status t = Connecting;
