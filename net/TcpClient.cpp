@@ -56,8 +56,8 @@ namespace net
     void TcpClient::disconnect_in_loop()
     {
         if (_connection) {
-            _connection->close(false);
-            _connection.reset();
+            _connection->close();
+            //_connection.reset();
         }
     }
 

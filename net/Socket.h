@@ -33,7 +33,7 @@ namespace net
 
         sockaddr_in get_local_addr(int fd);
 
-        void shutdownWrite();
+        void shutdownWrite(int fd);
 
         void SetKeepAlive(int fd, bool on);
 

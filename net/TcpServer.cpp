@@ -70,7 +70,7 @@ namespace net
             t.stop();
 
         for (auto &conn:_connections) {
-            conn.second->close(false);
+            conn.second->force_close();
         }
         _connections.clear();
         _pool.stop();

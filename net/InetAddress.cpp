@@ -28,7 +28,7 @@ namespace net
 
     std::string InetAddress::toIpPort() const
     {
-        return toIp() +":"+std::to_string(toPort());
+        return toIp().append(":").append(std::to_string(toPort()));
     }
 
     in_port_t InetAddress::toPort() const

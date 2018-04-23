@@ -28,13 +28,31 @@ namespace net
         Socket::close(_sockfd);
     }
 
-    void TcpConnection::close(bool call_close_cb)
+    void TcpConnection::close()
     {
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Disconnecting)) {
 
             auto temp = shared_from_this();
-            _loop->queue_in_loop([temp, call_close_cb] { temp->handle_close(call_close_cb); });
+            _loop->queue_in_loop([temp] { temp->shutdown_in_loop(); });
+        }
+    }
+
+    void TcpConnection::shutdown_in_loop()
+    {
+        assert(_loop->in_loop_thread());
+
+        if (!_event.is_writable())
+            Socket::shutdownWrite(_sockfd);
+    }
+
+    void TcpConnection::force_close()
+    {
+        Status t = Connected;
+        if (_status.compare_exchange_strong(t, Disconnecting)) {
+
+            auto temp = shared_from_this();
+            _loop->queue_in_loop([temp] { temp->handle_close(false); });
         }
     }
 
@@ -208,6 +226,9 @@ namespace net
                 if (_write_complete_cb) {
                     _loop->queue_in_loop(std::bind(_write_complete_cb, shared_from_this()));
                 }
+
+                if (_status == Disconnecting)
+                    shutdown_in_loop();
             }
         }
         else {

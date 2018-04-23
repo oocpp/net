@@ -24,7 +24,9 @@ namespace net
         TcpConnection(const TcpConnection &) = delete;
         TcpConnection &operator==(const TcpConnection &)= delete;
 
-        void close(bool call_close_cb=true);
+        void close();
+
+        void force_close();
 
         void set_message_cb(const MessageCallback &cb);
 
@@ -83,6 +85,8 @@ namespace net
         void handle_write();
 
         void handle_close(bool call_close_cb=true);
+
+        void shutdown_in_loop();
 
         void handle_error();
 

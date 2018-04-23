@@ -145,6 +145,11 @@ class Client
     }
   }
 
+  ~Client(){
+      for(auto t:sessions_)
+          delete t;
+  }
+
  private:
 
   void quit()
