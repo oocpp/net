@@ -76,7 +76,7 @@ namespace net
     void TcpClient::force_disconnect_in_loop()
     {
         if (_connection) {
-            _connection->force_close();
+            _connection->force_close(false);
             _connection.reset();
         }
     }

@@ -17,14 +17,17 @@ namespace net
     class TcpServer
     {
     public:
-        TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize = 0);
+        TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name = "Server", size_t threadSize = 0);
+
+        TcpServer(EventLoop *loop, const InetAddress &addr,int backlog = SOMAXCONN,
+                const std::string &name = "Server", size_t threadSize = 0);
 
         ~TcpServer()noexcept;
 
         TcpServer(const TcpServer &) = delete;
         TcpServer &operator==(const TcpServer &)= delete;
 
-        void add_acceptor(const InetAddress &addr);
+        void add_acceptor(const InetAddress &addr,int backlog = SOMAXCONN);
 
         void run();
 

@@ -18,7 +18,7 @@ namespace net
         public:
             using NewConnCallback = std::function<void(int, const InetAddress &)>;
 
-            Accepter(EventLoop *loop, const InetAddress &listen_addr)noexcept;
+            Accepter(EventLoop *loop, const InetAddress &listen_addr, int backlog = SOMAXCONN) noexcept;
 
             ~Accepter()noexcept;
 
@@ -32,7 +32,7 @@ namespace net
 
             void set_new_connection_cb(NewConnCallback &&cb)noexcept;
 
-            void listen(int backlog = SOMAXCONN);
+            void listen();
 
             void stop();
 
@@ -43,7 +43,8 @@ namespace net
             EventLoop *_loop;
             int _fd;
             InetAddress _listen_addr;
-
+            int _backlog;
+            
             Event _event;
             NewConnCallback _new_connection_cb;
         };

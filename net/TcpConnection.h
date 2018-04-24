@@ -26,7 +26,7 @@ namespace net
 
         void close();
 
-        void force_close();
+        void force_close(bool call_close_cb = true);
 
         void set_message_cb(const MessageCallback &cb);
 

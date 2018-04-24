@@ -10,6 +10,12 @@ namespace net
     using std::placeholders::_2;
 
     TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name, size_t threadSize)
+            :TcpServer(loop,addr,SOMAXCONN,name,threadSize)
+    {
+        
+    }
+
+    TcpServer::TcpServer(EventLoop *loop, const InetAddress &addr,int backlog, const std::string &name, size_t threadSize)
             : _loop(loop)
               , _pool(loop,threadSize)
               ,_name(name)
@@ -17,15 +23,15 @@ namespace net
               , _status(Stopped)
     {
         LOG_TRACE << "server:"<<_name;
-        add_acceptor(addr);
+        add_acceptor(addr,backlog);
     }
 
-    void TcpServer::add_acceptor(const InetAddress &addr)
+    void TcpServer::add_acceptor(const InetAddress &addr,int backlog)
     {
         assert(_status == Stopped);
         LOG_TRACE;
 
-        _accepters.emplace_back(_loop,addr);
+        _accepters.emplace_back(_loop,addr,backlog);
         _accepters.back().set_new_connection_cb([this](int fd, const InetAddress &addr){handle_new_connection(fd,addr);});
 
         LOG_TRACE<<_accepters.size();
@@ -70,7 +76,7 @@ namespace net
             t.stop();
 
         for (auto &conn:_connections) {
-            conn.second->force_close();
+            conn.second->force_close(false);
         }
         _connections.clear();
         _pool.stop();

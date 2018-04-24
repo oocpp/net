@@ -85,9 +85,6 @@ namespace net
             struct itimerspec newValue{};
             struct itimerspec oldValue{};
 
-            memset(&newValue, 0, sizeof newValue);
-            memset(&oldValue, 0, sizeof oldValue);
-
             newValue.it_value = from_now(expiration);
             int ret = ::timerfd_settime(_timer_fd, 0, &newValue, &oldValue);
             if (ret) {

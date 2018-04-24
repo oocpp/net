@@ -8,11 +8,12 @@ namespace net
 {
     namespace impl
     {
-        Accepter::Accepter(EventLoop *loop, const InetAddress &listen_addr)noexcept
+        Accepter::Accepter(EventLoop *loop, const InetAddress &listen_addr, int backlog)noexcept
                 : _loop(loop)
-                  , _fd(-1)
-                  , _listen_addr(listen_addr)
-                  , _event(loop)
+                , _fd(-1)
+                , _listen_addr(listen_addr)
+                , _event(loop)
+                ,_backlog(backlog)
         {
             LOG_TRACE;
         }
@@ -23,7 +24,7 @@ namespace net
             LOG_TRACE;
         }
 
-        void Accepter::listen(int backlog)
+        void Accepter::listen()
         {
             LOG_TRACE;
             _fd = Socket::create_nonblocking_socket(_listen_addr.get_family());
@@ -33,7 +34,7 @@ namespace net
             }
 
             Socket::bind(_fd, _listen_addr);
-            Socket::listen(_fd, backlog);
+            Socket::listen(_fd, _backlog);
 
             _event.set_fd(_fd);
             _event.set_read_cb([this] { handle_accept(); });

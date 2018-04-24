@@ -16,7 +16,7 @@ namespace net
     class TcpClient
     {
     public:
-        TcpClient(EventLoop *loop, const InetAddress &serverAddr, const std::string &nameArg);
+        TcpClient(EventLoop *loop, const InetAddress &serverAddr, const std::string &nameArg = "Client");
 
         ~TcpClient()noexcept;
         TcpClient(const TcpClient &) = delete;
@@ -53,9 +53,6 @@ namespace net
         void set_context(Any &&a);
 
         Any &get_context();
-
-        bool is_connecting() const
-        { return _status == Connecting; }
 
     private:
         void disconnect_in_loop();

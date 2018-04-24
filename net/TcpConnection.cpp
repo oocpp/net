@@ -46,13 +46,13 @@ namespace net
             Socket::shutdownWrite(_sockfd);
     }
 
-    void TcpConnection::force_close()
+    void TcpConnection::force_close(bool call_close_cb)
     {
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Disconnecting)) {
 
             auto temp = shared_from_this();
-            _loop->queue_in_loop([temp] { temp->handle_close(false); });
+            _loop->queue_in_loop([temp,call_close_cb] { temp->handle_close(call_close_cb); });
         }
     }
 

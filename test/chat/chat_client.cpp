@@ -25,7 +25,7 @@ public:
     }
 
     void disconnect() {
-            client.disconnect();
+            client.force_disconnect();
     }
 
     void write(const string&str){
