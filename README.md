@@ -34,6 +34,8 @@ net是一个基于Reactor 模式的现代化C++11网络库。
 
 服务端可同时监听多个ip/port
 
+ipv6支持
+
 # 例子
 ## Tcp Echo Server
 ```cpp
