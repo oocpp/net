@@ -58,8 +58,8 @@ namespace net
 
         void bind(int sockfd, const InetAddress &addr)
         {
-            if (::bind(sockfd, addr.get_sockaddr(), addr.get_sockaddr_size()) < 0) {
-                LOG_ERROR << "bind 失败";
+            if (::bind(sockfd, addr.get_sockaddr(), InetAddress::size6()) < 0) {
+                LOG_ERROR << "bind 失败" << errno;
             }
         }
 
@@ -72,7 +72,7 @@ namespace net
 
         int connect(int sockfd, const InetAddress &peeraddr)
         {
-            return ::connect(sockfd, peeraddr.get_sockaddr(), peeraddr.get_sockaddr_size());
+            return ::connect(sockfd, peeraddr.get_sockaddr(), InetAddress::size6());
         }
 
         void close(int sockfd)
@@ -84,7 +84,7 @@ namespace net
 
         int accept(int sockfd, InetAddress &peeraddr)
         {
-            socklen_t addrlen = peeraddr.get_sockaddr_size();
+            socklen_t addrlen = InetAddress::size6();
 
             int connfd = ::accept4(sockfd, peeraddr.get_sockaddr(),
                                    &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
@@ -96,9 +96,9 @@ namespace net
                     case EAGAIN:
                     case ECONNABORTED:
                     case EINTR:
-                    case EPROTO: // ???
+                    case EPROTO:
                     case EPERM:
-                    case EMFILE: // per-process lmit of open file desctiptor ???
+                    case EMFILE:
                         // expected errors
                         errno = savedErrno;
                         break;
@@ -125,7 +125,7 @@ namespace net
         void shutdownWrite(int fd)
         {
             if (::shutdown(fd, SHUT_WR) < 0) {
-                LOG_ERROR << "sockets::shutdownWrite";
+                LOG_ERROR << "failed";
             }
         }
 
@@ -134,7 +134,7 @@ namespace net
             int sockfd = ::socket(family, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, IPPROTO_TCP);
 
             if (sockfd < 0) {
-                LOG_ERROR << "sockets::createNonblockingOrDie";
+                LOG_ERROR << "failed";
             }
 
             SetReuseAddr(sockfd);
@@ -162,9 +162,9 @@ namespace net
             }
         }
 
-        sockaddr_in get_peer_addr(int fd)
+        sockaddr_in6 get_peer_addr(int fd)
         {
-            struct sockaddr_in peeraddr{};
+            struct sockaddr_in6 peeraddr{};
             auto addrlen = static_cast<socklen_t>(sizeof peeraddr);
             if (::getpeername(fd, reinterpret_cast< sockaddr *>(&peeraddr), &addrlen) < 0) {
                 LOG_ERROR << "sockets::getPeerAddr";
@@ -172,9 +172,9 @@ namespace net
             return peeraddr;
         }
 
-        sockaddr_in get_local_addr(int fd)
+        sockaddr_in6 get_local_addr(int fd)
         {
-            sockaddr_in localaddr{};
+            sockaddr_in6 localaddr{};
             auto addrlen = static_cast<socklen_t>(sizeof localaddr);
             if (::getsockname(fd, reinterpret_cast< sockaddr *>(&localaddr), &addrlen) < 0) {
                 LOG_ERROR << "sockets::getLocalAddr";
@@ -182,17 +182,17 @@ namespace net
             return localaddr;
         }
 
-        bool is_self_connect(int sockfd)
-        {
-            struct sockaddr_in laddr4 = get_local_addr(sockfd);
-            struct sockaddr_in raddr4 = get_peer_addr(sockfd);
-            if (laddr4.sin_family == AF_INET) {
-                return laddr4.sin_port == raddr4.sin_port
-                       && laddr4.sin_addr.s_addr == raddr4.sin_addr.s_addr;
-            }
-            else {
-                return false;
-            }
-        }
+        //bool is_self_connect(int sockfd)
+        //{
+        //    struct sockaddr_in6 laddr4 = get_local_addr(sockfd);
+        //    struct sockaddr_in6 raddr4 = get_peer_addr(sockfd);
+        //    if (laddr4.sin_family == AF_INET) {
+        //       return laddr4.sin_port == raddr4.sin_port
+        //               && laddr4.sin_addr.s_addr == raddr4.sin_addr.s_addr;
+         //   }
+        //    else {
+        //        return false;
+        //    }
+        //}
     }
 }
