@@ -165,4 +165,12 @@ namespace net
         assert(_status==Stopped);
         _write_complete_cb = std::move(cb);
     }
+
+    const std::string &TcpServer::name() const {
+        return _name;
+    }
+
+    EventLoop *TcpServer::loop() noexcept {
+        return _loop;
+    }
 }

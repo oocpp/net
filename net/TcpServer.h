@@ -45,13 +45,9 @@ namespace net
 
         void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
 
-        const std::string& name() const{
-            return _name;
-        }
+        const std::string& name() const;
 
-        EventLoop* loop()noexcept {
-            return _loop;
-        }
+        EventLoop* loop()noexcept;
 
     private:
         void handle_new_connection(int fd, const InetAddress &addr);

@@ -30,10 +30,8 @@ class Session
       bytesWritten_(0),
       messagesRead_(0)
   {
-    client_.set_connection_cb(
-        std::bind(&Session::onConnection, this, _1));
-    client_.set_message_cb(
-        std::bind(&Session::onMessage, this, _1, _2));
+    client_.set_connection_cb(std::bind(&Session::onConnection, this, _1));
+    client_.set_message_cb(std::bind(&Session::onMessage, this, _1, _2));
   }
 
   void start()
@@ -141,7 +139,7 @@ class Client
                << " average message size";
       LOG_WARN << static_cast<double>(totalBytesRead) / (timeout_.count() * 1024 * 1024)
                << " MiB/s throughput";
-      conn->loop()->queue_in_loop(std::bind(&Client::quit, this));
+      loop_->queue_in_loop([this]{quit();});
     }
   }
 
@@ -154,7 +152,9 @@ class Client
 
   void quit()
   {
-    loop_->queue_in_loop(std::bind(&EventLoop::stop, loop_));
+      threadPool_.stop();
+      threadPool_.join();
+      loop_->stop();
   }
 
   void handleTimeout()

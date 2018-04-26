@@ -10,7 +10,7 @@ namespace net
     public:
         InetAddress() noexcept ;
 
-        explicit InetAddress(const std::string &ip, uint16_t port, bool ipv6 = false);
+        InetAddress(const std::string &ip, uint16_t port, bool ipv6 = false);
 
         explicit InetAddress(const sockaddr_in &addr);
 
