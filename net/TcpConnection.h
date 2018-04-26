@@ -48,11 +48,11 @@ namespace net
 
         void set_close_cb(CloseCallback &&cb)noexcept;
 
-        EventLoop *get_loop()noexcept;
+        EventLoop *loop()noexcept;
 
-        uint64_t get_id() const noexcept;
+        uint64_t id() const noexcept;
 
-        int get_fd() const noexcept;
+        int fd() const noexcept;
 
         void attach_to_loop();
 

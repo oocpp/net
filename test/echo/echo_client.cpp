@@ -15,7 +15,7 @@ int main() {
     TcpClient client(&loop,InetAddress("127.0.0.1", 55555),"ChatClient");
 
     client.set_message_cb([](const TCPConnPtr& conn, Buffer* msg) {
-        LOG_INFO<<"receive:"<<msg->get_read_ptr();
+        LOG_INFO<<"receive:"<< msg->read_ptr();
     });
 
     Socket::setNonBlockAndCloseOnExec(STDIN_FILENO);
@@ -25,7 +25,7 @@ int main() {
     e.set_read_cb([&client]{
         string s;
         getline(cin,s);
-        client.get_conn()->send(s);
+        client.connection()->send(s);
     });
 
     client.set_connection_cb([&e](const TCPConnPtr& conn) {
@@ -37,7 +37,7 @@ int main() {
 
     client.set_message_cb([&e](const TCPConnPtr& conn,Buffer*msg) {
         msg->append("\0",1);
-        LOG_INFO<<"receive:"<<msg->get_read_ptr();
+        LOG_INFO<<"receive:"<< msg->read_ptr();
         msg->clear();
     });
 

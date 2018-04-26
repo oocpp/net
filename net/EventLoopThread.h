@@ -23,7 +23,7 @@ namespace net
 
         void stop_and_join();
 
-        EventLoop *get_loop();
+        EventLoop *loop();
 
     private:
 

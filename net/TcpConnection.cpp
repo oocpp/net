@@ -43,7 +43,7 @@ namespace net
         assert(_loop->in_loop_thread());
 
         if (!_event.is_writable())
-            Socket::shutdownWrite(_sockfd);
+            Socket::shutdown_write(_sockfd);
     }
 
     void TcpConnection::force_close(bool call_close_cb)
@@ -149,7 +149,7 @@ namespace net
 
     void TcpConnection::send(Buffer *d)
     {
-        send(d->get_read_ptr(), d->get_readable_size());
+        send(d->read_ptr(), d->readable_size());
         d->clear();
     }
 
@@ -216,11 +216,11 @@ namespace net
         assert(_loop->in_loop_thread());
         assert(!_event.is_add_to_loop() || _event.is_writable());
 
-        ssize_t n = ::send(_sockfd, _out_buff.get_read_ptr(), _out_buff.get_readable_size(), MSG_NOSIGNAL);
+        ssize_t n = ::send(_sockfd, _out_buff.read_ptr(), _out_buff.readable_size(), MSG_NOSIGNAL);
         if (n > 0) {
             _out_buff.has_read(static_cast<size_t>(n));
 
-            if (_out_buff.get_readable_size() == 0) {
+            if (_out_buff.readable_size() == 0) {
                 _event.disable_write();
 
                 if (_write_complete_cb) {
@@ -295,12 +295,12 @@ namespace net
         _close_cb = std::move(cb);
     }
 
-    EventLoop *TcpConnection::get_loop() noexcept
+    EventLoop *TcpConnection::loop() noexcept
     {
         return _loop;
     }
 
-    uint64_t TcpConnection::get_id() const noexcept
+    uint64_t TcpConnection::id() const noexcept
     {
         return _id;
     }
@@ -335,14 +335,14 @@ namespace net
         return _status == Connected;
     }
 
-    int TcpConnection::get_fd() const noexcept
+    int TcpConnection::fd() const noexcept
     {
         return _sockfd;
     }
 
     void TcpConnection::set_tcp_no_delay(bool on)
     {
-        Socket::setTcpNoDelay(_sockfd, on);
+        Socket::set_tcp_no_delay(_sockfd, on);
     }
 
     void TcpConnection::reserve_input_buffer(size_t len)

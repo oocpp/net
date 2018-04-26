@@ -12,7 +12,7 @@ namespace net
         class Event
         {
         public:
-            Event(EventLoop *loop, int fd = -1, bool r = false, bool w = false)noexcept;
+            explicit Event(EventLoop *loop, int fd = -1, bool r = false, bool w = false)noexcept;
 
             ~Event()noexcept;
 
@@ -51,6 +51,8 @@ namespace net
 
             void disable_all();
 
+            void set_fd(int fd)noexcept;
+
             int get_fd() const noexcept;
 
             uint32_t get_events() const noexcept;
@@ -62,8 +64,6 @@ namespace net
             void handle_event(uint32_t event);
 
             bool is_add_to_loop() const noexcept;
-
-            void set_fd(int fd)noexcept;
 
             bool is_writable() const noexcept;
 

@@ -63,8 +63,8 @@ class Session
   void onMessage(const TCPConnPtr& conn, Buffer* buf)
   {
     ++messagesRead_;
-    bytesRead_ += buf->get_readable_size();
-    bytesWritten_ += buf->get_readable_size();
+    bytesRead_ += buf->readable_size();
+    bytesWritten_ += buf->readable_size();
     conn->send(buf);
   }
 
@@ -102,7 +102,7 @@ class Client
     {
       char buf[32];
       snprintf(buf, sizeof buf, "C%05d", i);
-      Session* session = new Session(threadPool_.get_next_loop(), serverAddr, buf, this);
+      Session* session = new Session(threadPool_.next_loop(), serverAddr, buf, this);
       session->start();
       sessions_.push_back(session);
     }
@@ -141,7 +141,7 @@ class Client
                << " average message size";
       LOG_WARN << static_cast<double>(totalBytesRead) / (timeout_.count() * 1024 * 1024)
                << " MiB/s throughput";
-      conn->get_loop()->queue_in_loop(std::bind(&Client::quit, this));
+      conn->loop()->queue_in_loop(std::bind(&Client::quit, this));
     }
   }
 

@@ -11,7 +11,7 @@ namespace net
 {
     namespace Socket
     {
-        void SetKeepAlive(int fd, bool on)
+        void set_keep_alive(int fd, bool on)
         {
             int optval = on ? 1 : 0;
             int rc = ::setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE,
@@ -38,14 +38,14 @@ namespace net
             int optval = 1;
             int rc = ::setsockopt(fd, SOL_SOCKET, SO_REUSEPORT,
                                   reinterpret_cast<const char *>(&optval), static_cast<socklen_t>(sizeof optval));
-            //LOG_INFO << "setsockopt SO_REUSEPORT fd=" << get_fd << " rc=" << rc;
+            //LOG_INFO << "setsockopt SO_REUSEPORT fd=" << fd << " rc=" << rc;
             if (rc != 0) {
                 int serrno = errno;
                 LOG_ERROR << "setsockopt(SO_REUSEPORT) failed, errno=" << serrno << " " << strerror(serrno);
             }
         }
 
-        void setTcpNoDelay(int fd, bool on)
+        void set_tcp_no_delay(int fd, bool on)
         {
             int optval = on ? 1 : 0;
             int rc = ::setsockopt(fd, IPPROTO_TCP, TCP_NODELAY,
@@ -58,7 +58,7 @@ namespace net
 
         void bind(int sockfd, const InetAddress &addr)
         {
-            if (::bind(sockfd, addr.get_sockaddr(), InetAddress::size6()) < 0) {
+            if (::bind(sockfd, addr.to_sockaddr(), InetAddress::size6()) < 0) {
                 LOG_ERROR << "bind 失败" << errno;
             }
         }
@@ -72,7 +72,7 @@ namespace net
 
         int connect(int sockfd, const InetAddress &peeraddr)
         {
-            return ::connect(sockfd, peeraddr.get_sockaddr(), InetAddress::size6());
+            return ::connect(sockfd, peeraddr.to_sockaddr(), InetAddress::size6());
         }
 
         void close(int sockfd)
@@ -86,7 +86,7 @@ namespace net
         {
             socklen_t addrlen = InetAddress::size6();
 
-            int connfd = ::accept4(sockfd, peeraddr.get_sockaddr(),
+            int connfd = ::accept4(sockfd, peeraddr.to_sockaddr(),
                                    &addrlen, SOCK_NONBLOCK | SOCK_CLOEXEC);
             if (connfd < 0) {
 
@@ -122,7 +122,7 @@ namespace net
             return connfd;
         }
 
-        void shutdownWrite(int fd)
+        void shutdown_write(int fd)
         {
             if (::shutdown(fd, SHUT_WR) < 0) {
                 LOG_ERROR << "failed";

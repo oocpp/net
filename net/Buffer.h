@@ -24,9 +24,21 @@ namespace net
 
         std::pair<ssize_t, int> read_from_fd(int fd);
 
-        size_t get_writable_size() const noexcept;
+        size_t writable_size() const noexcept;
 
         size_t length() const noexcept;
+
+        size_t readable_size() const noexcept;
+
+        const char *read_ptr() const noexcept;
+
+        char *read_ptr() noexcept;
+
+        char *write_ptr()noexcept;
+
+        void has_read(size_t n)noexcept;
+
+        void has_write(size_t n)noexcept;
 
         void clear() noexcept;
 
@@ -37,18 +49,6 @@ namespace net
         void append(const Buffer &buff);
 
         void append(std::initializer_list<std::pair<const char *, std::size_t>> args);
-
-        size_t get_readable_size() const noexcept;
-
-        const char *get_read_ptr() const noexcept;
-
-        char *get_read_ptr() noexcept;
-
-        char *get_write_ptr()noexcept;
-
-        void has_read(size_t n)noexcept;
-
-        void has_write(size_t n)noexcept;
 
     public:
 
