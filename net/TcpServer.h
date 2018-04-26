@@ -45,6 +45,14 @@ namespace net
 
         void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
 
+        const std::string& name() const{
+            return _name;
+        }
+
+        EventLoop* loop()noexcept {
+            return _loop;
+        }
+
     private:
         void handle_new_connection(int fd, const InetAddress &addr);
 
@@ -54,7 +62,7 @@ namespace net
 
         void stop_in_loop();
 
-        EventLoop *get_next_loop();
+        EventLoop *next_loop();
 
         enum Status
         {

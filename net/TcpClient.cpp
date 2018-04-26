@@ -125,12 +125,12 @@ namespace net
         _retry = t;
     }
 
-    EventLoop *TcpClient::get_loop() const noexcept
+    EventLoop *TcpClient::loop() const noexcept
     {
         return _loop;
     }
 
-    const std::string &TcpClient::get_name()
+    const std::string &TcpClient::name()
     {
         return _name;
     }
@@ -192,7 +192,7 @@ namespace net
         abort();
     }
 
-    TCPConnPtr TcpClient::get_conn() const
+    TCPConnPtr TcpClient::connection() const
     {
         return std::atomic_load(&_connection);
     }

@@ -18,15 +18,15 @@ namespace net
 
         explicit InetAddress(uint16_t port,bool ipv6 = false);
 
-        const sockaddr *get_sockaddr() const;
+        const sockaddr *to_sockaddr() const;
 
-        sockaddr *get_sockaddr();
+        sockaddr *to_sockaddr();
 
-        sa_family_t get_family() const;
+        sa_family_t family() const;
 
-        in_port_t get_port() const;
+        in_port_t port() const;
 
-        uint32_t get_ip() const;
+        uint32_t ip() const;
 
         bool operator==(const InetAddress &addr) const noexcept ;
 
@@ -40,11 +40,11 @@ namespace net
             return static_cast<socklen_t>(sizeof(sockaddr_in6));
         }
 
-        std::string toIp() const;
+        std::string to_ip() const;
 
-        std::string toIpPort() const;
+        std::string to_ip_port() const;
 
-        in_port_t toPort() const;
+        in_port_t to_port() const;
 
     private:
         union

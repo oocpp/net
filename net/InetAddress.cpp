@@ -65,7 +65,7 @@ namespace net {
         }
     }
 
-    std::string InetAddress::toIp() const {
+    std::string InetAddress::to_ip() const {
         char buff[64] = {0};
 
         auto size = static_cast<socklen_t>(sizeof(buff));
@@ -74,48 +74,48 @@ namespace net {
             static_assert(sizeof(buff) >= INET_ADDRSTRLEN, "");
             ::inet_ntop(AF_INET, &_addr.sin_addr, buff, size);
         } else {
-            assert(get_family() == AF_INET6);
+            assert(family() == AF_INET6);
             static_assert(sizeof(buff) >= INET6_ADDRSTRLEN, "");
             ::inet_ntop(AF_INET6, &_addr6.sin6_addr, buff, size);
         }
         return std::string(buff);
     }
 
-    std::string InetAddress::toIpPort() const {
-        return toIp().append(":").append(std::to_string(toPort()));
+    std::string InetAddress::to_ip_port() const {
+        return to_ip().append(":").append(std::to_string(to_port()));
     }
 
-    in_port_t InetAddress::toPort() const {
+    in_port_t InetAddress::to_port() const {
         return ntohs(_addr.sin_port);
     }
 
-    const sockaddr *InetAddress::get_sockaddr() const {
+    const sockaddr *InetAddress::to_sockaddr() const {
         return reinterpret_cast<const sockaddr *>(&_addr);
     }
 
-    sockaddr *InetAddress::get_sockaddr() {
+    sockaddr *InetAddress::to_sockaddr() {
         return reinterpret_cast<sockaddr *>(&_addr);
     }
 
-    sa_family_t InetAddress::get_family() const {
+    sa_family_t InetAddress::family() const {
         return _addr.sin_family;
     }
 
-    in_port_t InetAddress::get_port() const {
+    in_port_t InetAddress::port() const {
         return _addr.sin_port;
     }
 
-    uint32_t InetAddress::get_ip() const {
-        assert(get_family() == AF_INET);
+    uint32_t InetAddress::ip() const {
+        assert(family() == AF_INET);
         return _addr.sin_addr.s_addr;
     }
 
     bool InetAddress::operator==(const InetAddress &another) const noexcept {
-        assert(get_family() == AF_INET || get_family() == AF_INET6);
+        assert(family() == AF_INET || family() == AF_INET6);
 
-        if (get_port() == another.get_port() && get_family() == another.get_family()) {
+        if (port() == another.port() && family() == another.family()) {
             if (_addr.sin_family == AF_INET) {
-                return get_ip() == another.get_ip();
+                return ip() == another.ip();
             } else {
                 return memcmp(&_addr6.sin6_addr, &another._addr6.sin6_addr, size6()) == 0;
             }

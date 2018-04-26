@@ -36,7 +36,7 @@ public:
 private:
 private:
     void onConnection(const TCPConnPtr &conn) {
-        LOG_INFO << conn->get_local_addr().toIp() << ":" << conn->get_local_addr().toPort() << " is "
+        LOG_INFO << conn->get_local_addr().to_ip() << ":" << conn->get_local_addr().to_port() << " is "
                  << ((conn->is_connected()) ? "up" : "down");
 
         if (conn->is_connected()) {
@@ -49,7 +49,7 @@ private:
 
     void onMessage(const TCPConnPtr &conn,Buffer*message){
         message->append("\0",1);
-        cout<<message->get_read_ptr()<<endl;
+        cout<< message->read_ptr()<<endl;
 
         message->clear();
     }
@@ -68,7 +68,7 @@ int main() {
 
     //InetAddress addr("112.74.86.0", 55555);
     InetAddress addr("127.0.0.1", 55555);
-    ChatClient c(loop.get_loop(), addr);
+    ChatClient c(loop.loop(), addr);
     c.connect();
 
     std::string str;

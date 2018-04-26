@@ -35,9 +35,9 @@ namespace net
         char extrabuf[65536];
         struct iovec vec[2];
 
-        const size_t w_size = get_writable_size();
+        const size_t w_size = writable_size();
 
-        vec[0].iov_base = get_write_ptr();
+        vec[0].iov_base = write_ptr();
         vec[0].iov_len = w_size;
         vec[1].iov_base = extrabuf;
         vec[1].iov_len = sizeof extrabuf;
@@ -63,8 +63,8 @@ namespace net
 
     void Buffer::ensure_writable_bytes(size_t len)
     {
-        if (get_writable_size() < len) {
-            if (get_writable_size() + _read_index < len) {
+        if (writable_size() < len) {
+            if (writable_size() + _read_index < len) {
                 _buff.resize(_write_index + len);
             }
             else {
@@ -76,7 +76,7 @@ namespace net
         }
     }
 
-    size_t Buffer::get_writable_size() const noexcept
+    size_t Buffer::writable_size() const noexcept
     {
         assert(_buff.size()>=_write_index);
         return _buff.size() - _write_index;
@@ -112,7 +112,7 @@ namespace net
 
     void Buffer::append(const Buffer &buff)
     {
-        append(buff.get_read_ptr(), buff.get_readable_size());
+        append(buff.read_ptr(), buff.readable_size());
     }
 
     void Buffer::append(std::initializer_list<std::pair<const char *, std::size_t>> args)
@@ -131,25 +131,25 @@ namespace net
         }
     }
 
-    size_t Buffer::get_readable_size() const noexcept
+    size_t Buffer::readable_size() const noexcept
     {
         assert(_write_index>=_read_index);
         return _write_index - _read_index;
     }
 
-    const char *Buffer::get_read_ptr() const noexcept
+    const char *Buffer::read_ptr() const noexcept
     {
         assert(_write_index>=_read_index);
         return _buff.data() + _read_index;
     }
 
-    char *Buffer::get_read_ptr()noexcept
+    char *Buffer::read_ptr()noexcept
     {
         assert(_write_index>=_read_index);
         return _buff.data() + _read_index;
     }
 
-    char *Buffer::get_write_ptr()noexcept
+    char *Buffer::write_ptr()noexcept
     {
         assert(_buff.size()>=_write_index);
         return _buff.data() + _write_index;
@@ -214,32 +214,32 @@ namespace net
 
     int8_t Buffer::peek_int8() const
     {
-        assert(get_readable_size() >= sizeof(int8_t));
-        int8_t x = *get_read_ptr();
+        assert(readable_size() >= sizeof(int8_t));
+        int8_t x = *read_ptr();
         return x;
     }
 
     int16_t Buffer::peek_int16() const
     {
-        assert(get_readable_size() >= sizeof(int16_t));
+        assert(readable_size() >= sizeof(int16_t));
         int16_t be16 = 0;
-        ::memcpy(&be16, get_read_ptr(), sizeof be16);
+        ::memcpy(&be16, read_ptr(), sizeof be16);
         return be16toh(be16);
     }
 
     int32_t Buffer::peek_int32() const
     {
-        assert(get_readable_size() >= sizeof(int32_t));
+        assert(readable_size() >= sizeof(int32_t));
         int32_t be32 = 0;
-        ::memcpy(&be32, get_read_ptr(), sizeof be32);
+        ::memcpy(&be32, read_ptr(), sizeof be32);
         return be32toh(be32);
     }
 
     int64_t Buffer::peek_int64() const
     {
-        assert(get_readable_size() >= sizeof(int64_t));
+        assert(readable_size() >= sizeof(int64_t));
         int64_t be64 = 0;
-        ::memcpy(&be64, get_read_ptr(), sizeof be64);
+        ::memcpy(&be64, read_ptr(), sizeof be64);
         return be64toh(be64);
     }
 

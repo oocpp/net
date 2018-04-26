@@ -30,11 +30,11 @@ namespace net
 
         void set_retry(bool t = true) noexcept;
 
-        EventLoop *get_loop() const noexcept;
+        EventLoop *loop() const noexcept;
 
-        TCPConnPtr get_conn() const;
+        TCPConnPtr connection() const;
 
-        const std::string &get_name();
+        const std::string &name();
 
         void set_connection_cb(const ConnectingCallback &cb);
 

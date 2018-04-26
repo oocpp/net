@@ -33,11 +33,11 @@ namespace net
 
         sockaddr_in6 get_local_addr(int fd);
 
-        void shutdownWrite(int fd);
+        void shutdown_write(int fd);
 
-        void SetKeepAlive(int fd, bool on);
+        void set_keep_alive(int fd, bool on);
 
-        void setTcpNoDelay(int fd, bool on);
+        void set_tcp_no_delay(int fd, bool on);
 
         void setNonBlockAndCloseOnExec(int sockfd);
     };

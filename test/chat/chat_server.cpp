@@ -28,7 +28,7 @@ public:
 
 private:
     void onConnection(const TCPConnPtr &conn){
-        LOG_INFO<<conn->get_peer_addr().toIp()<<":"<<conn->get_peer_addr().toPort()<<" is "
+        LOG_INFO<< conn->get_peer_addr().to_ip()<<":"<< conn->get_peer_addr().to_port()<<" is "
                 <<((conn->is_connected())?"up":"down");
 
         if(conn->is_connected()) {
@@ -43,7 +43,7 @@ private:
         
         for(auto&t:conns) {
             if (t != conn) {
-                t->send(message->get_read_ptr(),message->get_readable_size());
+                t->send(message->read_ptr(), message->readable_size());
             }
         }
         message->clear();

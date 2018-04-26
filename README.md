@@ -59,7 +59,7 @@ int main(int argc, char* argv[]) {
         if (conn->is_connected()) {
             LOG_INFO << "A new connection from " << conn->get_peer_addr().toIpPort();
         } else {
-            LOG_INFO << "Lost the connection from " << conn->get_peer_addr().toIpPort();
+            LOG_INFO << "Lost the connection from " << conn->get_peer_addr().to_ip_port();
         }
     });
 
@@ -87,7 +87,7 @@ int main() {
     TcpClient client(&loop,InetAddress("127.0.0.1", 55555),"ChatClient");
 
     client.set_message_cb([](const TCPConnPtr& conn, Buffer* msg) {
-        LOG_INFO<<"receive:"<<msg->get_read_ptr();
+        LOG_INFO<<"receive:"<<msg->read_ptr();
     });
 
     Socket::setNonBlockAndCloseOnExec(STDIN_FILENO);
@@ -97,7 +97,7 @@ int main() {
     e.set_read_cb([&client]{
         string s;
         getline(cin,s);
-        client.get_conn()->send(s);
+        client.connection()->send(s);
     });
 
     client.set_connection_cb([&e](const TCPConnPtr& conn) {
@@ -109,7 +109,7 @@ int main() {
 
     client.set_message_cb([&e](const TCPConnPtr& conn,Buffer*msg) {
         msg->append("\0",1);
-        LOG_INFO<<"receive:"<<msg->get_read_ptr();
+        LOG_INFO<<"receive:"<<msg->read_ptr();
         msg->clear();
     });
 

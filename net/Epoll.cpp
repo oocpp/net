@@ -24,7 +24,7 @@ namespace net
         void Epoll::add(int fd, epoll_event event)
         {
             if (::epoll_ctl(_epollfd, EPOLL_CTL_ADD, fd, &event) < 0) {
-                LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_ADD" << " get_fd =" << fd;
+                LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_ADD" << " fd =" << fd;
             }
         }
 
@@ -32,14 +32,14 @@ namespace net
         {
             epoll_event event{};
             if (::epoll_ctl(_epollfd, EPOLL_CTL_DEL, fd, &event) < 0) {
-                LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_DEL" << " get_fd =" << fd;
+                LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_DEL" << " fd =" << fd;
             }
         }
 
         void Epoll::update(int fd, epoll_event event)
         {
             if (::epoll_ctl(_epollfd, EPOLL_CTL_MOD, fd, &event) < 0) {
-                LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_MOD" << " get_fd =" << fd;
+                LOG_ERROR << "epoll_ctl op =" << "EPOLL_CTL_MOD" << " fd =" << fd;
             }
         }
 

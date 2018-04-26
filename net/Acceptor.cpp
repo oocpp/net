@@ -27,7 +27,7 @@ namespace net
         void Accepter::listen()
         {
             LOG_TRACE;
-            _fd = Socket::create_nonblocking_socket(_listen_addr.get_family());
+            _fd = Socket::create_nonblocking_socket(_listen_addr.family());
             if (_fd < 0) {
                 LOG_ERROR << "listen failed. fd = " << _fd;
                 abort();

@@ -11,7 +11,7 @@ namespace net
     class EventLoopThreadPool
     {
     public:
-        EventLoopThreadPool(EventLoop*loop,size_t threadNum = 0);
+        explicit EventLoopThreadPool(EventLoop*loop,size_t threadNum = 0);
 
         EventLoopThreadPool(const EventLoopThreadPool &) = delete;
         EventLoopThreadPool &operator==(const EventLoopThreadPool &)= delete;
@@ -22,7 +22,7 @@ namespace net
 
         void join();
 
-        EventLoop *get_next_loop();
+        EventLoop *next_loop();
 
     private:
         size_t next_loop_index();

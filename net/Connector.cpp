@@ -17,7 +17,7 @@ namespace net
         {
             LOG_TRACE;
             _event.set_write_cb([this] { handle_write(); });
-            //_event.set_connect_error_cb([this]{handle_error(_event.get_fd());});
+            //_event.set_connect_error_cb([this]{handle_error(_event.fd());});
         }
 
         Connector::~Connector() noexcept
@@ -38,12 +38,12 @@ namespace net
 
         void Connector::set_connect_error_cb(Connector::NewConnCallback &&cb) noexcept
         {
-            _error_cb = cb;
+            _error_cb = std::move(cb);
         }
 
         void Connector::set_connect_error_cb(const Connector::NewConnCallback &cb)
         {
-            _error_cb = std::move(cb);
+            _error_cb = cb;
         }
 
         void Connector::start()
@@ -87,7 +87,7 @@ namespace net
             if (_status != Connecting)
                 return;
 
-            int fd = Socket::create_nonblocking_socket(_peer_addr.get_family());
+            int fd = Socket::create_nonblocking_socket(_peer_addr.family());
             int rt = Socket::connect(fd, _peer_addr);
 
             int serrno = (rt == 0) ? 0 : errno;
@@ -210,7 +210,7 @@ namespace net
 
             if (_status == Connecting) {
 
-                LOG_INFO << "Retry connecting to " << _peer_addr.toIpPort()
+                LOG_INFO << "Retry connecting to " << _peer_addr.to_ip_port()
                          << " in " << _retry_delay_ms.count() << " milliseconds. ";
 
                 _retry_delay_ms *= 2;

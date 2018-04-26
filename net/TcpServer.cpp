@@ -94,9 +94,9 @@ namespace net
             LOG_INFO << "server is stopping";
             return;
         }
-        Socket::SetKeepAlive(fd,true);
+        Socket::set_keep_alive(fd, true);
 
-        EventLoop *loop = get_next_loop();
+        EventLoop *loop = next_loop();
 
         //TCPConnPtr conn(new TcpConnection(_next_conn_id++, loop, fd, _addr, addr));
         TCPConnPtr conn {std::make_shared<TcpConnection>(_next_conn_id++, loop, fd, _addr, addr)};
@@ -108,7 +108,7 @@ namespace net
         conn->set_close_cb([this](const TCPConnPtr &conn){remove_connection(conn);});
 
         loop->run_in_loop([conn]{conn->attach_to_loop();});
-        _connections[conn->get_id()] = conn;
+        _connections[conn->id()] = conn;
     }
 
     void TcpServer::remove_connection(const TCPConnPtr &conn)
@@ -120,14 +120,14 @@ namespace net
     {
         assert(_loop->in_loop_thread());
 
-        _connections.erase(conn->get_id());
+        _connections.erase(conn->id());
 
-        LOG_TRACE << "remove id=" << conn->get_id();
+        LOG_TRACE << "remove id=" << conn->id();
     }
 
-    EventLoop *TcpServer::get_next_loop()
+    EventLoop *TcpServer::next_loop()
     {
-        return _pool.get_next_loop();
+        return _pool.next_loop();
     }
 
     void TcpServer::set_connection_cb(const ConnectingCallback &cb)

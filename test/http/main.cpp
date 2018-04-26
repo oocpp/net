@@ -22,7 +22,7 @@ void http_echo(const TCPConnPtr &conn, Buffer *buff) {
 
 void new_conn(const TCPConnPtr &conn) {
     if (conn->is_connected()) {
-        LOG_INFO << "new connection" << conn->get_fd();
+        LOG_INFO << "new connection" << conn->fd();
     }
 }
 

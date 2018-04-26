@@ -33,12 +33,12 @@ size_t net::EventLoopThreadPool::next_loop_index()
     return t;
 }
 
-net::EventLoop *net::EventLoopThreadPool::get_next_loop()
+net::EventLoop *net::EventLoopThreadPool::next_loop()
 {
     if (_threads.empty()) {
         return _loop;
     }
     else{
-        return _threads[next_loop_index()].get_loop();
+        return _threads[next_loop_index()].loop();
     }
 }

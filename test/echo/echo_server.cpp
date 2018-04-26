@@ -16,9 +16,9 @@ int main(int argc, char* argv[]) {
 
     server.set_connection_cb([](const TCPConnPtr & conn) {
         if (conn->is_connected()) {
-            LOG_INFO << "A new connection from " << conn->get_peer_addr().toIpPort();
+            LOG_INFO << "A new connection from " << conn->get_peer_addr().to_ip_port();
         } else {
-            LOG_INFO << "Lost the connection from " << conn->get_peer_addr().toIpPort();
+            LOG_INFO << "Lost the connection from " << conn->get_peer_addr().to_ip_port();
         }
     });
 
