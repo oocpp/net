@@ -116,7 +116,8 @@ namespace net {
         if (port() == another.port() && family() == another.family()) {
             if (_addr.sin_family == AF_INET) {
                 return ip() == another.ip();
-            } else {
+            }
+            else {
                 return memcmp(&_addr6.sin6_addr, &another._addr6.sin6_addr, size6()) == 0;
             }
         }

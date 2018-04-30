@@ -16,6 +16,7 @@ namespace net
 
         explicit InetAddress(const sockaddr_in6 &addr);
 
+        /// 自动使用回环地址
         explicit InetAddress(uint16_t port,bool ipv6 = false);
 
         const sockaddr *to_sockaddr() const;

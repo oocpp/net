@@ -11,6 +11,7 @@ namespace net
     class EventLoopThreadPool
     {
     public:
+        /// threadSize 为0，next_loop永远返回loop
         explicit EventLoopThreadPool(EventLoop*loop,size_t threadNum = 0);
 
         EventLoopThreadPool(const EventLoopThreadPool &) = delete;
@@ -22,6 +23,8 @@ namespace net
 
         void join();
 
+        /// 获取一个loop
+        /// threadNum为0，则返回_loop
         EventLoop *next_loop();
 
     private:

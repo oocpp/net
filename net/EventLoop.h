@@ -21,20 +21,22 @@ namespace net
         EventLoop(const EventLoop &) = delete;
         EventLoop &operator==(const EventLoop &)= delete;
 
-        void add(impl::Event *e);
-
-        void update(impl::Event *e);
-
-        void remove(impl::Event *e);
-
+        /// 线程安全
+        /// 如果当前线程是本对象所在线程，则立即执行cb
+        /// 如果不是，则将cb加入事件队列，等待在loop循环中被执行
+        /// 加入队列会唤醒loop循环
         void run_in_loop(const EventCallback &cb);
 
+        /// 线程安全
+        /// 将cb加入事件队列，等待在loop循环中被执行
+        /// 加入队列会唤醒loop循环
         void queue_in_loop(const EventCallback &cb);
 
         void run_in_loop(EventCallback &&cb);
 
         void queue_in_loop(EventCallback &&cb);
 
+        /// 设置一个定时器
         uint64_t run_after(std::chrono::milliseconds ms, const EventCallback &cb);
 
         uint64_t run_at(impl::TimerQueue::time_point time, const EventCallback &cb);
@@ -47,14 +49,28 @@ namespace net
 
         uint64_t run_every(std::chrono::milliseconds ms, EventCallback &&cb);
 
+        /// 取消定时器
         void cancel(uint64_t id);
 
         void run();
 
         void stop();
 
+        /// 判断当前线程是不是loop所在线程
         bool in_loop_thread() const noexcept;
 
+    public:
+        /// 添加事件
+        /// 对事件循环进行扩展时，用户可调用添加其他可被epoll管理的事件
+        void add(impl::Event *e);
+
+        /// 更新已添加的事件
+        void update(impl::Event *e);
+
+        /// 删除已添加事件
+        void remove(impl::Event *e);
+
+        ///以下函数不应被用户使用
         void reset_thread_id()noexcept;
 
     private:

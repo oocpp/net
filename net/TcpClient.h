@@ -22,19 +22,32 @@ namespace net
         TcpClient(const TcpClient &) = delete;
         TcpClient &operator==(const TcpClient &)= delete;
 
+        /// 线程安全
+        /// 主动连服务器，会不断尝试连接
         void connect();
 
+        /// 线程安全
+        /// 断开连接，只是执行了shtudown write。
+        /// 需要等待连接断开，才能停止loop
         void disconnect();
 
+        /// 线程安全
+        /// 强制断开连接，可以立即停止loop
         void force_disconnect();
 
+        /// 设置连接中断是否重新连接
         void set_retry(bool t = true) noexcept;
 
         EventLoop *loop() const noexcept;
 
+        /// 线程安全
+        /// 返回std::shared_ptr<TcpConnection>对象
+        /// 客户端重连后对象会失效
         TCPConnPtr connection() const;
 
         const std::string &name();
+
+        /// 所有回调函数应在client状态为Disconnected时，设置
 
         void set_connection_cb(const ConnectingCallback &cb);
 
@@ -48,6 +61,7 @@ namespace net
 
         void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
 
+        /// context 可用来保存自定义的数据
         void set_context(const Any &a);
 
         void set_context(Any &&a);

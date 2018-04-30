@@ -51,12 +51,18 @@ namespace net
         void append(std::initializer_list<std::pair<const char *, std::size_t>> args);
 
     public:
-
+        /// 在当前的写位置，预留一块空间
+        /// 后面可以对这块空间进行填充
         void reserve_head_space(size_t len);
 
+        /// 填充预留的空间
         void fill_head_space(size_t index,const std::string &str);
 
+        /// 填充预留的空间
         void fill_head_space(size_t index,const char *str,size_t len);
+
+        /// 末尾写入一个数值
+        /// 会自动传换成网络字节序
 
         void append_int64(int64_t x);
 
@@ -66,6 +72,8 @@ namespace net
 
         void append_int8(int8_t x);
 
+        /// 读取一个数值
+        /// 会自动传换成本机字节序
         int64_t read_int64();
 
         int32_t read_int32();
@@ -74,6 +82,8 @@ namespace net
 
         int8_t read_int8();
 
+        /// 读取一个数值，不消耗内容，可重复读取
+        /// 会自动传换成本机字节序
         int64_t peek_int64() const;
 
         int32_t peek_int32() const;
@@ -82,6 +92,7 @@ namespace net
 
         int8_t peek_int8() const;
 
+        /// 预留空间
         void reserve(size_t len);
 
     private:

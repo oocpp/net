@@ -17,6 +17,9 @@ namespace net
     class TcpServer
     {
     public:
+        /// threadSize 为0，意为着server为单线程模式，所有操作均在loop线程
+        /// threadSize 为1，意味着IO操作在新线程，listen在loop线程
+        /// threadSize 为N，意味着会有一个线程数为N的线程池，IO操作均在线程池内处理
         TcpServer(EventLoop *loop, const InetAddress &addr, const std::string &name = "Server", size_t threadSize = 0);
 
         TcpServer(EventLoop *loop, const InetAddress &addr,int backlog = SOMAXCONN,
@@ -27,11 +30,18 @@ namespace net
         TcpServer(const TcpServer &) = delete;
         TcpServer &operator==(const TcpServer &)= delete;
 
+        /// 添加新的监听，可同时监听多个ip:port
         void add_acceptor(const InetAddress &addr,int backlog = SOMAXCONN);
 
+        /// 线程安全
+        /// 开始server。开始监听，处理accept
         void run();
 
+        /// 线程安全
+        /// 停止server。主动强制断开所有连接
         void stop();
+
+        /// 所有回调函数应在server状态为Stop时，设置
 
         void set_connection_cb(const ConnectingCallback &cb);
 
