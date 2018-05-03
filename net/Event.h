@@ -39,16 +39,23 @@ namespace net
 
             void set_close_cb(EventCallback &&cb)noexcept;
 
+            /// enable系列函数会使event加入到事件循环里面
+
             void enable_read();
 
             void enable_write();
 
             void enable_all();
 
+            /// disable系列函数，如果导致事件类型为NoneEvent，
+            /// 则事件会从事件循环里面删除。
+
             void disable_read();
 
             void disable_write();
 
+            /// 从事件循环里删除
+            /// 重置已设置的事件类型
             void disable_all();
 
             void set_fd(int fd)noexcept;
@@ -59,9 +66,27 @@ namespace net
 
             void attach_to_loop();
 
+            /// 取消对事件的检测
+            /// 不会重置已设置的事件类型
             void detach_from_loop();
 
-            void handle_event(uint32_t event);
+            void async_enable_read();
+
+            void async_enable_write();
+
+            void async_enable_all();
+
+            void async_disable_read();
+
+            void async_disable_write();
+
+            /// 从事件循环里删除
+            /// 重置已设置的事件类型
+            void async_disable_all();
+
+            void async_attach_to_loop();
+
+            void async_detach_from_loop();
 
             bool is_add_to_loop() const noexcept;
 
@@ -70,6 +95,10 @@ namespace net
             bool is_readable() const noexcept;
 
             bool is_none() const noexcept;
+
+        public:
+            /// 用户不应该调用
+            void handle_event(uint32_t event);
 
         private:
             void update();

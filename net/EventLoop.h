@@ -59,9 +59,9 @@ namespace net
         /// 判断当前线程是不是loop所在线程
         bool in_loop_thread() const noexcept;
 
-    public:
+    public: ///以下函数不应被用户使用
+
         /// 添加事件
-        /// 对事件循环进行扩展时，用户可调用添加其他可被epoll管理的事件
         void add(impl::Event *e);
 
         /// 更新已添加的事件
@@ -70,7 +70,6 @@ namespace net
         /// 删除已添加事件
         void remove(impl::Event *e);
 
-        ///以下函数不应被用户使用
         void reset_thread_id()noexcept;
 
     private:
