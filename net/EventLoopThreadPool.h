@@ -3,6 +3,7 @@
 #include "EventLoopThread.h"
 #include<vector>
 #include <cstddef>
+#include <cassert>
 
 namespace net
 {
@@ -22,6 +23,10 @@ namespace net
         void stop();
 
         void join();
+
+        void resize(size_t s);
+
+        size_t size() const noexcept;
 
         /// 获取一个loop
         /// threadNum为0，则返回_loop

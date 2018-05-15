@@ -173,4 +173,16 @@ namespace net
     EventLoop *TcpServer::loop() noexcept {
         return _loop;
     }
+
+    void TcpServer::set_thread_size(size_t s) {
+        assert(_th_size==0);
+        assert(_status == Stopped);
+
+        _th_size=s;
+        _pool.resize(s);
+    }
+
+    size_t TcpServer::size() const noexcept {
+        return _pool.size();
+    }
 }

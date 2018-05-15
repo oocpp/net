@@ -42,3 +42,12 @@ net::EventLoop *net::EventLoopThreadPool::next_loop()
         return _threads[next_loop_index()].loop();
     }
 }
+
+void net::EventLoopThreadPool::resize(size_t s) {
+    assert(_threads.empty());
+    _threads = std::vector<EventLoopThread>(s);
+}
+
+size_t net::EventLoopThreadPool::size() const noexcept {
+    return _threads.size();
+}

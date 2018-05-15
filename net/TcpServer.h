@@ -33,6 +33,12 @@ namespace net
         /// 添加新的监听，可同时监听多个ip:port
         void add_acceptor(const InetAddress &addr,int backlog = SOMAXCONN);
 
+        /// 仅当构造函数未指定线程数量，
+        /// 或者给定的参数值为0时可以调用这个函数
+        void set_thread_size(size_t s);
+
+        size_t size() const noexcept;
+
         /// 线程安全
         /// 开始server。开始监听，处理accept
         void run();

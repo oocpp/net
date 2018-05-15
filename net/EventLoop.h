@@ -20,6 +20,7 @@ namespace net
 
         EventLoop(const EventLoop &) = delete;
         EventLoop &operator==(const EventLoop &)= delete;
+        EventLoop(EventLoop&&) = delete;
 
         /// 线程安全
         /// 如果当前线程是本对象所在线程，则立即执行cb

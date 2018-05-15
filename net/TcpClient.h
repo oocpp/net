@@ -59,6 +59,10 @@ namespace net
 
         void set_message_cb(MessageCallback &&cb)noexcept;
 
+        void set_connect_failed_cb(ConnectionFailedCallback&cb);
+
+        void set_connect_failed_cb(ConnectionFailedCallback&&cb) noexcept;
+
         void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
 
         /// context 可用来保存自定义的数据
@@ -101,6 +105,7 @@ namespace net
         WriteCompleteCallback _write_complete_cb;
         ConnectingCallback _connecting_cb;
         MessageCallback _message_cb;
+        ConnectionFailedCallback  _conn_failed_cb;
         Any _context;
     };
 }

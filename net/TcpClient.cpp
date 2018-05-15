@@ -189,11 +189,20 @@ namespace net
     void TcpClient::handle_connect_failed(int fd, const InetAddress &addr)
     {
         LOG_ERROR<<"connect failed";
-        abort();
+        if(_conn_failed_cb)
+            _conn_failed_cb(fd,addr);
     }
 
     TCPConnPtr TcpClient::connection() const
     {
         return std::atomic_load(&_connection);
+    }
+
+    void TcpClient::set_connect_failed_cb(ConnectionFailedCallback &&cb) noexcept {
+        _conn_failed_cb=std::move(cb);
+    }
+
+    void TcpClient::set_connect_failed_cb(ConnectionFailedCallback &cb) {
+        _conn_failed_cb=cb;
     }
 }

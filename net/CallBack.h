@@ -24,4 +24,6 @@ namespace net
     using HighWaterMarkCallback = std::function<void(const TCPConnPtr &, size_t)> ;
 
     using EventCallback=std::function<void()>;
+
+    using ConnectionFailedCallback = std::function<void(int,const InetAddress&)> ;
 }
