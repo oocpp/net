@@ -24,7 +24,7 @@ namespace net
 
             Epoll(const Epoll &) = delete;
 
-            Epoll &operator==(const Epoll &)= delete;
+            Epoll &operator=(const Epoll &)= delete;
 
             void add(int fd, epoll_event event);
 

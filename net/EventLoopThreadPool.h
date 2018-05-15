@@ -16,7 +16,9 @@ namespace net
         explicit EventLoopThreadPool(EventLoop*loop,size_t threadNum = 0);
 
         EventLoopThreadPool(const EventLoopThreadPool &) = delete;
-        EventLoopThreadPool &operator==(const EventLoopThreadPool &)= delete;
+        EventLoopThreadPool &operator=(const EventLoopThreadPool &)= delete;
+        EventLoopThreadPool( EventLoopThreadPool &&) = delete;
+        EventLoopThreadPool &operator=( EventLoopThreadPool &&)= delete;
 
         void run();
 

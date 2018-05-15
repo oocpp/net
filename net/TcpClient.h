@@ -20,7 +20,9 @@ namespace net
 
         ~TcpClient()noexcept;
         TcpClient(const TcpClient &) = delete;
-        TcpClient &operator==(const TcpClient &)= delete;
+        TcpClient &operator=(const TcpClient &)= delete;
+        TcpClient(TcpClient &&) = delete;
+        TcpClient &operator=(TcpClient &&)= delete;
 
         /// 线程安全
         /// 主动连服务器，会不断尝试连接
@@ -59,7 +61,7 @@ namespace net
 
         void set_message_cb(MessageCallback &&cb)noexcept;
 
-        void set_connect_failed_cb(ConnectionFailedCallback&cb);
+        void set_connect_failed_cb(const ConnectionFailedCallback&cb);
 
         void set_connect_failed_cb(ConnectionFailedCallback&&cb) noexcept;
 

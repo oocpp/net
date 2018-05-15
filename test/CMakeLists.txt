@@ -8,4 +8,5 @@ add_subdirectory (http)
 add_subdirectory (pingpong)
 add_subdirectory (timer)
 add_subdirectory (echo)
+add_subdirectory (signal)
 

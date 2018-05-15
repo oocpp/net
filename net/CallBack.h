@@ -26,4 +26,6 @@ namespace net
     using EventCallback=std::function<void()>;
 
     using ConnectionFailedCallback = std::function<void(int,const InetAddress&)> ;
+
+    using SignalEventCallback = std::function<void(int)>;
 }

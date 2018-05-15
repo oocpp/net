@@ -27,7 +27,11 @@ namespace net
 
             TimerQueue(const TimerQueue &) = delete;
 
-            TimerQueue &operator==(const TimerQueue &)= delete;
+            TimerQueue &operator=(const TimerQueue &)= delete;
+
+            TimerQueue( TimerQueue &&) = delete;
+
+            TimerQueue &operator=( TimerQueue &&)= delete;
 
             uint64_t add_timer(const EventCallback &cb, time_point when, std::chrono::milliseconds interval);
 

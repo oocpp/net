@@ -202,7 +202,7 @@ namespace net
         _conn_failed_cb=std::move(cb);
     }
 
-    void TcpClient::set_connect_failed_cb(ConnectionFailedCallback &cb) {
+    void TcpClient::set_connect_failed_cb(const ConnectionFailedCallback &cb) {
         _conn_failed_cb=cb;
     }
 }

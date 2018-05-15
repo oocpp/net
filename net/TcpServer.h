@@ -28,7 +28,9 @@ namespace net
         ~TcpServer()noexcept;
 
         TcpServer(const TcpServer &) = delete;
-        TcpServer &operator==(const TcpServer &)= delete;
+        TcpServer &operator=(const TcpServer &)= delete;
+        TcpServer(TcpServer &&) = delete;
+        TcpServer &operator=(TcpServer &&)= delete;
 
         /// 添加新的监听，可同时监听多个ip:port
         void add_acceptor(const InetAddress &addr,int backlog = SOMAXCONN);

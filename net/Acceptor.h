@@ -26,7 +26,7 @@ namespace net
 
             Accepter(const Accepter &) = delete;
 
-            Accepter &operator==(const Accepter &)= delete;
+            Accepter &operator=(const Accepter &)= delete;
 
             void set_new_connection_cb(const NewConnCallback &cb);
 

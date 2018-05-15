@@ -22,6 +22,7 @@ set(SOURCE_FILES
         Timer.cpp
         TimerQueue.cpp
         Log.cpp
+        SignalWatcher.cpp
         )
 
 set(target_name ${lib_name})
@@ -54,6 +55,7 @@ set(HEAD_FILES
         Any.h
         CallBack.h
         NetFwd.h
+        SignalWatcher.h
         )
 
 INSTALL(FILES ${HEAD_FILES} DESTINATION ${PROJECT_BINARY_DIR}/include/)

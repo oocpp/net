@@ -23,7 +23,9 @@ namespace net
         ~TcpConnection()noexcept;
 
         TcpConnection(const TcpConnection &) = delete;
-        TcpConnection &operator==(const TcpConnection &)= delete;
+        TcpConnection &operator=(const TcpConnection &)= delete;
+        TcpConnection(TcpConnection &&) = delete;
+        TcpConnection &operator=(TcpConnection &&)= delete;
 
         /// 线程安全
         /// 关闭连接，只是调用了shutdown write
