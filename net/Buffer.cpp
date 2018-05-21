@@ -275,4 +275,9 @@ namespace net
     {
         _buff.resize(len);
     }
+
+    void Buffer::to_text() {
+        append_int8('\0');
+        --_write_index;
+    }
 }

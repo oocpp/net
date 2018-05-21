@@ -21,6 +21,7 @@ void onConnection(const TCPConnPtr& conn)
 
 void onMessage(const TCPConnPtr& conn, Buffer* buf)
 {
+    buf->to_text();
     LOG_INFO<<buf->read_ptr();
     buf->clear();
 }

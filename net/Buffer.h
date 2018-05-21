@@ -48,6 +48,9 @@ namespace net
 
         void append(const Buffer &buff);
 
+        /// 添加'\0'，但不改变数据长度
+        void to_text();
+
         void append(std::initializer_list<std::pair<const char *, std::size_t>> args);
 
     public:

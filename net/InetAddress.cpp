@@ -1,37 +1,36 @@
 #include <arpa/inet.h>
 #include <cstring>
 #include <cassert>
-
+#include <cstddef>
 #include "Log.h"
 #include "InetAddress.h"
 
 namespace net {
-    static_assert(sizeof(InetAddress) == sizeof(struct sockaddr_in6), "InetAddress is same size as sockaddr_in6");
-    static_assert(offsetof(sockaddr_in, sin_family) == 0, "sin_family offset 0");
-    static_assert(offsetof(sockaddr_in6, sin6_family) == 0, "sin6_family offset 0");
-    static_assert(offsetof(sockaddr_in, sin_port) == 2, "sin_port offset 2");
-    static_assert(offsetof(sockaddr_in6, sin6_port) == 2, "sin6_port offset 2");
-
     InetAddress::InetAddress() noexcept
             :_addr6{}
     {
-    }
-
-    InetAddress::InetAddress(const std::string &ip, uint16_t port,  bool ipv6)
-        :_addr6{}
-    {
+        static_assert(sizeof(InetAddress) == sizeof(struct sockaddr_in6), "InetAddress is same size as sockaddr_in6");
+        static_assert(offsetof(sockaddr_in, sin_family) == 0, "sin_family offset 0");
+        static_assert(offsetof(sockaddr_in6, sin6_family) == 0, "sin6_family offset 0");
+        static_assert(offsetof(sockaddr_in, sin_port) == 2, "sin_port offset 2");
+        static_assert(offsetof(sockaddr_in6, sin6_port) == 2, "sin6_port offset 2");
         static_assert(offsetof(InetAddress, _addr6) == 0, "addr6_ offset 0");
         static_assert(offsetof(InetAddress, _addr) == 0, "addr_ offset 0");
+    }
 
+    InetAddress::InetAddress(const std::string &ip, uint16_t port,  bool ipv4)
+        :_addr6{}
+    {
         _addr.sin_port = htons(port);
 
-        if (!ipv6) {
+        if (ipv4) {
             _addr.sin_family = AF_INET;
 
             if (::inet_pton(AF_INET, ip.c_str(), &_addr.sin_addr) <= 0) {
                 LOG_ERROR << "inet_pton 失败";
             }
-        } else {
+        }
+        else {
             _addr.sin_family = AF_INET6;
             if (::inet_pton(AF_INET6, ip.c_str(), &_addr6.sin6_addr) <= 0) {
                 LOG_ERROR << "inet_pton 失败";
@@ -50,18 +49,18 @@ namespace net {
     }
 
 
-    InetAddress::InetAddress(uint16_t port, bool ipv6)
+    InetAddress::InetAddress(uint16_t port, bool addr_any, bool ipv4)
             :_addr6{}
     {
-        std::memset(&_addr6, 0, size6());
         _addr.sin_port = htons(port);
 
-        if (!ipv6) {
+        if (ipv4) {
             _addr.sin_family = AF_INET;
-            _addr.sin_addr.s_addr = htonl(INADDR_LOOPBACK);
-        } else {
+            _addr.sin_addr.s_addr = htonl(addr_any? INADDR_ANY:INADDR_LOOPBACK);
+        }
+        else {
             _addr6.sin6_family = AF_INET6;
-            _addr6.sin6_addr = in6addr_loopback;
+            _addr6.sin6_addr = addr_any?in6addr_any:in6addr_loopback;
         }
     }
 

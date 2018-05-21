@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 2.8)
 project(net-library)
 
 if(NOT CMAKE_BUILD_TYPE)

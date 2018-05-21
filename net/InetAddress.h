@@ -10,14 +10,15 @@ namespace net
     public:
         InetAddress() noexcept ;
 
-        InetAddress(const std::string &ip, uint16_t port, bool ipv6 = false);
+        InetAddress(const std::string &ip, uint16_t port, bool ipv4 = true);
 
         explicit InetAddress(const sockaddr_in &addr);
 
         explicit InetAddress(const sockaddr_in6 &addr);
 
-        /// 自动使用回环地址
-        explicit InetAddress(uint16_t port,bool ipv6 = false);
+        /// addr_any true:使用any地址
+        /// false：使用回环地址
+        explicit InetAddress(uint16_t port,bool addr_any = true,bool ipv4 = true);
 
         const sockaddr *to_sockaddr() const;
 
