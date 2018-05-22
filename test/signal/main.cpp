@@ -26,7 +26,7 @@ int main() {
     loop.run_after(3s,[]{raise(SIGCHLD);});
     loop.run_after(5s,[]{raise(SIGCHLD);});
     loop.run_after(7s,[]{
-        sig_handler.clear(SIGCHLD);
+        sig_handler.cancel(SIGCHLD);
         raise(SIGCHLD);
         LOG_INFO<<"signal cancel";
     });
@@ -35,3 +35,4 @@ int main() {
 
     LOG_INFO<<"exit";
 }
+

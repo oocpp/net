@@ -35,7 +35,7 @@ namespace
 
 #pragma GCC diagnostic error "-Wold-style-cast"
 
-    IgnoreSigPipe initObj;
+    // IgnoreSigPipe initObj; //当前的设计是否有可能触发这个？
 }
 
 namespace net
