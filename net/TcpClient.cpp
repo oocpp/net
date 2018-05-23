@@ -152,37 +152,37 @@ namespace net
 
     void TcpClient::set_connection_cb(const ConnectingCallback &cb)
     {
-        assert(_status == Disconnected);
+        assert(_status != Connecting);
         _connecting_cb = cb;
     }
 
     void TcpClient::set_message_cb(const MessageCallback &cb)
     {
-        assert(_status == Disconnected);
+        assert(_status != Connecting);
         _message_cb = cb;
     }
 
     void TcpClient::set_write_complete_cb(const WriteCompleteCallback &cb)
     {
-        assert(_status == Disconnected);
+        assert(_status != Connecting);
         _write_complete_cb = cb;
     }
 
     void TcpClient::set_connection_cb(ConnectingCallback &&cb) noexcept
     {
-        assert(_status == Disconnected);
+        assert(_status != Connecting);
         _connecting_cb = std::move(cb);
     }
 
     void TcpClient::set_message_cb(MessageCallback &&cb)noexcept
     {
-        assert(_status == Disconnected);
+        assert(_status != Connecting);
         _message_cb = std::move(cb);
     }
 
     void TcpClient::set_write_complete_cb(WriteCompleteCallback &&cb)noexcept
     {
-        assert(_status == Disconnected);
+        assert(_status != Connecting);
         _write_complete_cb = std::move(cb);
     }
 

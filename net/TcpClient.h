@@ -57,20 +57,20 @@ namespace net
 
         void set_write_complete_cb(const WriteCompleteCallback &cb);
 
-        void set_connection_cb(ConnectingCallback &&cb)noexcept;
+        void set_connection_cb(ConnectingCallback &&cb = nullptr)noexcept;
 
-        void set_message_cb(MessageCallback &&cb)noexcept;
+        void set_message_cb(MessageCallback &&cb = nullptr)noexcept;
 
         void set_connect_failed_cb(const ConnectionFailedCallback&cb);
 
-        void set_connect_failed_cb(ConnectionFailedCallback&&cb) noexcept;
+        void set_connect_failed_cb(ConnectionFailedCallback&&cb = nullptr) noexcept;
 
-        void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
+        void set_write_complete_cb(WriteCompleteCallback &&cb = nullptr)noexcept;
 
         /// context 可用来保存自定义的数据
-        void set_context(const Any &a);
+        void set_context(const Any &a = Any{});
 
-        void set_context(Any &&a);
+        void set_context(Any &&a = Any{});
 
         Any &get_context();
 

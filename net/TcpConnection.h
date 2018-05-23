@@ -42,11 +42,16 @@ namespace net
 
         void set_write_complete_cb(const WriteCompleteCallback &cb);
 
-        void set_message_cb(MessageCallback &&cb)noexcept;
+        void set_message_cb(MessageCallback &&cb = nullptr)noexcept;
 
-        void set_high_water_cb(HighWaterMarkCallback &&cb, size_t mark)noexcept;
+        void set_high_water_cb(HighWaterMarkCallback &&cb = nullptr, size_t mark = 0)noexcept;
 
-        void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
+        void set_write_complete_cb(WriteCompleteCallback &&cb = nullptr)noexcept;
+
+        /// 被调用，在链接成功后，或者链接关闭后
+        void set_connection_cb(const ConnectingCallback &cb);
+
+        void set_connection_cb(ConnectingCallback &&cb = nullptr)noexcept;
 
         EventLoop *loop()noexcept;
 
@@ -56,9 +61,9 @@ namespace net
         int fd() const noexcept;
 
         // context 可用来保存自定义的数据
-        void set_context(const Any &a);
+        void set_context(const Any &a = Any{});
 
-        void set_context(Any &&a)noexcept;
+        void set_context(Any &&a = Any{})noexcept;
 
         Any &get_context();
 
@@ -80,13 +85,11 @@ namespace net
         
         void reserve_output_buffer(size_t len);
 
-    public: /// 用户不应该使用下面的函数
+        friend class TcpClient;
+        friend class TcpServer;
+    protected: /// 用户不应该使用下面的函数
 
         void attach_to_loop();
-
-        void set_connection_cb(const ConnectingCallback &cb);
-
-        void set_connection_cb(ConnectingCallback &&cb)noexcept;
 
         void set_close_cb(const CloseCallback &cb);
 

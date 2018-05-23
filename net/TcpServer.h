@@ -57,11 +57,11 @@ namespace net
 
         void set_write_complete_cb(const WriteCompleteCallback &cb);
 
-        void set_connection_cb(ConnectingCallback &&cb) noexcept;
+        void set_connection_cb(ConnectingCallback &&cb = nullptr) noexcept;
 
-        void set_message_cb(MessageCallback &&cb) noexcept;
+        void set_message_cb(MessageCallback &&cb = nullptr) noexcept;
 
-        void set_write_complete_cb(WriteCompleteCallback &&cb)noexcept;
+        void set_write_complete_cb(WriteCompleteCallback &&cb = nullptr)noexcept;
 
         const std::string& name() const;
 

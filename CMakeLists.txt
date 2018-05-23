@@ -29,4 +29,4 @@ SET(DEPENDENT_LIBRARIES pthread)
 SET(lib_name "net")
 
 add_subdirectory (net)
-add_subdirectory (test)
+add_subdirectory (example)

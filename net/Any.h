@@ -17,7 +17,9 @@ namespace net
             delete _value_ptr;
         }
 
-        template<typename ValueType>
+        template<typename ValueType
+                ,typename=std::enable_if<!std::is_same<typename std::decay<ValueType>::type,Any>::value
+                        &&std::is_copy_constructible<typename std::decay<ValueType>::type>::value> >
         explicit Any(ValueType &&value)
                 : _value_ptr(new AnyImpl<typename std::decay<ValueType>::type>(std::forward<ValueType>(value)))
         {}
@@ -107,6 +109,10 @@ namespace net
         {
             AnyImpl(const ValueType &value)
                     : _value(value)
+            {}
+
+            AnyImpl(ValueType &&value)
+                    : _value(std::move(value))
             {}
 
             virtual const std::type_info &type() const noexcept
