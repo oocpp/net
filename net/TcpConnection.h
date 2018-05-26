@@ -95,6 +95,8 @@ namespace net
 
         void set_close_cb(CloseCallback &&cb)noexcept;
 
+        bool is_active_shutdown() const noexcept;
+
     private:
         void handle_read();
 
@@ -126,6 +128,7 @@ namespace net
 
         InetAddress _local_addr;
         InetAddress _peer_addr;
+        bool _active_shutdown; //主动关闭连接，以便TcpClient类判断是否需要重连
         Buffer _in_buff;
         Buffer _out_buff;
 

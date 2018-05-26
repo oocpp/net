@@ -111,7 +111,7 @@ namespace net
         _connection.reset();
 
         Status t = Connected;
-        if (_retry && _status.compare_exchange_strong(t, Connecting)) {
+        if (_retry &&!conn->is_active_shutdown()&& _status.compare_exchange_strong(t, Connecting)) {
             LOG_INFO << "retry";
             _connector->restart();
         }

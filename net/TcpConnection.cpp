@@ -16,6 +16,7 @@ namespace net
               , _status(Disconnected)
               , _local_addr(local_addr)
               , _peer_addr(peer_add)
+              ,_active_shutdown(false)
     {
         _event.set_read_cb([this] { handle_read(); });
         _event.set_write_cb([this] { handle_write(); });
@@ -32,7 +33,7 @@ namespace net
     {
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Disconnecting)) {
-
+            _active_shutdown=true;
             auto temp = shared_from_this();
             _loop->queue_in_loop([temp] { temp->shutdown_in_loop(); });
         }
@@ -50,7 +51,7 @@ namespace net
     {
         Status t = Connected;
         if (_status.compare_exchange_strong(t, Disconnecting)) {
-
+            _active_shutdown=true;
             auto temp = shared_from_this();
             _loop->queue_in_loop([temp,call_close_cb] { temp->handle_close(call_close_cb); });
         }
@@ -353,5 +354,9 @@ namespace net
     void TcpConnection::reserve_output_buffer(size_t len)
     {
         _out_buff.reserve(len);
+    }
+
+    bool TcpConnection::is_active_shutdown() const noexcept {
+        return _active_shutdown;
     }
 }
